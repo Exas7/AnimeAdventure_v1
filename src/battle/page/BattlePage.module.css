@@ -35,8 +35,8 @@
   font-size: 0.9em;
 }
 
-/* Only the page's own buttons: the character menu keeps its look. */
-.page :where(.actions, .controls, .knobs, .memberButtons) button {
+/* Only these pieces' own buttons, on the test page and in the director's fight dialog: the character menu keeps its look. */
+:where(.actions, .controls, .knobs, .memberButtons) button {
   padding: 6px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -44,7 +44,7 @@
   color: var(--text);
 }
 
-.page :where(.actions, .controls, .knobs, .memberButtons) button:disabled {
+:where(.actions, .controls, .knobs, .memberButtons) button:disabled {
   opacity: 0.45;
   cursor: default;
 }
@@ -120,7 +120,7 @@
   margin-left: auto;
 }
 
-.page .memberButtons button {
+.memberButtons button {
   padding: 1px 8px;
 }
 

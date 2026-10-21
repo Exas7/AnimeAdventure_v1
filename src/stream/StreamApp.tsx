@@ -22,12 +22,15 @@ export function StreamApp() {
 
   useEffect(() => {
     const channel = openSyncChannel((message) => {
+      // A fight goes first; any other message means the fight is over (spec 037, D-058).
       if (message.type === 'view') {
         setView(message.view);
         setChoice(null);
+        setBattle(null);
         setHeardFromDirector(true);
       } else if (message.type === 'starterChoice') {
         setChoice(message.choice);
+        setBattle(null);
         setHeardFromDirector(true);
       } else if (message.type === 'battle') {
         setBattle(message.battle);

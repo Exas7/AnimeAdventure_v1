@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   TEAM_SIZE,
+  trainingRule,
   type PanelMission,
   type Character,
   type ItemDefinition,
@@ -22,6 +23,8 @@ export interface PlayerPanelActions {
   setPowerUses(powerId: string, uses: number): void;
   addItem(itemId: string): void;
   removeItem(itemId: string): void;
+  /** "Usa" on a training item (spec 041): opens its window. */
+  trainItem(itemId: string): void;
   /** "Completata": the reward by hand, even if the app has not noticed (spec 026, 2.4). */
   completeMission(nodeId: string): void;
   abandonMission(missionId: number): void;
@@ -42,6 +45,10 @@ export function PlayerPanel(props: PlayerPanelProps) {
   const { playerId, player, catalog, items, isCurrent, actions } = props;
   const itemName = (itemId: string) =>
     items.find((item) => item.id === itemId)?.name ?? itemId;
+  const isTraining = (itemId: string) => {
+    const item = items.find((candidate) => candidate.id === itemId);
+    return item !== undefined && trainingRule(item) !== undefined;
+  };
   const nameOf = (characterId: string) =>
     catalog.find((character) => character.id === characterId)?.name ?? characterId;
   const slots = Array.from({ length: TEAM_SIZE }, (_, index) => player.team[index]);
@@ -170,6 +177,15 @@ export function PlayerPanel(props: PlayerPanelProps) {
           {player.inventory.map((itemId, index) => (
             <span key={`${itemId}-${index}`} className={styles.item}>
               {itemName(itemId)}
+              {actions && isTraining(itemId) && (
+                <button
+                  className={styles.use}
+                  title={`Usa ${itemName(itemId)}: scegli chi sale di forma`}
+                  onClick={() => actions.trainItem(itemId)}
+                >
+                  Usa
+                </button>
+              )}
               {actions && (
                 <button
                   title={`Togli ${itemName(itemId)} (usato)`}

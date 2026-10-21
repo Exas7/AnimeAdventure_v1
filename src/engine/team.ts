@@ -53,6 +53,45 @@ export function joinTeam(
   addToTeam(state, context, playerId, characterId, out);
 }
 
+/**
+ * "Aggiorna la squadra" (spec 037, 2.4, D-060): each new form takes the place
+ * of the old one in the team, and the starter follows it. A form already in
+ * a team only warns (D-008).
+ */
+export function transformInTeam(
+  state: GameState,
+  context: GameContext,
+  playerId: PlayerId,
+  changes: readonly { from: string; to: string }[],
+  out: ActionOutput,
+): void {
+  for (const { from, to } of changes) {
+    const character = findCharacter(context.catalog, to);
+    const holder = PLAYER_IDS.find((id) => state.players[id].team.includes(to));
+    if (holder !== undefined) {
+      warn(
+        out,
+        'characterInTeam',
+        `${character.name} è già nella squadra di ${state.players[holder].name}`,
+      );
+    }
+    replaceInTeam(state, playerId, from, character.id);
+  }
+}
+
+/** The new form takes the place of the old one in the team, and the starter follows it (D-060). */
+export function replaceInTeam(state: GameState, playerId: PlayerId, from: string, to: string): void {
+  const player = state.players[playerId];
+  const index = player.team.indexOf(from);
+  if (index === -1) {
+    throw new EngineError(`Character "${from}" is not in the team of ${player.name}`);
+  }
+  player.team[index] = to;
+  if (player.starterId === from) {
+    player.starterId = to;
+  }
+}
+
 export function removeFromTeam(
   state: GameState,
   playerId: PlayerId,

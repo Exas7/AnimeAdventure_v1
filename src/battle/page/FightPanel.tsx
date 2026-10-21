@@ -1,8 +1,15 @@
 import { BAR_HP, SIDES, type FightRecord, type FightSettings, type Side } from '../fight';
-import { afterNextExchange, describeStep, formatHp, SIDE_NAMES, snapshotAt } from '../playback';
+import {
+  afterNextExchange,
+  describeStep,
+  fighterAt,
+  formatHp,
+  SIDE_NAMES,
+  snapshotAt,
+  type SideNames,
+} from '../playback';
+import type { Speed } from '../usePlayback';
 import styles from './BattlePage.module.css';
-
-export type Speed = 1 | 2 | 4;
 
 const SPEEDS: readonly Speed[] = [1, 2, 4];
 
@@ -18,6 +25,8 @@ interface FightPanelProps {
   onShown: (shown: number) => void;
   onPlaying: (playing: boolean) => void;
   onSpeed: (speed: Speed) => void;
+  /** Missing: "Squadra A" and "Squadra B". */
+  names?: SideNames;
 }
 
 function formText(form: number): string {
@@ -31,12 +40,13 @@ function formText(form: number): string {
 /** One fight told step by step (2.10): who is on the field, health, switch gauges and the log. */
 export function FightPanel(props: FightPanelProps) {
   const { record, settings, shown, playing, speed, onShown, onPlaying, onSpeed } = props;
+  const names = props.names ?? SIDE_NAMES;
   const snapshot = snapshotAt(record, shown);
   const finished = shown >= record.steps.length;
   const lastEvent = record.steps[shown - 1]?.event;
   const log = Array.from({ length: shown }, (_, index) => ({
     exchange: record.steps[index]?.event.exchange ?? 0,
-    text: describeStep(record, index),
+    text: describeStep(record, index, names),
   })).reverse();
 
   return (
@@ -77,12 +87,12 @@ export function FightPanel(props: FightPanelProps) {
         </span>
       </div>
 
-      <p className={styles.banner}>{shown > 0 ? describeStep(record, shown - 1) : 'Si comincia!'}</p>
+      <p className={styles.banner}>{shown > 0 ? describeStep(record, shown - 1, names) : 'Si comincia!'}</p>
 
       {SIDES.map((side: Side) => (
         <div key={side} className={`${styles.board} ${styles[side]}`}>
           <div className={styles.boardHead}>
-            <span className={styles.teamName}>{SIDE_NAMES[side]}</span>
+            <span className={styles.teamName}>{names[side]}</span>
             <span className={styles.note}>{formText(record.form[side])}</span>
             <span className={styles.gauge} title="Barra di ricarica del cambio">
               Cambio
@@ -95,7 +105,8 @@ export function FightPanel(props: FightPanelProps) {
             </span>
           </div>
           <div className={styles.cards}>
-            {record.teams[side].map((fighter, index) => {
+            {record.teams[side].map((_, index) => {
+              const fighter = fighterAt(record, snapshot, side, index);
               const hp = snapshot.hp[side][index] ?? 0;
               const classes = [
                 styles.card,

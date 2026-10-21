@@ -241,6 +241,24 @@ export interface ItemDefinition {
    * and the host applies their effect by hand.
    */
   onPurchase?: 'rechargeStarter';
+  /** Training items (spec 041, D-067): "Usa" makes characters of the team take later forms. */
+  training?: TrainingRule;
+}
+
+/**
+ * How far a training item goes: at most `characters` characters, each up
+ * `formsEach` forms, `formsTotal` forms in all. A guide, not a block (D-008).
+ */
+export interface TrainingRule {
+  characters: number;
+  formsEach: number;
+  formsTotal: number;
+}
+
+/** A character of the team and how many forms it goes up. */
+export interface TrainingChoice {
+  characterId: string;
+  forms: number;
 }
 
 /** Any catalog character, with the powers the host chose for this game. */
@@ -403,7 +421,12 @@ export type GameAction =
   // Missions (spec 026): accepted by a player, completed with the reward, or abandoned.
   | { type: 'acceptMission'; nodeId: string; player: PlayerId }
   | { type: 'completeMission'; nodeId: string; player: PlayerId }
-  | { type: 'abandonMission'; missionId: number };
+  | { type: 'abandonMission'; missionId: number }
+  // "Aggiorna la squadra" (spec 037, 2.4): characters that transformed in a
+  // simulated fight take their new form in the team.
+  | { type: 'transformCharacters'; player: PlayerId; changes: { from: string; to: string }[] }
+  // "Usa" on a training item (spec 041): the chosen characters take later forms, the item is used up.
+  | { type: 'useTraining'; player: PlayerId; itemId: string; choices: TrainingChoice[] };
 
 export type RecordedAction = { type: 'startGame' } | GameAction;
 
@@ -432,7 +455,9 @@ export type WarningKind =
   | 'otherPlayerPawn'
   // Missions (spec 026): accepted twice, or completed by the other player first.
   | 'missionAlreadyActive'
-  | 'missionTaken';
+  | 'missionTaken'
+  // A training item used past its rule (spec 041).
+  | 'trainingRule';
 
 /** Non-blocking warning for the host, shown only in the director window (D-008). */
 export interface Warning {

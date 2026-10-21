@@ -66,6 +66,8 @@ import { decideClick, type PendingAction } from './confirmation';
 import { ContextMenu, type MenuState } from './ContextMenu';
 import { CorrectionsPanel } from './CorrectionsPanel';
 import { DiscardGameDialog } from './DiscardGameDialog';
+import { GameFight, type FightSetup } from './GameFight';
+import { TrainingDialog } from './TrainingDialog';
 import { downloadGame, readGameFile } from './fileIO';
 import { LogPanel } from './LogPanel';
 import { MessageBar } from './MessageBar';
@@ -93,7 +95,7 @@ import {
 } from './screens';
 import { showdownDue } from './showdown';
 import { StarterChoiceStage } from './StarterChoiceStage';
-import { sheetProblemsNotice } from './startMenu';
+import { catalogImportedNotice } from './startMenu';
 import { StartScreen } from './StartScreen';
 import { Toolbar } from './Toolbar';
 import { useGameSession } from './useGameSession';
@@ -155,6 +157,10 @@ export function DirectorApp() {
   const [startNotice, setStartNotice] = useState<string[]>([]);
   // "Chiudi e cancella partita" waiting for the host's confirmation (D-030).
   const [discardAsked, setDiscardAsked] = useState(false);
+  // "Simula" (spec 037, 2.4-2.5): the simulated fight being prepared or told.
+  const [fightSetup, setFightSetup] = useState<FightSetup | null>(null);
+  // "Usa" on a training item (spec 041): whose inventory, which item.
+  const [training, setTraining] = useState<{ player: PlayerId; itemId: string } | null>(null);
   // A character's scene, or the board, for the director only, over what the stream shows (D-032).
   const [preview, setPreview] = useState<DirectorPreview | null>(null);
 
@@ -448,6 +454,8 @@ export function DirectorApp() {
   };
 
   const importCatalogFile = (file: File) => {
+    // The notice of an earlier import is not about this one.
+    setStartNotice([]);
     file
       .text()
       .then(async (text) => {
@@ -465,7 +473,7 @@ export function DirectorApp() {
         setImportedCatalog(result.catalog);
         session.clearError();
         // Wrong sheet values do not stop the import: they count as empty (spec 037, 2.2).
-        setStartNotice(sheetProblemsNotice(result.sheetProblems));
+        setStartNotice(catalogImportedNotice(result.summary, result.sheetProblems));
       })
       .catch((cause: unknown) => showError(`Impossibile importare la lista: ${describeError(cause)}`));
   };
@@ -798,6 +806,7 @@ export function DirectorApp() {
       perform({ type: 'setPowerUses', player: playerId, powerId, uses }),
     addItem: (itemId) => perform({ type: 'addToInventory', player: playerId, itemId }),
     removeItem: (itemId) => perform({ type: 'removeFromInventory', player: playerId, itemId }),
+    trainItem: (itemId) => setTraining({ player: playerId, itemId }),
     completeMission: (nodeId) => perform({ type: 'completeMission', nodeId, player: playerId }),
     abandonMission: (missionId) => perform({ type: 'abandonMission', missionId }),
   });
@@ -909,6 +918,12 @@ export function DirectorApp() {
                   )}
                   {mission?.type === 'fight' && (
                     <>
+                      <button
+                        title="Simula lo scontro sulla stream invece di giocarlo in BT3"
+                        onClick={() => setFightSetup({ kind: 'mission', nodeId, player: current })}
+                      >
+                        Simula
+                      </button>
                       {complete(mission.condition === 'transform' ? 'Si è trasformato' : 'Vinta')}
                       <button onClick={close}>Persa</button>
                     </>
@@ -943,6 +958,12 @@ export function DirectorApp() {
             }}
             showdownControls={
               <>
+                <button
+                  title="Simula lo showdown sulla stream invece di giocarlo in BT3"
+                  onClick={() => setFightSetup({ kind: 'showdown' })}
+                >
+                  Simula
+                </button>
                 {exploreButton}
                 <button onClick={() => session.setOverlay(null)}>Chiudi</button>
               </>
@@ -1027,6 +1048,36 @@ export function DirectorApp() {
       {menu && <ContextMenu menu={menu} onClose={closeMenu} />}
       {discardAsked && (
         <DiscardGameDialog onCancel={closeDiscardDialog} onConfirm={discardGame} />
+      )}
+      {fightSetup && (
+        <GameFight
+          game={game}
+          state={state}
+          setup={fightSetup}
+          perform={perform}
+          onView={session.setBattle}
+          onLost={() => applyScreens(closeShown(screens))}
+          onClose={() => setFightSetup(null)}
+        />
+      )}
+      {training && (
+        <TrainingDialog
+          game={game}
+          state={state}
+          player={training.player}
+          itemId={training.itemId}
+          onConfirm={(choices) => {
+            // The window already showed its guides: not repeated in the message bar.
+            const done = perform(
+              { type: 'useTraining', player: training.player, itemId: training.itemId, choices },
+              { alreadyShown: ['trainingRule', 'characterAlreadyPlaced'] },
+            );
+            if (done) {
+              setTraining(null);
+            }
+          }}
+          onClose={() => setTraining(null)}
+        />
       )}
     </div>
   );

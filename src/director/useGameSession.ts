@@ -17,6 +17,7 @@ import { clearAutosave, saveAutosave } from '../storage/autosave';
 import { openSyncChannel, type SyncChannel } from '../sync/channel';
 import { directorMessage, isShowing } from '../sync/directorMessage';
 import { DEFAULT_LAYOUT, type Overlay, type StreamLayout } from '../sync/liveView';
+import type { BattleView } from '../battle/playback';
 import type { StarterChoiceView } from '../starters/starterChoice';
 import { describeError } from '../describeError';
 
@@ -55,6 +56,11 @@ export interface GameSession {
    * instead of the game; null gives the stream back to the game.
    */
   setStarterChoice(choice: StarterChoiceView | null): void;
+  /**
+   * A simulated fight (spec 037, D-058): while set, the stream shows it
+   * instead of everything else; null gives the stream back to the game.
+   */
+  setBattle(battle: BattleView | null): void;
   closeNotification(notificationId: number): void;
   showError(message: string): void;
   clearError(): void;
@@ -69,6 +75,7 @@ export function useGameSession(): GameSession {
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [layout, setLayout] = useState<StreamLayout>(DEFAULT_LAYOUT);
   const [starterChoice, setStarterChoice] = useState<StarterChoiceView | null>(null);
+  const [battle, setBattle] = useState<BattleView | null>(null);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [error, setError] = useState<string | null>(null);
   // What "Ripeti" can bring back: kept in this session only, never saved (spec 021).
@@ -77,8 +84,8 @@ export function useGameSession(): GameSession {
   // The latest values, readable from callbacks and timers without waiting for a render.
   const gameRef = useRef<Game | null>(null);
   const redoRef = useRef<HistoryEntry[]>([]);
-  const viewRef = useRef({ game, overlay, layout, starterChoice });
-  viewRef.current = { game, overlay, layout, starterChoice };
+  const viewRef = useRef({ game, overlay, layout, starterChoice, battle });
+  viewRef.current = { game, overlay, layout, starterChoice, battle };
 
   const setGame = useCallback((next: Game | null) => {
     gameRef.current = next;
@@ -187,12 +194,12 @@ export function useGameSession(): GameSession {
   }, []);
 
   useEffect(() => {
-    const message = directorMessage({ game, overlay, layout, starterChoice }, showingRef.current);
+    const message = directorMessage({ game, overlay, layout, starterChoice, battle }, showingRef.current);
     if (message) {
       channelRef.current?.send(message);
       showingRef.current = isShowing(message);
     }
-  }, [game, overlay, layout, starterChoice]);
+  }, [game, overlay, layout, starterChoice, battle]);
 
   // --- Automatic save (D-011) ----------------------------------------------
   useEffect(() => {
@@ -262,6 +269,7 @@ export function useGameSession(): GameSession {
     setOverlay,
     setLayout,
     setStarterChoice,
+    setBattle,
     closeNotification,
     showError: setError,
     clearError: () => setError(null),

@@ -47,6 +47,7 @@ export const testItems: ItemDefinition[] = [
     price: 200,
     copiesPerShop: null,
     oncePerPlayer: true,
+    training: { characters: 1, formsEach: 1, formsTotal: 1 },
   },
   {
     id: 'gravity-room',
@@ -54,6 +55,7 @@ export const testItems: ItemDefinition[] = [
     price: 400,
     copiesPerShop: null,
     oncePerPlayer: true,
+    training: { characters: 2, formsEach: 2, formsTotal: 2 },
   },
   {
     id: 'time-chamber',
@@ -61,6 +63,7 @@ export const testItems: ItemDefinition[] = [
     price: 700,
     copiesPerShop: null,
     oncePerPlayer: true,
+    training: { characters: 2, formsEach: 2, formsTotal: 4 },
   },
   { id: 'flying-nimbus', name: 'Nuvola Speedy', price: 250, copiesPerShop: null, oncePerPlayer: false },
   {

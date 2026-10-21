@@ -1,11 +1,14 @@
-import type { Character } from '../engine';
+import { personOf, personOfId, type Character } from '../engine';
 
-// The forms of one person (D-048): "Son Gohan SSJ" and "Son Gohan SSJ2" are
-// two characters of the list, but the same person.
+// The forms of one person (D-048, D-064): "Son Gohan SSJ" and "Son Gohan
+// SSJ2" are two characters of the list, but the same person. In a game a
+// person stands in one place only (spec 039).
 
-/** The person of a character: the "persona" column, or the character alone. */
-export function personOf(character: Character): string {
-  return character.person?.trim() || `#${character.id}`;
+export { personOf };
+
+/** The persons of these characters of the list; a code not in the list is a person alone. */
+export function personsOf(ids: Iterable<string>, catalog: readonly Character[]): Set<string> {
+  return new Set([...ids].map((id) => personOfId(catalog, id)));
 }
 
 export function samePerson(a: Character | undefined, b: Character | undefined): boolean {

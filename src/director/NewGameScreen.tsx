@@ -20,6 +20,7 @@ import {
 } from './mapGroups';
 import { playerNames, type NewGameForm, type PlayerForm } from './newGame';
 import { RandomReportTiles } from './RandomReportTiles';
+import { WHERE_TO_IMPORT_CATALOG } from './startMenu';
 import styles from './Screens.module.css';
 
 interface NewGameScreenProps {
@@ -226,7 +227,7 @@ export function NewGameUnavailable({ missing, onOpenMaps, onBack }: NewGameUnava
       <h1 className={styles.title}>Nuova partita</h1>
       <p className={styles.note}>
         {missing === 'catalog'
-          ? 'Serve la lista dei personaggi: importala dal menu iniziale con "Importa lista personaggi".'
+          ? `Serve la lista dei personaggi: importala ${WHERE_TO_IMPORT_CATALOG}.`
           : "Non c'è nessuna mappa: disegnane una con l'editor delle mappe."}
       </p>
       <div className={styles.choices}>

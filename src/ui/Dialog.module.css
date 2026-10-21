@@ -22,6 +22,10 @@
   background: var(--bg);
 }
 
+.narrow {
+  width: min(520px, 100%);
+}
+
 .title {
   margin: 0;
   font-size: 1.2em;

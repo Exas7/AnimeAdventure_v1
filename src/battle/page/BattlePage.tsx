@@ -14,15 +14,14 @@ import {
   type FightStats,
   type Side,
 } from '../fight';
-import { eventDuration, type BattleView } from '../playback';
-import { FightPanel, type Speed } from './FightPanel';
+import type { BattleView } from '../playback';
+import { usePlayback } from '../usePlayback';
+import { FightPanel } from './FightPanel';
 import { Knobs } from './Knobs';
 import { StatsPanel } from './StatsPanel';
 import { TeamColumn } from './TeamColumn';
 import styles from './BattlePage.module.css';
 
-/** Pause before the first event, at speed 1×. */
-const START_PAUSE = 1000;
 const STATS_FIGHTS = 1000;
 
 /**
@@ -31,23 +30,22 @@ const STATS_FIGHTS = 1000;
  */
 export function BattlePage() {
   // Everyone with a tier can fight (2.6).
-  const fighters = useMemo(
-    () =>
-      new Map(
-        includedCatalog().flatMap((character) => {
-          const fighter = fighterOf(character);
-          return fighter ? [[fighter.id, { character, fighter }] as const] : [];
-        }),
-      ),
-    [],
-  );
+  const fighters = useMemo(() => {
+    const catalog = includedCatalog();
+    return new Map(
+      catalog.flatMap((character) => {
+        // With the list, so the forms it can transform into come along (spec 037, 2.3).
+        const fighter = fighterOf(character, catalog);
+        return fighter ? [[fighter.id, { character, fighter }] as const] : [];
+      }),
+    );
+  }, []);
   const [teams, setTeams] = useState<Record<Side, string[]>>({ a: [], b: [] });
   const [settings, setSettings] = useState<FightSettings>(DEFAULT_SETTINGS);
   // The fight being told, with the knobs it was played with.
   const [fight, setFight] = useState<{ record: FightRecord; settings: FightSettings } | null>(null);
-  const [shown, setShown] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState<Speed>(1);
+  const playback = usePlayback(fight?.record ?? null);
+  const { shown, speed } = playback;
   const [stats, setStats] = useState<{ stats: FightStats; milliseconds: number } | null>(null);
   const [counting, setCounting] = useState(false);
 
@@ -57,8 +55,6 @@ export function BattlePage() {
       return entry ? [entry.fighter] : [];
     });
   const ready = SIDES.every((side) => teams[side].length > 0);
-
-  const record = fight?.record;
 
   // The stream tells the same fight, in step (2.11, D-055).
   const battle = useMemo<BattleView | null>(
@@ -95,25 +91,10 @@ export function BattlePage() {
     }
   }, [battle]);
 
-  useEffect(() => {
-    if (!record || !playing) {
-      return;
-    }
-    if (shown >= record.steps.length) {
-      setPlaying(false);
-      return;
-    }
-    const last = record.steps[shown - 1];
-    const wait = last ? eventDuration(last.event) : START_PAUSE;
-    const timer = setTimeout(() => setShown((count) => count + 1), wait / speed);
-    return () => clearTimeout(timer);
-  }, [record, playing, shown, speed]);
-
   const simulate = () => {
     const teamsNow = { a: teamFighters('a'), b: teamFighters('b') };
     setFight({ record: recordFight(teamsNow, settings, Math.random), settings });
-    setShown(0);
-    setPlaying(true);
+    playback.restart();
   };
 
   const countMany = () => {
@@ -137,7 +118,7 @@ export function BattlePage() {
       <header className={styles.header}>
         <h1 className={styles.title}>Prova battaglia</h1>
         <p className={styles.note}>
-          Concept della spec 035: non fa parte del gioco. Gli scontri non cambiano nessuna partita.
+          Strumento per tarare il simulatore (spec 035 e 037): gli scontri qui non cambiano nessuna partita.
         </p>
       </header>
 
@@ -178,14 +159,11 @@ export function BattlePage() {
           record={fight.record}
           settings={fight.settings}
           shown={shown}
-          playing={playing}
+          playing={playback.playing}
           speed={speed}
-          onShown={(count) => {
-            setPlaying(false);
-            setShown(count);
-          }}
-          onPlaying={setPlaying}
-          onSpeed={setSpeed}
+          onShown={playback.jump}
+          onPlaying={playback.setPlaying}
+          onSpeed={playback.setSpeed}
         />
       )}
     </div>

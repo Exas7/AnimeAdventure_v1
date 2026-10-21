@@ -1,4 +1,4 @@
-import { samePerson } from '../catalog/person';
+import { onePerPerson, personsOf, samePerson } from '../catalog/person';
 import {
   cellNumber,
   rewardText,
@@ -114,6 +114,9 @@ export function randomizeWithMissions(
   const notes: string[] = [];
   const extras: RandomExtra[] = [];
   const isReserved = (id: string | undefined) => id !== undefined && reserved.includes(id);
+  // One person in one place (spec 039, D-064): the persons of the starters proposed are taken too.
+  const personOfCode = (id: string) => [...personsOf([id], catalog)][0] as string;
+  const reservedPersons = personsOf(reserved, catalog);
 
   // The chosen character cells start empty: what they held is free again.
   const working: Content = { ...content };
@@ -142,9 +145,16 @@ export function randomizeWithMissions(
       continue;
     }
     const used = usedCharacters(working);
+    const usedPersons = personsOf(used, catalog);
+    // The two of a chain may be one person (D-066), never one already elsewhere.
     const entry = chainEntries.find((candidate) =>
       [giverId(candidate), candidate.behindId ?? ''].every(
-        (id) => find(id) && !used.has(id) && !isReserved(id),
+        (id) =>
+          find(id) &&
+          !used.has(id) &&
+          !usedPersons.has(personOfCode(id)) &&
+          !isReserved(id) &&
+          !reservedPersons.has(personOfCode(id)),
       ),
     );
     if (!entry?.behindId) {
@@ -164,15 +174,19 @@ export function randomizeWithMissions(
   // 2. Story characters (D-042): no tier, with missions of their own. A
   // shopkeeper too, when not keeping a shop in this episode (D-047).
   const usedBefore = usedCharacters(working);
-  const storyPool = shuffle(
-    catalog.filter(
-      (character) =>
-        !character.tier &&
-        !usedBefore.has(character.id) &&
-        !isReserved(character.id) &&
-        hasOwnMissions(character.id, sources.catalog),
+  const personsBefore = personsOf(usedBefore, catalog);
+  const storyPool = onePerPerson(
+    shuffle(
+      catalog.filter(
+        (character) =>
+          !character.tier &&
+          !usedBefore.has(character.id) &&
+          !isReserved(character.id) &&
+          hasOwnMissions(character.id, sources.catalog),
+      ),
+      random,
     ),
-    random,
+    new Set([...personsBefore, ...reservedPersons]),
   );
   const storyCells = pickStoryCells(
     new Map([...places].filter(([id]) => cellTargets.includes(id))),
@@ -185,7 +199,12 @@ export function randomizeWithMissions(
     working[cellId] = { ...working[cellId], characterId: storyPool[index]?.id };
   });
 
-  // 3. The usual draw on the other cells and on the shops (spec 022).
+  // 3. The usual draw on the other cells and on the shops (spec 022). The
+  // rewards promised by the cells not chosen are places too (D-066): the draw
+  // leaves them, and their persons, out.
+  const promised = Object.entries(working)
+    .filter(([id]) => !cellTargets.includes(id))
+    .flatMap(([, cell]) => cell.mission?.reward.characters ?? []);
   const drawn = randomize(
     map,
     working,
@@ -195,7 +214,7 @@ export function randomizeWithMissions(
     nodeIds.filter((id) => !storyCells.includes(id) && !chainCells.has(id)),
     perShop,
     random,
-    reserved,
+    [...reserved, ...promised],
   );
   const result: Content = { ...drawn.content };
 
@@ -333,12 +352,22 @@ export function randomizeWithMissions(
     const giver = find(result[cellId]?.characterId);
     const notGiver = (id: string | undefined) => !samePerson(giver, find(id));
     let replace: Planned['replace'];
+    // A person already in the game, on the board, for sale, promised or proposed as starter (spec 039).
+    const takenPersons = personsOf(
+      [
+        ...Object.values(result).flatMap((cell) => [...(cell.characterId ? [cell.characterId] : []), ...(cell.forSale ?? [])]),
+        ...rewarded,
+        ...reserved,
+      ],
+      catalog,
+    );
+    const personTaken = (id: string) => takenPersons.has(personOfCode(id));
 
     // Rewards never stand on the board, and each goes to one mission only;
-    // the proposed starters are never a reward (D-044).
+    // the proposed starters are never a reward (D-044); nor any other form of them (spec 039).
     if (
       (mission.reward.characters ?? []).some(
-        (id) => onBoard(id) || forSale(id) || rewarded.has(id) || isReserved(id),
+        (id) => onBoard(id) || forSale(id) || rewarded.has(id) || isReserved(id) || personTaken(id),
       )
     ) {
       return null;
@@ -373,7 +402,8 @@ export function randomizeWithMissions(
             return null;
           }
           if (!onBoard(target)) {
-            if (forSale(target) || rewarded.has(target) || !find(target)) {
+            // Put on the board only if no other form of its person is in the game (spec 039).
+            if (forSale(target) || rewarded.has(target) || !find(target) || personTaken(target)) {
               return null;
             }
             // Put the target in a chosen cell still to be done, farther away for

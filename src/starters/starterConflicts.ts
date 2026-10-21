@@ -1,4 +1,4 @@
-import { cellNumber, PLAYER_IDS, type CellContent, type Character, type GameMap } from '../engine';
+import { cellNumber, personOfId, PLAYER_IDS, type CellContent, type Character, type GameMap } from '../engine';
 import type { StarterProposals } from './proposals';
 
 /**
@@ -23,8 +23,21 @@ export function starterConflicts(
   ];
   const lines: string[] = [];
   for (const id of proposed) {
+    // Another form of the same person leaves the map too when the starter is chosen (spec 039).
+    const otherForm = (other: string | undefined) =>
+      other !== undefined && other !== id && personOfId(catalog, other) === personOfId(catalog, id);
     for (const [nodeId, cell] of Object.entries(content)) {
       const number = cellNumber(nodeId);
+      if (otherForm(cell.characterId)) {
+        lines.push(
+          `${name(cell.characterId as string)}, un'altra forma di ${name(id)}, è ${shops.has(nodeId) ? `negoziante nel negozio ${number}` : `nella casella ${number}`}: se ${name(id)} viene scelto, lì ne arriva un altro.`,
+        );
+      }
+      for (const sold of (cell.forSale ?? []).filter(otherForm)) {
+        lines.push(
+          `${name(sold)}, un'altra forma di ${name(id)}, è in vendita nel negozio ${number}: se ${name(id)} viene scelto, al suo posto ne arriva un altro.`,
+        );
+      }
       if (cell.characterId === id) {
         lines.push(
           shops.has(nodeId)

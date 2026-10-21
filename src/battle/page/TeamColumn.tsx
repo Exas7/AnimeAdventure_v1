@@ -12,6 +12,8 @@ interface TeamColumnProps {
   ids: string[];
   fighters: Map<string, { character: Character; fighter: Fighter }>;
   onChange: (ids: string[]) => void;
+  /** Missing: "Squadra A" or "Squadra B". */
+  name?: string;
 }
 
 const KIND_NAMES = { wave: 'onda', rush: 'impeto' } as const;
@@ -22,7 +24,7 @@ function moveText(move: Move): string {
 }
 
 /** One team (2.10): from 1 to 5 characters in order, each with its sheet. */
-export function TeamColumn({ side, ids, fighters, onChange }: TeamColumnProps) {
+export function TeamColumn({ side, ids, fighters, onChange, name = SIDE_NAMES[side] }: TeamColumnProps) {
   const catalog = useMemo(() => [...fighters.values()].map((entry) => entry.character), [fighters]);
   const move = (index: number, step: -1 | 1) => {
     const next = [...ids];
@@ -33,7 +35,7 @@ export function TeamColumn({ side, ids, fighters, onChange }: TeamColumnProps) {
 
   return (
     <section className={`${styles.team} ${styles[side]}`}>
-      <h2 className={styles.teamName}>{SIDE_NAMES[side]}</h2>
+      <h2 className={styles.teamName}>{name}</h2>
       <ol className={styles.lineUp}>
         {ids.map((id, index) => {
           const fighter = fighters.get(id)?.fighter;
@@ -71,6 +73,7 @@ export function TeamColumn({ side, ids, fighters, onChange }: TeamColumnProps) {
               <div className={styles.sheet}>
                 {sheet.bars} barre · Potenza {sheet.power} · Velocità {sheet.speed}
                 {!fighters.get(id)?.character.fight && ' · scheda normale'}
+                {fighter.next && ` · si trasforma in ${fighter.next.name}`}
               </div>
               <div className={styles.sheet}>
                 {sheet.moves.map(moveText).join(' · ')} · Finale: {moveText(sheet.finale)}
@@ -85,7 +88,7 @@ export function TeamColumn({ side, ids, fighters, onChange }: TeamColumnProps) {
           value=""
           onChange={(id) => id && onChange([...ids, id])}
           placeholder="Aggiungi un personaggio…"
-          ariaLabel={`Aggiungi un personaggio alla ${SIDE_NAMES[side]}`}
+          ariaLabel={`Aggiungi un personaggio: ${name}`}
         />
       ) : (
         <p className={styles.note}>Squadra completa.</p>

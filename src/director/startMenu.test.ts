@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { catalogStatus, sheetProblemsNotice, startMenu } from './startMenu';
+import {
+  catalogFigures,
+  catalogImportedNotice,
+  NO_CATALOG,
+  sheetProblemsNotice,
+  startMenu,
+} from './startMenu';
 
-describe('start page menu (spec 024, criterion 2)', () => {
+describe('start page menu (spec 024, criterion 2; spec 042, criterion 1)', () => {
   it('with a saved game: every button in order, "Riprendi la partita" first and main', () => {
     const menu = startMenu(true);
     expect(menu.map((item) => item.label)).toEqual([
@@ -10,7 +16,6 @@ describe('start page menu (spec 024, criterion 2)', () => {
       'Puntate',
       'Editor delle mappe',
       'Carica partita da file',
-      'Importa lista personaggi',
     ]);
     expect(menu.filter((item) => item.primary).map((item) => item.id)).toEqual(['resume']);
   });
@@ -28,17 +33,46 @@ describe('start page menu (spec 024, criterion 2)', () => {
   });
 });
 
-describe('character list status under the menu (spec 024, 2.1)', () => {
-  it('sums up the imported list', () => {
+describe('character list in use, in the advanced settings (spec 042, criterion 2)', () => {
+  it('one line per number', () => {
     expect(
-      catalogStatus({ count: 165, possibleStarters: 24, priced: 124, shopkeepers: 6, withoutTier: 4 }),
-    ).toBe(
-      'Lista dei personaggi: 165 personaggi, 24 possibili starter, 124 con prezzo, 6 negozianti, 4 senza tier (non arruolabili).',
-    );
+      catalogFigures({ count: 166, possibleStarters: 24, priced: 124, shopkeepers: 6, withoutTier: 5 }),
+    ).toEqual([
+      '166 personaggi',
+      '24 possibili starter',
+      '124 con prezzo',
+      '6 negozianti',
+      '5 senza tier (non arruolabili)',
+    ]);
+  });
+
+  it('one of a kind is singular', () => {
+    expect(
+      catalogFigures({ count: 1, possibleStarters: 1, priced: 1, shopkeepers: 1, withoutTier: 1 }),
+    ).toEqual([
+      '1 personaggio',
+      '1 possibile starter',
+      '1 con prezzo',
+      '1 negoziante',
+      '1 senza tier (non arruolabili)',
+    ]);
   });
 
   it('says what to do without a list', () => {
-    expect(catalogStatus(null)).toBe('Nessuna lista importata: importala per iniziare una partita.');
+    expect(NO_CATALOG).toBe('Nessuna lista: importala per iniziare una partita.');
+  });
+});
+
+describe('notice after an import (spec 042, criterion 3)', () => {
+  const summary = { count: 166, possibleStarters: 24, priced: 124, shopkeepers: 6, withoutTier: 5 };
+
+  it('says how many characters came in', () => {
+    expect(catalogImportedNotice(summary, [])).toEqual(['Lista importata: 166 personaggi.']);
+  });
+
+  it('with wrong fight sheet values, the notice of spec 037 stays', () => {
+    const problems = ['Goku: barre «7», va da 3 a 5'];
+    expect(catalogImportedNotice(summary, problems)).toEqual(sheetProblemsNotice(problems));
   });
 });
 

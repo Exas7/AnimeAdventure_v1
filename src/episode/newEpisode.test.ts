@@ -27,7 +27,8 @@ describe('"Prima di cominciare": the state of the libraries (spec 028, criterion
   it('what is missing is said, with what it means', () => {
     const status = libraryStatus({ characters: [], powers: 0, specialKeepers: 0, missions: 0, questions: 0 });
     expect(status.every((check) => !check.ready)).toBe(true);
-    expect(status[0]?.text).toMatch(/Importa lista personaggi/);
+    // The button is in the advanced settings of the start page (spec 042, criterion 4).
+    expect(status[0]?.text).toMatch(/«Impostazioni avanzate» → «Importa lista personaggi»/);
     expect(status[3]?.text).toMatch(/docs\/missioni-bt3\.csv/);
   });
 

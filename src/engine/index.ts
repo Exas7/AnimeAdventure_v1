@@ -44,6 +44,7 @@ export {
   type ShopListing,
 } from './shop';
 export { parseGame, SaveFileError, SAVE_FORMAT_VERSION, serializeGame } from './save';
+export { nextForms, trainingChanges, trainingRule, trainingRuleText, trainingWarnings } from './training';
 export {
   testCatalog,
   testContent,
@@ -52,3 +53,4 @@ export {
   testSetup,
   type TestSetupOptions,
 } from './testMap';
+export { personOf, personOfId } from './lookup';

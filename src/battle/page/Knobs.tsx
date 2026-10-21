@@ -94,6 +94,15 @@ export function Knobs({ settings, onChange }: KnobsProps) {
           text={`${settings.switchRecharge} scambi`}
           onChange={(switchRecharge) => set({ switchRecharge })}
         />
+        <Knob
+          label="Trasformazioni"
+          value={oneIn(settings.transformChance)}
+          min={5}
+          max={200}
+          step={5}
+          text={`1 scambio su ${oneIn(settings.transformChance)} a vita piena`}
+          onChange={(value) => set({ transformChance: 1 / value })}
+        />
       </div>
       <button type="button" disabled={!changed} onClick={() => onChange(DEFAULT_SETTINGS)}>
         Valori di partenza

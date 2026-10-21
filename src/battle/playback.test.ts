@@ -29,10 +29,11 @@ const wave = { name: 'Kamehameha', kind: 'wave' } as const;
 const rush = { name: 'Meteor Smash', kind: 'rush' } as const;
 const galick = { name: 'Galick Gun', kind: 'wave' } as const;
 
-const snapshot = (hpA: number[], hpB: number[], activeA = 0): FightSnapshot => ({
+const snapshot = (hpA: number[], hpB: number[], activeA = 0, formsA = [0, 0]): FightSnapshot => ({
   hp: { a: hpA, b: hpB },
   active: { a: activeA, b: 0 },
   gauge: { a: 0, b: 0 },
+  forms: { a: formsA, b: [0] },
 });
 
 /** A short fight written by hand: Goku and Piccolo against Vegeta. */
@@ -185,4 +186,29 @@ describe('telling a fight (spec 035, 2.9-2.11)', () => {
       { title: 'VINCE LA SQUADRA B!', detail: '' },
     ]);
   });
+
+  it('a transformation is told with the new name, and so is everything after it (spec 037, 2.3)', () => {
+    const gokuWithForm: Fighter = { ...goku, next: fighter('Goku SSJ', 'A+') };
+    const forms = (a: number): FightSnapshot => ({
+      hp: { a: [40_000], b: [40_000] },
+      active: { a: 0, b: 0 },
+      gauge: { a: 0, b: 0 },
+      forms: { a: [a], b: [0] },
+    });
+    const record: FightRecord = {
+      teams: { a: [gokuWithForm], b: [vegeta] },
+      form: { a: 1, b: 1 },
+      start: forms(0),
+      steps: [
+        { event: { type: 'transform', exchange: 1, side: 'a', fighter: 0 }, after: forms(1) },
+        { event: { type: 'blow', exchange: 1, side: 'a', damage: 1_000 }, after: forms(1) },
+      ],
+      winner: 'a',
+    };
+    expect(describeStep(record, 0)).toBe('Goku si trasforma: Goku SSJ!');
+    expect(describeStep(record, 1)).toBe('Goku SSJ colpisce Vegeta: −1.000');
+    expect(captionOf(record, 0)).toEqual({ title: 'TRASFORMAZIONE!', detail: 'Goku → Goku SSJ' });
+    expect(eventDuration({ type: 'transform', exchange: 1, side: 'a', fighter: 0 })).toBe(2500);
+  });
 });
+

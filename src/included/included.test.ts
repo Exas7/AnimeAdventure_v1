@@ -33,14 +33,28 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
     });
   });
 
-  it('every character has its person (spec 031, criterion 5)', () => {
+  it('every character has its person: one character with its transformations (spec 031, criterion 5; D-064)', () => {
     const catalog = includedCatalog();
     expect(catalog.every((character) => character.person)).toBe(true);
     const person = (name: string) => catalog.find((character) => character.name === name)?.person;
-    expect(person('Son Gohan SSJ2')).toBe(person('Great Saiyaman'));
+    expect(person('Son Gohan SSJ2')).toBe(person('Son Gohan'));
+    expect(person('Cooler (forma finale)')).toBe(person('Cooler'));
+    // Not transformations in BT3: other persons (D-064, changes D-048).
+    expect(person('Great Saiyaman')).not.toBe(person('Son Gohan'));
+    expect(person('Metal Cooler')).not.toBe(person('Cooler'));
+    expect(person('Son Goku (fine)')).not.toBe(person('Son Goku (metà)'));
     expect(person('Son Gohan (nonno)')).not.toBe(person('Son Gohan'));
-    expect(person('Metal Cooler')).toBe(person('Cooler'));
     expect(person('Trunks (bambino)')).not.toBe(person('Trunks'));
+  });
+
+  it('a transformation stays within one person (spec 039, 2.1)', () => {
+    const catalog = includedCatalog();
+    const byId = new Map(catalog.map((character) => [character.id, character]));
+    const transforming = catalog.filter((character) => character.fight?.transformsInto);
+    expect(transforming.length).toBeGreaterThan(30);
+    for (const character of transforming) {
+      expect(byId.get(character.fight?.transformsInto as string)?.person).toBe(character.person);
+    }
   });
 
   it('fights on Pianeta Nameck: at most 70% of the Character cells on average (spec 031 and 034)', async () => {

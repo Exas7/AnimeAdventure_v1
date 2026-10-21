@@ -1,7 +1,15 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Placeholder } from '../../ui/Placeholder';
 import { BAR_HP, otherSide, SIDES, type FightEvent, type FightSnapshot, type Fighter, type Side } from '../fight';
-import { captionOf, eventDuration, formatHp, SIDE_NAMES, snapshotAt, type BattleView } from '../playback';
+import {
+  captionOf,
+  eventDuration,
+  fighterAt,
+  formatHp,
+  SIDE_NAMES,
+  snapshotAt,
+  type BattleView,
+} from '../playback';
 import styles from './BattleScreen.module.css';
 
 interface BattleScreenProps {
@@ -17,6 +25,7 @@ interface BattleScreenProps {
  */
 export function BattleScreen({ view }: BattleScreenProps) {
   const { record, shown, speed } = view;
+  const names = view.names ?? SIDE_NAMES;
   const event = record.steps[shown - 1]?.event;
   const beat = event ? eventDuration(event) / speed : 0;
   // Health changes when the blow lands, not when the move starts: a waves
@@ -31,9 +40,11 @@ export function BattleScreen({ view }: BattleScreenProps) {
   const snapshot = snapshotAt(record, impacted ? shown : shown - 1);
   const caption =
     shown === 0
-      ? { title: 'SI COMINCIA!', detail: `${SIDE_NAMES.a} contro ${SIDE_NAMES.b}` }
-      : captionOf(record, shown - 1);
-  const onField = (side: Side) => record.teams[side][snapshot.active[side]] as Fighter;
+      ? { title: 'SI COMINCIA!', detail: `${names.a} contro ${names.b}` }
+      : captionOf(record, shown - 1, names);
+  // Everyone in the form they have at this moment (spec 037, 2.3).
+  const current = (side: Side) => record.teams[side].map((_, index) => fighterAt(record, snapshot, side, index));
+  const onField = (side: Side) => fighterAt(record, snapshot, side, snapshot.active[side]);
 
   return (
     <div className={styles.scene} style={{ '--beat': `${beat}ms` } as CSSProperties}>
@@ -59,7 +70,7 @@ export function BattleScreen({ view }: BattleScreenProps) {
       </div>
 
       <div className={styles.middle}>
-        <TeamList side="a" fighters={record.teams.a} snapshot={snapshot} />
+        <TeamList side="a" name={names.a} fighters={current('a')} snapshot={snapshot} />
         <div className={styles.arena}>
           {SIDES.map((side) => {
             const fighter = onField(side);
@@ -75,7 +86,7 @@ export function BattleScreen({ view }: BattleScreenProps) {
           })}
           <Effects key={shown} event={event} />
         </div>
-        <TeamList side="b" fighters={record.teams.b} snapshot={snapshot} />
+        <TeamList side="b" name={names.b} fighters={current('b')} snapshot={snapshot} />
       </div>
 
       <div key={shown} className={styles.caption}>
@@ -107,10 +118,17 @@ function HealthBars({ fighter, hp, large }: { fighter: Fighter; hp: number; larg
   );
 }
 
-function TeamList({ side, fighters, snapshot }: { side: Side; fighters: readonly Fighter[]; snapshot: FightSnapshot }) {
+interface TeamListProps {
+  side: Side;
+  name: string;
+  fighters: readonly Fighter[];
+  snapshot: FightSnapshot;
+}
+
+function TeamList({ side, name, fighters, snapshot }: TeamListProps) {
   return (
     <div className={`${styles.team} ${styles[side]}`}>
-      <p className={styles.teamName}>{SIDE_NAMES[side]}</p>
+      <p className={styles.teamName}>{name}</p>
       {fighters.map((fighter, index) => {
         const hp = snapshot.hp[side][index] ?? 0;
         const classes = [
@@ -179,6 +197,8 @@ function motionOf(event: FightEvent | undefined, side: Side): string | undefined
       return event.side === side ? styles.slideIn : undefined;
     case 'ko':
       return event.side === side ? styles.fall : undefined;
+    case 'transform':
+      return event.side === side ? styles.powerUp : undefined;
     case 'end':
       return event.winner === side ? styles.victory : styles.defeated;
   }

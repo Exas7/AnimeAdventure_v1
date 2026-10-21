@@ -1,8 +1,9 @@
-import { useRef, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { currentState, type Game } from '../engine';
 import type { CatalogSummary } from '../catalog/importCatalog';
 import { START_PAGE_BACKGROUND } from '../ui/layoutImages';
-import { catalogStatus, startMenu, type StartMenuId } from './startMenu';
+import { AdvancedSettingsDialog } from './AdvancedSettingsDialog';
+import { startMenu, type StartMenuId } from './startMenu';
 import styles from './StartScreen.module.css';
 
 interface StartScreenProps {
@@ -17,22 +18,23 @@ interface StartScreenProps {
   onOpenEpisodes(): void;
 }
 
-/** First screen of the director window (spec 003, 2.1; spec 024). */
+/** First screen of the director window (spec 003, 2.1; spec 024; spec 042). */
 export function StartScreen(props: StartScreenProps) {
   const { saved, catalog } = props;
   const savedState = saved ? currentState(saved) : null;
   const gameFile = useRef<HTMLInputElement>(null);
   const catalogFile = useRef<HTMLInputElement>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
-  // The two file buttons are real buttons, so they look and behave like the
-  // others (Tab, hint); they open the hidden file pickers below.
+  // The file buttons are real buttons, so they look and behave like the
+  // others (Tab, hint); they open the hidden file pickers below. The one of
+  // the character list is in the advanced settings (spec 042).
   const actions: Record<StartMenuId, () => void> = {
     resume: props.onResume,
     newGame: props.onNewGame,
     episodes: props.onOpenEpisodes,
     maps: props.onOpenMaps,
     loadFile: () => gameFile.current?.click(),
-    importCatalog: () => catalogFile.current?.click(),
   };
 
   return (
@@ -73,7 +75,17 @@ export function StartScreen(props: StartScreenProps) {
         ))}
       </nav>
 
-      <p className={styles.status}>{catalogStatus(catalog)}</p>
+      <button className={styles.advanced} onClick={() => setAdvancedOpen(true)}>
+        <span aria-hidden="true">⚙</span> Impostazioni avanzate
+      </button>
+
+      {advancedOpen && (
+        <AdvancedSettingsDialog
+          catalog={catalog}
+          onImportCatalog={() => catalogFile.current?.click()}
+          onClose={() => setAdvancedOpen(false)}
+        />
+      )}
 
       <input
         ref={gameFile}

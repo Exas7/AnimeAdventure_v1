@@ -12,6 +12,8 @@ import {
   otherSide,
   recordFight,
   runFight,
+  transformationsOf,
+  transformChance,
   worksOn,
   type Fighter,
   type FightRecord,
@@ -21,6 +23,8 @@ import {
 import { seededRandom } from './random';
 import charactersCsv from '../../docs/personaggi-bt3.csv?raw';
 import { importCatalog } from '../catalog/importCatalog';
+import type { Character } from '../engine';
+import { fighterAt } from './playback';
 import type { Move } from './sheets';
 
 const catalog = includedCatalog();
@@ -263,5 +267,66 @@ describe('the fight as a whole (spec 035, criteria 10-11)', () => {
     const stats = fightStats({ a: team(2, 'A'), b: team(2, 'B') }, DEFAULT_SETTINGS, 100, seededRandom(12));
     expect(stats.wins.a + stats.wins.b).toBe(100);
     expect(stats.exchanges).toBeGreaterThan(100);
+  });
+});
+
+describe('transformations (spec 037, 2.3 and criteria 4-5)', () => {
+  /** A fighter of the list with the forms it can transform into. */
+  const withForms = (id: string, blocked?: ReadonlySet<string>) =>
+    fighterOf(catalog.find((entry) => entry.id === id) as Character, catalog, blocked) as Fighter;
+  const names = (fighter: Fighter | undefined): string[] => (fighter ? [fighter.name, ...names(fighter.next)] : []);
+
+  it('the forms follow "si trasforma in"; a form already elsewhere stops them (D-064)', () => {
+    expect(names(withForms('freeza-prima-forma'))).toEqual([
+      'Freeza (prima forma)',
+      'Freeza (seconda forma)',
+      'Freeza (terza forma)',
+      'Freeza (forma finale)',
+      'Freeza (massima potenza)',
+    ]);
+    expect(names(withForms('freeza-prima-forma', new Set(['freeza-terza-forma'])))).toEqual([
+      'Freeza (prima forma)',
+      'Freeza (seconda forma)',
+    ]);
+    expect(fighter('freeza-prima-forma').next).toBeUndefined();
+  });
+
+  it('the worse off, the likelier to transform: up to three times as likely near a KO', () => {
+    const full = transformChance(DEFAULT_SETTINGS, 40_000, 40_000);
+    expect(transformChance(DEFAULT_SETTINGS, 20_000, 40_000)).toBeGreaterThan(full);
+    expect(transformChance(DEFAULT_SETTINGS, 0, 40_000)).toBeCloseTo(3 * full, 10);
+  });
+
+  it('C4: one form at a time, with the tier of the new form and the same health', () => {
+    let seen = 0;
+    for (const record of records([withForms('freeza-prima-forma')], [normal('S')], 200, 41)) {
+      for (const { event, before, after } of withBefore(record)) {
+        if (event.type !== 'transform') {
+          continue;
+        }
+        seen += 1;
+        const at = event.fighter;
+        expect(after.forms[event.side][at]).toBe((before.forms[event.side][at] ?? 0) + 1);
+        expect(fighterAt(record, after, event.side, at)).toBe(fighterAt(record, before, event.side, at).next);
+        const newMax = fighterAt(record, after, event.side, at).sheet.bars * BAR_HP;
+        expect(after.hp[event.side][at]).toBe(Math.min(before.hp[event.side][at] as number, newMax));
+      }
+    }
+    expect(seen).toBeGreaterThan(100);
+  });
+
+  it('C5: at the same tier, who can transform wins more often than who cannot', () => {
+    const base: Character = { id: 'base', name: 'Base', tier: 'A', fight: { transformsInto: 'super' } };
+    const stronger: Character = { id: 'super', name: 'Super', tier: 'S' };
+    const transforming = fighterOf(base, [base, stronger]) as Fighter;
+    expect(winShare([transforming], [normal('A')], 3000, 42)).toBeGreaterThan(0.55);
+  });
+
+  it('who ends the fight in another form is what "Aggiorna la squadra" offers (spec 037, 2.4)', () => {
+    const goku = withForms('son-goku-meta');
+    const fights = records([goku, normal('A')], [normal('A')], 60, 43);
+    const changed = fights.find((record) => transformationsOf(record, 'a').length > 0);
+    expect(transformationsOf(changed as FightRecord, 'a')).toEqual([{ from: goku, to: goku.next }]);
+    expect(fights.every((record) => transformationsOf(record, 'b').length === 0)).toBe(true);
   });
 });

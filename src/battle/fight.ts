@@ -26,21 +26,60 @@ export interface Fighter {
   /** Steps from E (0) to SS+ (19), as in "Randomizza" (spec 007). */
   rank: number;
   sheet: Sheet;
+  /** The form it can transform into during the fight (spec 037, 2.3). */
+  next?: Fighter;
 }
 
-/** The fighter of a character of the list; null without a tier. */
-export function fighterOf(character: Character): Fighter | null {
+/**
+ * The fighter of a character of the list; null without a tier. Given the
+ * list, its forms follow "si trasforma in" (spec 037, 2.3), but never into
+ * a form in `blocked`: one already elsewhere in the game (D-064).
+ */
+export function fighterOf(
+  character: Character,
+  catalog: readonly Character[] = [],
+  blocked: ReadonlySet<string> = new Set(),
+): Fighter | null {
+  return withForms(character, catalog, blocked, new Set());
+}
+
+function withForms(
+  character: Character,
+  catalog: readonly Character[],
+  blocked: ReadonlySet<string>,
+  seen: Set<string>,
+): Fighter | null {
   const rank = tierRank(character.tier);
   if (rank === null || character.tier === undefined) {
     return null;
   }
-  return {
+  const fighter: Fighter = {
     id: character.id,
     name: character.name,
     tier: character.tier,
     rank,
     sheet: sheetOf(character),
   };
+  seen.add(character.id);
+  const nextId = character.fight?.transformsInto;
+  const nextCharacter =
+    nextId !== undefined && !blocked.has(nextId) && !seen.has(nextId)
+      ? catalog.find((entry) => entry.id === nextId)
+      : undefined;
+  const next = nextCharacter ? withForms(nextCharacter, catalog, blocked, seen) : null;
+  if (next) {
+    fighter.next = next;
+  }
+  return fighter;
+}
+
+/** A fighter after `transformations` steps up its forms. */
+export function formOf(fighter: Fighter, transformations: number): Fighter {
+  let current = fighter;
+  for (let step = 0; step < transformations && current.next; step++) {
+    current = current.next;
+  }
+  return current;
 }
 
 /** The knobs of the test page (spec 035, 2.10); DEFAULT_SETTINGS holds the starting values. */
@@ -55,6 +94,8 @@ export interface FightSettings {
   counterChance: number;
   /** Exchanges the switch gauge takes to fill (2.8). */
   switchRecharge: number;
+  /** Chance to transform in an exchange at full health; up to three times as much near a KO (spec 037, 2.3). */
+  transformChance: number;
 }
 
 export const DEFAULT_SETTINGS: FightSettings = {
@@ -63,19 +104,25 @@ export const DEFAULT_SETTINGS: FightSettings = {
   finaleChance: 1 / 50,
   counterChance: 0.3,
   switchRecharge: 15,
+  transformChance: 1 / 40,
 };
 
+/** The chance to transform in an exchange (spec 037, 2.3): the worse off, the likelier. */
+export function transformChance(settings: FightSettings, hp: number, maxHp: number): number {
+  return settings.transformChance * (1 + 2 * (1 - hp / maxHp));
+}
+
 /** Each tier step makes a fighter this much stronger, in attacks and in damage. */
-const TIER_STEP = 1.065;
+export const TIER_STEP = 1.065;
 /** Damage at equal tiers and power 3, before the dice (2.3). */
-const BLOW_DAMAGE = 1500;
-const MOVE_DAMAGE = 9000;
-const FINALE_DAMAGE = 18_000;
+export const BLOW_DAMAGE = 1500;
+export const MOVE_DAMAGE = 9000;
+export const FINALE_DAMAGE = 18_000;
 /** A special move is dodged this often between equally fast fighters (2.4). */
-const DODGE_CHANCE = 0.15;
-const FAIL_CHANCE = 0.1;
+export const DODGE_CHANCE = 0.15;
+export const FAIL_CHANCE = 0.1;
 /** How often a counter is the finale (2.4: "di rado"). */
-const FINALE_COUNTER_SHARE = 0.2;
+export const FINALE_COUNTER_SHARE = 0.2;
 /** Chance to switch with the gauge full, for a whole bar to win back (2.8). */
 const SWITCH_WILL = 0.5;
 /** A guard against endless loops: real fights last a few hundred exchanges. */
@@ -142,6 +189,8 @@ export type FightEvent =
     }
   | { type: 'ko'; exchange: number; side: Side; fighter: number }
   | { type: 'enter'; exchange: number; side: Side; fighter: number }
+  /** The fighter on the field of `side` goes to its next form (spec 037, 2.3). */
+  | { type: 'transform'; exchange: number; side: Side; fighter: number }
   | { type: 'end'; exchange: number; winner: Side };
 
 export interface FightSnapshot {
@@ -151,6 +200,8 @@ export interface FightSnapshot {
   active: Record<Side, number>;
   /** Exchanges in the switch gauge, up to the recharge. */
   gauge: Record<Side, number>;
+  /** Transformations of every fighter so far, in team order: see formOf. */
+  forms: Record<Side, number[]>;
 }
 
 export interface FightOutcome {
@@ -208,6 +259,7 @@ export function recordFight(
     steps.push({ event, after: snapshot() }),
   );
   const fullHp = (fighters: readonly Fighter[]) => fighters.map((fighter) => fighter.sheet.bars * BAR_HP);
+  const firstForms = (fighters: readonly Fighter[]) => fighters.map(() => 0);
   return {
     teams,
     form: outcome.form,
@@ -215,10 +267,23 @@ export function recordFight(
       hp: { a: fullHp(teams.a), b: fullHp(teams.b) },
       active: { a: 0, b: 0 },
       gauge: { a: 0, b: 0 },
+      forms: { a: firstForms(teams.a), b: firstForms(teams.b) },
     },
     steps,
     winner: outcome.winner,
   };
+}
+
+/**
+ * The fighters of a side that ended the fight in another form, with the
+ * first form and the last (spec 037, 2.4: "Aggiorna la squadra").
+ */
+export function transformationsOf(record: FightRecord, side: Side): { from: Fighter; to: Fighter }[] {
+  const final = record.steps.at(-1)?.after ?? record.start;
+  return record.teams[side].flatMap((fighter, index) => {
+    const transformations = final.forms[side][index] ?? 0;
+    return transformations > 0 ? [{ from: fighter, to: formOf(fighter, transformations) }] : [];
+  });
 }
 
 /** Totals of many fights between the same teams ("Lancia 1000 scontri", 2.10). */
@@ -231,6 +296,7 @@ export interface FightStats {
   /** Special moves not countered, by outcome; countered ones are in `clashes`. */
   moves: Record<MoveOutcome, number>;
   clashes: Record<ClashKind, number>;
+  transformations: number;
 }
 
 export function fightStats(
@@ -247,6 +313,7 @@ export function fightStats(
     immediateSwitches: 0,
     moves: { hit: 0, dodged: 0, failed: 0, giant: 0 },
     clashes: { waves: 0, rushes: 0, rushVsWave: 0 },
+    transformations: 0,
   };
   for (let fight = 0; fight < fights; fight++) {
     runFight(teams, settings, random, (event) => {
@@ -260,6 +327,8 @@ export function fightStats(
         stats.moves[event.outcome] += 1;
       } else if (event.type === 'clash') {
         stats.clashes[event.kind] += 1;
+      } else if (event.type === 'transform') {
+        stats.transformations += 1;
       }
     });
   }
@@ -356,7 +425,10 @@ function sameStyle(one: Sheet, other: Sheet): boolean {
 // ---------------------------------------------------------------------------
 
 interface FighterState {
+  /** The current form. */
   fighter: Fighter;
+  /** Transformations so far. */
+  form: number;
   hp: number;
   maxHp: number;
   /** Tier and team form together. */
@@ -392,6 +464,7 @@ function simulate(
   const team = (side: Side): TeamState => ({
     members: teams[side].map((fighter) => ({
       fighter,
+      form: 0,
       hp: fighter.sheet.bars * BAR_HP,
       maxHp: fighter.sheet.bars * BAR_HP,
       strength: TIER_STEP ** fighter.rank * form[side],
@@ -406,6 +479,7 @@ function simulate(
     hp: { a: state.a.members.map((member) => member.hp), b: state.b.members.map((member) => member.hp) },
     active: { a: state.a.active, b: state.b.active },
     gauge: { a: state.a.gauge, b: state.b.gauge },
+    forms: { a: state.a.members.map((member) => member.form), b: state.b.members.map((member) => member.form) },
   });
   const emit = (event: FightEvent) => onEvent(event, snapshot);
   const onField = (side: Side) => state[side].members[state[side].active] as FighterState;
@@ -449,6 +523,23 @@ function simulate(
       recovered,
       immediate: current.fullSince === exchange,
     });
+  };
+
+  // Only who has a next form rolls a die: fights without forms stay the same.
+  const maybeTransform = (side: Side, exchange: number) => {
+    const member = onField(side);
+    const next = member.fighter.next;
+    if (!next || random() >= transformChance(settings, member.hp, member.maxHp)) {
+      return;
+    }
+    member.fighter = next;
+    member.form += 1;
+    // As in BT3, transforming does not heal: the health stays, within the new bars.
+    member.maxHp = next.sheet.bars * BAR_HP;
+    member.hp = Math.min(member.hp, member.maxHp);
+    member.strength = TIER_STEP ** next.rank * form[side];
+    member.factor = factorOf(next.sheet);
+    emit({ type: 'transform', exchange, side, fighter: state[side].active });
   };
 
   const damage = (attacker: FighterState, defender: FighterState, base: number): number =>
@@ -552,6 +643,9 @@ function simulate(
   for (let exchange = 1; exchange <= MAX_EXCHANGES; exchange++) {
     for (const side of SIDES) {
       maybeSwitch(side, exchange);
+    }
+    for (const side of SIDES) {
+      maybeTransform(side, exchange);
     }
     attack(exchange);
     // Only one fighter takes damage in an exchange, so at most one KO.

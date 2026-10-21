@@ -47,6 +47,8 @@ export function StatsPanel({ stats, milliseconds }: StatsPanelProps) {
           {average(stats.clashes.rushes, stats.fights)} · impeto contro onda{' '}
           {average(stats.clashes.rushVsWave, stats.fights)}
         </dd>
+        <dt>Trasformazioni</dt>
+        <dd>{average(stats.transformations, stats.fights)} a scontro</dd>
       </dl>
     </section>
   );

@@ -101,3 +101,14 @@ export function validateCellContent(
 export function deepCopy<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
+
+/** The person of a character (D-064): the "persona" column, or the character alone. */
+export function personOf(character: Character): string {
+  return character.person?.trim() || `#${character.id}`;
+}
+
+/** The person of a character of the list by its code; a code not in the list is a person alone. */
+export function personOfId(catalog: readonly Character[], characterId: string): string {
+  const character = catalog.find((entry) => entry.id === characterId);
+  return character ? personOf(character) : `#${characterId}`;
+}

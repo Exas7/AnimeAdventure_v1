@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Character } from '../engine';
 import screenStyles from '../director/Screens.module.css';
+import { WHERE_TO_IMPORT_CATALOG } from '../director/startMenu';
 import { InfoButton } from '../ui/InfoButton';
 import { Placeholder } from '../ui/Placeholder';
 import styles from './SpecialKeepersPanel.module.css';
@@ -54,8 +55,8 @@ export function SpecialKeepersPanel(props: SpecialKeepersPanelProps) {
         Dalla lista dei personaggi
         <InfoButton label="Negozianti della lista">
           Sono i personaggi con «sì» nella colonna «negoziante» della lista. Si cambiano nel file Excel
-          della lista (docs/personaggi-bt3.xlsx), salvandolo come CSV e reimportandolo dal menu
-          iniziale con «Importa lista personaggi».
+          della lista (docs/personaggi-bt3.xlsx), salvandolo come CSV e reimportandolo{' '}
+          {WHERE_TO_IMPORT_CATALOG}.
         </InfoButton>
       </h3>
       {listKeepers.length === 0 ? (

@@ -1,5 +1,6 @@
 import type { Character, GameMap } from '../engine';
 import { keepersUsedIn } from '../catalog/specialKeepers';
+import { WHERE_TO_IMPORT_CATALOG } from '../director/startMenu';
 import { areEmpty, type StarterProposals } from '../starters/proposals';
 import type { Episode } from './episodeFile';
 import type { Content } from './fill';
@@ -32,7 +33,7 @@ export function libraryStatus(counts: LibraryCounts): LibraryCheck[] {
   const villains = characters.filter((character) => character.villain).length;
   const characterText =
     characters.length === 0
-      ? 'Nessuna lista: importala dal menu iniziale con «Importa lista personaggi».'
+      ? `Nessuna lista: importala ${WHERE_TO_IMPORT_CATALOG}.`
       : villains === 0
         ? `${characters.length} personaggi, ma nessun cattivo: reimporta docs/personaggi-bt3.csv, che ha la colonna «cattivo».`
         : `${characters.length} personaggi: ${keepers} negozianti, ${villains} cattivi.`;

@@ -61,10 +61,13 @@ echo [4/5] Pacchetti del gioco gia' installati.
 goto :build_check
 :install
 echo [4/5] Installo i pacchetti del gioco: succede solo la prima volta o dopo un aggiornamento, e serve qualche minuto...
+rem Qui l'errore si controlla con "diverso da 0": npm puo' uscire con un codice
+rem negativo (-4048 se un file e' in uso), che "if errorlevel 1" non vede; i
+rem pacchetti risulterebbero installati anche se l'installazione e' fallita.
 call npm ci
-if errorlevel 1 goto :fail
+if not "%errorlevel%"=="0" goto :fail
 call node scripts\build-stamp.mjs packages --save
-if errorlevel 1 goto :fail
+if not "%errorlevel%"=="0" goto :fail
 
 :build_check
 call node scripts\build-stamp.mjs app
@@ -76,9 +79,9 @@ goto :start
 :build
 echo [5/5] Preparo il gioco: e' cambiato qualcosa dall'ultima volta, serve qualche secondo...
 call npm run build
-if errorlevel 1 goto :fail
+if not "%errorlevel%"=="0" goto :fail
 call node scripts\build-stamp.mjs app --save
-if errorlevel 1 goto :fail
+if not "%errorlevel%"=="0" goto :fail
 
 :start
 echo.

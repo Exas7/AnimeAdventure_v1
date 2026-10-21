@@ -1,3 +1,4 @@
+import { onePerPerson, personOf, personsOf } from '../catalog/person';
 import type { CellContent, Character, GameMap } from '../engine';
 import type { TextLibrary } from './textLibrary';
 
@@ -199,11 +200,16 @@ export function randomize(
   for (const id of reserved) {
     used.add(id);
   }
+  // One person in one place (spec 039): no other form of anyone already used.
+  const usedPersons = personsOf(used, [...catalog, ...specialKeepers]);
 
   // Characters for the cells, weakest first, to follow `placementOrder`.
-  const drawn = shuffle(
-    catalog.filter((character) => canBeDrawn(character) && !used.has(character.id)),
-    random,
+  const drawn = onePerPerson(
+    shuffle(
+      catalog.filter((character) => canBeDrawn(character) && !used.has(character.id)),
+      random,
+    ),
+    usedPersons,
   )
     .slice(0, cellTargets.length)
     .map((character) => ({ character, rank: tierRank(character.tier) as number }))
@@ -245,6 +251,7 @@ export function randomize(
       lines: drawnLine === undefined ? previous.lines : [drawnLine],
     });
     used.add(character.id);
+    usedPersons.add(personOf(character));
   }
 
   // Shopkeepers: a free one for each shop; without, the shop keeps its own if still free.
@@ -253,26 +260,32 @@ export function randomize(
     random,
   );
   let keepersKept = 0;
+  const personOfKeeper = (keeperId: string) => [...personsOf([keeperId], [...catalog, ...specialKeepers])][0];
+  const isFree = (keeperId: string) => !used.has(keeperId) && !usedPersons.has(personOfKeeper(keeperId) as string);
   for (const id of shopTargets) {
-    const free = keepers.find((keeper) => !used.has(keeper.id));
+    const free = keepers.find((keeper) => isFree(keeper.id));
     const old = oldKeepers.get(id);
-    const keeper = free?.id ?? (old !== undefined && !used.has(old) ? old : undefined);
+    const keeper = free?.id ?? (old !== undefined && isFree(old) ? old : undefined);
     if (!free && keeper !== undefined) {
       keepersKept += 1;
     }
     if (keeper !== undefined) {
       used.add(keeper);
+      usedPersons.add(personOfKeeper(keeper) as string);
     }
     setCell(result, id, { ...result[id], characterId: keeper });
   }
 
-  // Characters for sale: with a price, from C- up, never used.
-  const forSale = shuffle(
-    catalog.filter(
-      (character) =>
-        canBeDrawn(character) && character.price !== undefined && !used.has(character.id),
+  // Characters for sale: with a price, from C- up, never used, one form per person.
+  const forSale = onePerPerson(
+    shuffle(
+      catalog.filter(
+        (character) =>
+          canBeDrawn(character) && character.price !== undefined && !used.has(character.id),
+      ),
+      random,
     ),
-    random,
+    usedPersons,
   );
   let forSaleFilled = 0;
   for (const id of shopTargets) {

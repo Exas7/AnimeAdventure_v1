@@ -2,6 +2,7 @@ import { cellNumber } from './cellNumber';
 import { cellLabel, findCharacter, findEdge, findItem, findPower } from './lookup';
 import { isRepeatInteraction } from './rules';
 import { characterPrice, itemPrice } from './shop';
+import { trainingChanges, trainingChangesText } from './training';
 import type { Game, GameContext, GameState, PlayerId, RecordedAction } from './types';
 
 export interface LogEntry {
@@ -59,6 +60,14 @@ function describeAction(action: RecordedAction, before: GameState, context: Game
       return `${character(action.characterId)} entra nella squadra di ${name(action.player)}`;
     case 'removeCharacter':
       return `${character(action.characterId)} esce dalla squadra di ${name(action.player)}`;
+    case 'transformCharacters': {
+      const changes = action.changes.map((change) => `${character(change.from)} → ${character(change.to)}`);
+      return `Squadra di ${name(action.player)} aggiornata: ${changes.join(', ')}`;
+    }
+    case 'useTraining': {
+      const changes = trainingChanges(context.catalog, action.choices);
+      return `${name(action.player)} usa ${item(action.itemId)}: ${trainingChangesText(context.catalog, changes)}`;
+    }
     case 'setConquest':
       return action.player === null
         ? `${cell(action.nodeId)} di nuovo sfidabile`

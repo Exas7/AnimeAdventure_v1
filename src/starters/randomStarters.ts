@@ -1,4 +1,4 @@
-import { onePerPerson, personOf } from '../catalog/person';
+import { onePerPerson, personOf, personsOf } from '../catalog/person';
 import type { Character } from '../engine';
 import { canBeDrawn, shuffle, tierRank, type Random } from '../episode/fill';
 import { PROPOSALS_PER_PLAYER, type StarterProposal, type StarterProposals } from './proposals';
@@ -26,7 +26,11 @@ export function randomStarters(
   random: Random,
 ): RandomStarters {
   const needed = PROPOSALS_PER_PLAYER * 2;
-  const free = catalog.filter((character) => !taken.has(character.id));
+  // Nor another form of someone already in the episode (spec 039).
+  const takenPersons = personsOf(taken, catalog);
+  const free = catalog.filter(
+    (character) => !taken.has(character.id) && !takenPersons.has(personOf(character)),
+  );
   // Never two forms of the same person among the six (D-048).
   const starters = onePerPerson(shuffle(free.filter((character) => character.possibleStarter), random));
   const notes: string[] = [];

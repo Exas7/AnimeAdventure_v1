@@ -154,12 +154,14 @@
   min-height: 0;
 }
 
+/* Long names ("Freeza (prima forma)") go on two lines instead of out of the screen. */
 .teamName {
   margin: 0;
   font-family: var(--font-team);
   font-size: 1.6cqw;
+  line-height: 1.1;
   color: var(--side);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .member {
@@ -269,6 +271,29 @@
 .defeated {
   opacity: 0.4;
   filter: grayscale(1);
+}
+
+/* A transformation (spec 037, 2.3): a burst of aura around the new form. */
+.powerUp {
+  animation-name: powerUp;
+}
+
+@keyframes powerUp {
+  0% {
+    transform: scale(0.85);
+    filter: drop-shadow(0 0 0 var(--side)) brightness(3);
+  }
+  25% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 5cqw #ffffff) drop-shadow(0 0 3cqw var(--accent)) brightness(2);
+  }
+  55% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 4cqw var(--accent)) brightness(1.4);
+  }
+  100% {
+    transform: none;
+  }
 }
 
 @keyframes lunge {

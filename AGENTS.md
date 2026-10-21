@@ -53,8 +53,9 @@ Tu prepari **file**: mappe, puntate, liste. La persona li carica nell'app:
 - una mappa: nell'editor delle mappe, «Importa file»; oppure, per farla
   diventare una mappa base, il file in `assets/maps/incluse/`;
 - una puntata: in «Puntate», «Importa puntata»;
-- le liste: «Importa lista personaggi» nel menu iniziale; in «Puntate», le
-  schede «Missioni» e «Domande», con «Importa da Excel» (accetta i CSV).
+- le liste: «Importa lista personaggi» nella finestra «⚙ Impostazioni
+  avanzate», sotto il menu iniziale; in «Puntate», le schede «Missioni»
+  e «Domande», con «Importa da Excel» (accetta i CSV).
 
 Le liste in `docs/` l'app le carica da sola **solo se Chrome non ne ha
 già**: dopo averle modificate, la persona le deve reimportare.

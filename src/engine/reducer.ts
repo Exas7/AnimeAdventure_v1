@@ -19,9 +19,10 @@ import {
 import { emptyOutput, notify, warn, type ActionOutput } from './output';
 import { applyPower, firePowers } from './powers';
 import { isRepeatInteraction, turnRuleWarnings } from './rules';
-import { setCellContent } from './cells';
+import { setCellContent, warnIfElsewhere } from './cells';
 import { buyCharacter, buyItem } from './shop';
-import { joinTeam, addToTeam, removeFromTeam } from './team';
+import { joinTeam, addToTeam, removeFromTeam, transformInTeam } from './team';
+import { useTraining } from './training';
 import {
   BASE_ACTIONS,
   BASE_INTERACTIONS,
@@ -73,10 +74,18 @@ export function applyAction(
       endTurn(draft, out);
       break;
     case 'addCharacter':
+      // A form of a person already in the game: a warning, never a block (spec 039).
+      warnIfElsewhere(draft, context, action.characterId, out);
       addToTeam(draft, context, action.player, action.characterId, out);
       break;
     case 'removeCharacter':
       removeFromTeam(draft, action.player, action.characterId, out);
+      break;
+    case 'transformCharacters':
+      transformInTeam(draft, context, action.player, action.changes, out);
+      break;
+    case 'useTraining':
+      useTraining(draft, context, action.player, action.itemId, action.choices, out);
       break;
     case 'setConquest':
       setConquest(draft, action.nodeId, action.player, context, out);

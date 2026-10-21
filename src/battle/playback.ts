@@ -1,10 +1,18 @@
-import type { FightEvent, FightRecord, FightSnapshot, Fighter, Side } from './fight';
+import { formOf, type FightEvent, type FightRecord, type FightSnapshot, type Fighter, type Side } from './fight';
 
 // Telling a recorded fight (spec 035, 2.9-2.11): the texts of the log and of
 // the stream, how long each event stays on screen, and where "Avanti di uno
 // scambio" stops. Shared by the test page (director) and the stream.
 
-export const SIDE_NAMES: Record<Side, string> = { a: 'Squadra A', b: 'Squadra B' };
+/** How the two sides are called: "Squadra A" on the test page, the players' names in the game. */
+export type SideNames = Record<Side, string>;
+
+export const SIDE_NAMES: SideNames = { a: 'Squadra A', b: 'Squadra B' };
+
+/** "Vince la Squadra A", "Vince Maggi". */
+function winsText(names: SideNames, side: Side): string {
+  return `Vince ${names[side] === SIDE_NAMES[side] ? 'la ' : ''}${names[side]}`;
+}
 
 /** "19.999", with the dot for thousands, as the coins of the game. */
 export function formatHp(hp: number): string {
@@ -26,6 +34,8 @@ export function eventDuration(event: FightEvent): number {
     case 'switch':
     case 'ko':
       return 2000;
+    case 'transform':
+      return 2500;
     case 'enter':
       return 1500;
     case 'end':
@@ -43,6 +53,11 @@ export function snapshotAt(record: FightRecord, shown: number): FightSnapshot {
   return shown === 0 ? record.start : (record.steps[shown - 1]?.after ?? record.start);
 }
 
+/** The fighter at `position` of a side, in the form it has in `snapshot` (spec 037, 2.3). */
+export function fighterAt(record: FightRecord, snapshot: FightSnapshot, side: Side, position: number): Fighter {
+  return formOf(record.teams[side][position] as Fighter, snapshot.forms[side][position] ?? 0);
+}
+
 /** How many steps are shown after "Avanti di uno scambio": all those of the next exchange. */
 export function afterNextExchange(record: FightRecord, shown: number): number {
   const next = record.steps[shown];
@@ -57,13 +72,13 @@ export function afterNextExchange(record: FightRecord, shown: number): number {
 }
 
 /** The log line of the step at `index`, with the names of who was on the field. */
-export function describeStep(record: FightRecord, index: number): string {
+export function describeStep(record: FightRecord, index: number, names: SideNames = SIDE_NAMES): string {
   const step = record.steps[index];
   if (!step) {
     return '';
   }
   const before = snapshotAt(record, index);
-  const fighter = (side: Side, position: number) => (record.teams[side][position] as Fighter).name;
+  const fighter = (side: Side, position: number) => fighterAt(record, before, side, position).name;
   const onField = (side: Side) => fighter(side, before.active[side]);
   const other = (side: Side): Side => (side === 'a' ? 'b' : 'a');
   const { event } = step;
@@ -102,8 +117,10 @@ export function describeStep(record: FightRecord, index: number): string {
       return `KO! ${fighter(event.side, event.fighter)} è a terra`;
     case 'enter':
       return `Entra ${fighter(event.side, event.fighter)}`;
+    case 'transform':
+      return `${fighter(event.side, event.fighter)} si trasforma: ${fighterAt(record, step.after, event.side, event.fighter).name}!`;
     case 'end':
-      return `Vince la ${SIDE_NAMES[event.winner]}!`;
+      return `${winsText(names, event.winner)}!`;
   }
 }
 
@@ -116,6 +133,8 @@ export interface BattleView {
   speed: number;
   /** Exchanges the switch gauge takes to fill, to draw it. */
   switchRecharge: number;
+  /** Missing: "Squadra A" and "Squadra B". */
+  names?: SideNames;
 }
 
 /** The big writing of the stream for an event; null for plain blows, which only show the damage. */
@@ -125,13 +144,13 @@ export interface Caption {
 }
 
 /** The big writing of the stream for the step at `index` (2.11). */
-export function captionOf(record: FightRecord, index: number): Caption | null {
+export function captionOf(record: FightRecord, index: number, names: SideNames = SIDE_NAMES): Caption | null {
   const step = record.steps[index];
   if (!step) {
     return null;
   }
   const before = snapshotAt(record, index);
-  const fighter = (side: Side, position: number) => (record.teams[side][position] as Fighter).name;
+  const fighter = (side: Side, position: number) => fighterAt(record, before, side, position).name;
   const onField = (side: Side) => fighter(side, before.active[side]);
   const shout = (name: string) => `${name.toUpperCase()}!`;
   const { event } = step;
@@ -170,7 +189,12 @@ export function captionOf(record: FightRecord, index: number): Caption | null {
       return { title: 'KO!', detail: `${fighter(event.side, event.fighter)} è a terra` };
     case 'enter':
       return { title: 'IN CAMPO!', detail: fighter(event.side, event.fighter) };
+    case 'transform':
+      return {
+        title: 'TRASFORMAZIONE!',
+        detail: `${fighter(event.side, event.fighter)} → ${fighterAt(record, step.after, event.side, event.fighter).name}`,
+      };
     case 'end':
-      return { title: `VINCE LA ${SIDE_NAMES[event.winner].toUpperCase()}!`, detail: '' };
+      return { title: `${winsText(names, event.winner).toUpperCase()}!`, detail: '' };
   }
 }

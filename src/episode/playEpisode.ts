@@ -1,3 +1,4 @@
+import { personOf, personsOf } from '../catalog/person';
 import { cellNumber, type CellContent, type Character, type GameMap } from '../engine';
 import { canBeDrawn, tierRank, type Content } from './fill';
 import { charactersInContent } from './stepRandomize';
@@ -12,6 +13,8 @@ export interface Replacement {
   inShop: boolean;
   /** The starter kept this shop (spec 022, 2.4). */
   asKeeper?: true;
+  /** Another form of the starter's person left, not the starter itself (spec 039). */
+  formName?: string;
 }
 
 export interface PreparedContent {
@@ -60,10 +63,13 @@ export function prepareEpisodeContent(
 
   const used = charactersInContent(result);
   starterIds.forEach((id) => used.add(id));
+  // Substitutes are of persons not yet in the game (spec 039).
+  const usedPersons = personsOf(used, catalog);
   const replacements: Replacement[] = [];
 
   const fits = (character: Character, place: 'cell' | 'sale' | 'keeper') =>
     !used.has(character.id) &&
+    !usedPersons.has(personOf(character)) &&
     (place === 'keeper'
       ? character.shopkeeper === true
       : canBeDrawn(character) && (place === 'cell' || character.price !== undefined));
@@ -86,12 +92,25 @@ export function prepareEpisodeContent(
     if (!starter) {
       continue;
     }
+    // The starter and every other form of its person leave the map (spec 039).
+    const leaves = (id: string) => {
+      const character = known.get(id);
+      return id === starterId || (character !== undefined && personOf(character) === personOf(starter));
+    };
+    const form = (id: string) => (id === starterId ? {} : { formName: known.get(id)?.name ?? id });
+    const take = (substitute: Character | undefined) => {
+      if (substitute) {
+        used.add(substitute.id);
+        usedPersons.add(personOf(substitute));
+      }
+    };
     for (const [nodeId, cell] of Object.entries(result)) {
-      if (cell.characterId === starterId) {
+      const here = cell.characterId;
+      if (here !== undefined && leaves(here)) {
         const asKeeper = shopIds.has(nodeId);
         const substitute = replacementFor(starter, asKeeper ? 'keeper' : 'cell');
+        take(substitute);
         if (substitute) {
-          used.add(substitute.id);
           cell.characterId = substitute.id;
         } else {
           delete cell.characterId;
@@ -102,21 +121,21 @@ export function prepareEpisodeContent(
           nodeId,
           inShop: false,
           ...(asKeeper ? { asKeeper: true as const } : {}),
+          ...form(here),
         });
       }
-      if (cell.forSale?.includes(starterId)) {
+      for (const sold of (cell.forSale ?? []).filter(leaves)) {
         const substitute = replacementFor(starter, 'sale');
-        if (substitute) {
-          used.add(substitute.id);
-        }
-        cell.forSale = cell.forSale.flatMap((id) =>
-          id !== starterId ? [id] : substitute ? [substitute.id] : [],
+        take(substitute);
+        cell.forSale = (cell.forSale ?? []).flatMap((id) =>
+          id !== sold ? [id] : substitute ? [substitute.id] : [],
         );
         replacements.push({
           starterName: starter.name,
           replacementName: substitute?.name ?? null,
           nodeId,
           inShop: true,
+          ...form(sold),
         });
       }
     }
@@ -140,10 +159,13 @@ export function preparationReport(prepared: PreparedContent): string[] {
       : replacement.inShop
         ? `dal negozio ${number}`
         : `dalla casella ${number}`;
+    const who = replacement.formName
+      ? `${replacement.formName}, un'altra forma dello starter ${replacement.starterName}, tolto`
+      : `Starter ${replacement.starterName} tolto`;
     lines.push(
       replacement.replacementName
-        ? `Starter ${replacement.starterName} tolto ${where}: al suo posto ${replacement.replacementName}.`
-        : `Starter ${replacement.starterName} tolto ${where}: nessun sostituto disponibile, il posto resta vuoto.`,
+        ? `${who} ${where}: al suo posto ${replacement.replacementName}.`
+        : `${who} ${where}: nessun sostituto disponibile, il posto resta vuoto.`,
     );
   }
   return lines;

@@ -1,0 +1,59 @@
+/* The simulated fight in the director (spec 037, 2.4-2.5): wider than the other dialogs, to fit two teams and the fight. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  background: rgb(2 6 23 / 0.75);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(1200px, 100%);
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.3em;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.warning {
+  margin: 0;
+  color: var(--warning);
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+/* What the fight proposes: the host decides with a click. */
+.outcome {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.outcome p {
+  margin: 0;
+}

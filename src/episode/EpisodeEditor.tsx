@@ -135,7 +135,7 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
     apply(areEmpty(next) ? rest : { ...rest, starters: next });
   };
   const dirty = episode !== savedEpisode;
-  const issues = [...checkEpisode(content, known), ...checkMissions(content, known)];
+  const issues = [...checkEpisode(content, known, map), ...checkMissions(content, known)];
   const mapIssues = checkMap(map);
   // Character cells left empty become passage cells in a game (D-023).
   const emptyCells = emptyCharacterCells(map, content);

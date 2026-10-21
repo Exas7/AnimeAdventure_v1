@@ -218,7 +218,7 @@ export function NewEpisodeWizard(props: NewEpisodeWizardProps) {
   const episode = map && content ? newEpisode({ name, map, content, starters }, props.specialKeepers) : null;
   const guides = map && content
     ? [
-        ...checkEpisode(content, known).map((issue) => issue.message),
+        ...checkEpisode(content, known, map).map((issue) => issue.message),
         ...checkMissions(content, known).map((issue) => issue.message),
         ...(emptyCharacterCells(map, content).length > 0
           ? [`Caselle personaggio vuote: ${emptyCharacterCells(map, content).map(cellNumber).join(', ')}.`]

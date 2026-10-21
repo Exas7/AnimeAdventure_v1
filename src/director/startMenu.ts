@@ -5,8 +5,7 @@ export type StartMenuId =
   | 'newGame'
   | 'episodes'
   | 'maps'
-  | 'loadFile'
-  | 'importCatalog';
+  | 'loadFile';
 
 /** One button of the start page menu, with the hint shown on hover (spec 024). */
 export interface StartMenuItem {
@@ -42,11 +41,6 @@ const ITEMS: Omit<StartMenuItem, 'primary'>[] = [
     label: 'Carica partita da file',
     hint: 'Riapre una partita esportata su file (.json), anche da un altro PC.',
   },
-  {
-    id: 'importCatalog',
-    label: 'Importa lista personaggi',
-    hint: 'Carica la lista dei personaggi da un file CSV (da Excel: Salva con nome → CSV UTF-8). Vale per le partite nuove.',
-  },
 ];
 
 /**
@@ -61,16 +55,43 @@ export function startMenu(hasSavedGame: boolean): StartMenuItem[] {
   }));
 }
 
-/** The one line under the menu about the imported character list. */
-export function catalogStatus(summary: CatalogSummary | null): string {
-  if (!summary) {
-    return 'Nessuna lista importata: importala per iniziare una partita.';
-  }
-  return `Lista dei personaggi: ${summary.count} personaggi, ${summary.possibleStarters} possibili starter, ${summary.priced} con prezzo, ${summary.shopkeepers} negozianti, ${summary.withoutTier} senza tier (non arruolabili).`;
+/**
+ * Where the character list is imported, for the messages that send there
+ * (spec 042, 2.3): the button is in the advanced settings (D-068).
+ */
+export const WHERE_TO_IMPORT_CATALOG =
+  'dal menu iniziale, in «Impostazioni avanzate» → «Importa lista personaggi»';
+
+export const NO_CATALOG = 'Nessuna lista: importala per iniziare una partita.';
+
+/** The numbers of the character list in use, one per line (spec 042, 2.2). */
+export function catalogFigures(summary: CatalogSummary): string[] {
+  return [
+    counted(summary.count, 'personaggio', 'personaggi'),
+    counted(summary.possibleStarters, 'possibile starter', 'possibili starter'),
+    `${summary.priced} con prezzo`,
+    counted(summary.shopkeepers, 'negoziante', 'negozianti'),
+    `${summary.withoutTier} senza tier (non arruolabili)`,
+  ];
+}
+
+function counted(count: number, one: string, many: string): string {
+  return `${count} ${count === 1 ? one : many}`;
 }
 
 /** Problems listed after an import; the others are counted. */
 const MAX_SHEET_PROBLEMS = 8;
+
+/**
+ * The notice after a list is imported: how many characters (spec 042, 2.2),
+ * or the wrong fight sheet values when there are some (spec 037, 2.2).
+ */
+export function catalogImportedNotice(summary: CatalogSummary, sheetProblems: string[]): string[] {
+  if (sheetProblems.length > 0) {
+    return sheetProblemsNotice(sheetProblems);
+  }
+  return [`Lista importata: ${counted(summary.count, 'personaggio', 'personaggi')}.`];
+}
 
 /**
  * The notice after importing a list with wrong fight sheet values (spec 037,

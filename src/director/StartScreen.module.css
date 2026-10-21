@@ -182,15 +182,31 @@
 
 @media (prefers-reduced-motion: reduce) {
   .button,
-  .hint {
+  .hint,
+  .advanced {
     transition: none;
   }
 }
 
-.status {
-  max-width: 640px;
-  margin: 0;
+/* Smaller than the menu and in the plain font: what is behind it is on trial (spec 042, D-068). */
+.advanced {
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
   color: var(--muted);
   font-size: 0.9em;
-  text-align: center;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.advanced:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.advanced:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
