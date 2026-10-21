@@ -1,0 +1,105 @@
+import { useRef, type ChangeEvent } from 'react';
+import { currentState, type Game } from '../engine';
+import type { CatalogSummary } from '../catalog/importCatalog';
+import { START_PAGE_BACKGROUND } from '../ui/layoutImages';
+import { catalogStatus, startMenu, type StartMenuId } from './startMenu';
+import styles from './StartScreen.module.css';
+
+interface StartScreenProps {
+  saved: Game | null;
+  /** Summary of the imported character list, or null when none was imported. */
+  catalog: CatalogSummary | null;
+  onResume(): void;
+  onNewGame(): void;
+  onLoadFile(file: File): void;
+  onImportCatalog(file: File): void;
+  onOpenMaps(): void;
+  onOpenEpisodes(): void;
+}
+
+/** First screen of the director window (spec 003, 2.1; spec 024). */
+export function StartScreen(props: StartScreenProps) {
+  const { saved, catalog } = props;
+  const savedState = saved ? currentState(saved) : null;
+  const gameFile = useRef<HTMLInputElement>(null);
+  const catalogFile = useRef<HTMLInputElement>(null);
+
+  // The two file buttons are real buttons, so they look and behave like the
+  // others (Tab, hint); they open the hidden file pickers below.
+  const actions: Record<StartMenuId, () => void> = {
+    resume: props.onResume,
+    newGame: props.onNewGame,
+    episodes: props.onOpenEpisodes,
+    maps: props.onOpenMaps,
+    loadFile: () => gameFile.current?.click(),
+    importCatalog: () => catalogFile.current?.click(),
+  };
+
+  return (
+    <div className={styles.page}>
+      {START_PAGE_BACKGROUND && (
+        <div
+          className={styles.backdrop}
+          style={{ backgroundImage: `url("${START_PAGE_BACKGROUND}")` }}
+          aria-hidden="true"
+        />
+      )}
+
+      <header className={styles.header}>
+        <h1 className={styles.title}>Anime Adventure</h1>
+        <p className={styles.subtitle}>Regia</p>
+      </header>
+
+      <nav className={styles.menu} aria-label="Menu iniziale">
+        {startMenu(savedState !== null).map((item) => (
+          <div key={item.id} className={styles.item}>
+            <button
+              className={item.primary ? `${styles.button} ${styles.primary}` : styles.button}
+              aria-describedby={`start-hint-${item.id}`}
+              onClick={actions[item.id]}
+            >
+              {item.label}
+              {item.id === 'resume' && savedState && (
+                <small>
+                  {savedState.players.p1.name} contro {savedState.players.p2.name} · turno{' '}
+                  {savedState.turn}
+                </small>
+              )}
+            </button>
+            <span id={`start-hint-${item.id}`} role="tooltip" className={styles.hint}>
+              {item.hint}
+            </span>
+          </div>
+        ))}
+      </nav>
+
+      <p className={styles.status}>{catalogStatus(catalog)}</p>
+
+      <input
+        ref={gameFile}
+        type="file"
+        accept=".json,application/json"
+        hidden
+        onChange={withFile(props.onLoadFile)}
+      />
+      <input
+        ref={catalogFile}
+        type="file"
+        accept=".csv,text/csv"
+        hidden
+        onChange={withFile(props.onImportCatalog)}
+      />
+    </div>
+  );
+}
+
+/** Hands the chosen file over, and clears the picker so the same file can be chosen again. */
+function withFile(onFile: (file: File) => void) {
+  return (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (file) {
+      onFile(file);
+    }
+  };
+}

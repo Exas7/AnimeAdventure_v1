@@ -1,0 +1,183 @@
+.board {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.background {
+  fill: #13213a;
+}
+
+.edge,
+.edgeClosed {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+/* Paths in red; closed ones very light grey, almost white (spec 013). */
+.edge {
+  stroke: #dc2626;
+}
+
+/* Closed for the current player (D-006). */
+.edgeClosed {
+  stroke: #f1f5f9;
+  stroke-dasharray: 14 12;
+}
+
+.edgeHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 28;
+  cursor: context-menu;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:hover .placeholder,
+.interactive:hover .pictureImage,
+.interactive:hover .cellSmall {
+  filter: brightness(1.15);
+}
+
+/* Passage cells: red dots with a black border (spec 013). */
+.cellSmall {
+  fill: #ef4444;
+  stroke: #000000;
+  stroke-width: 3;
+}
+
+.cellSpecial {
+  fill: #a855f7;
+  stroke: #0f172a;
+  stroke-width: 3;
+}
+
+/* A character without an image: white background, name in black (spec 002, D-024). */
+.placeholder {
+  fill: #ffffff;
+  stroke-width: 6;
+}
+
+/* A character's image cut to the circle, with the frame of its role on top. */
+.picture {
+  fill: #ffffff;
+}
+
+.frame {
+  fill: none;
+  stroke-width: 6;
+}
+
+.character {
+  stroke: #f59e0b;
+}
+
+.shop {
+  stroke: #10b981;
+}
+
+.start {
+  stroke: #94a3b8;
+}
+
+.conquered {
+  opacity: 0.5;
+}
+
+.conquered .placeholder {
+  fill: #9ca3af;
+}
+
+.conquered .pictureImage {
+  filter: grayscale(1);
+}
+
+.label {
+  fill: #000000;
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.caption {
+  fill: #047857;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+/* The pawn: a little figure whose head is the round pawn of before (spec 016). */
+.pawn {
+  pointer-events: none;
+}
+
+.pawn circle,
+.pawn path {
+  stroke: #0f172a;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.pawnP1 circle,
+.pawnP1 path {
+  fill: var(--p1);
+}
+
+.pawnP2 circle,
+.pawnP2 path {
+  fill: var(--p2);
+}
+
+.pawnCurrent circle,
+.pawnCurrent path {
+  stroke: #ffffff;
+  stroke-width: 5;
+}
+
+/* Director only: pawns are moved by dragging them (D-026). */
+.pawnDraggable {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.pawnDragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.55));
+}
+
+/* The cell a dragged pawn would land on. */
+.dropTarget {
+  fill: rgba(250, 204, 21, 0.18);
+  stroke: #facc15;
+  stroke-width: 4;
+  stroke-dasharray: 8 6;
+  pointer-events: none;
+}
+
+.pawnLabel {
+  fill: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.pawnP2 .pawnLabel {
+  fill: #ffffff;
+}

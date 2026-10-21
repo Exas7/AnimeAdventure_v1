@@ -1,0 +1,38 @@
+.stream {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--muted);
+  font-size: 1.4em;
+}
+
+/* The starter choice fills the window, as the channel's graphic (spec 025, 2.4). */
+.choice {
+  height: 100%;
+}
+
+/* The simulated fight fills the window too (spec 035, 2.11). */
+.battle {
+  height: 100%;
+}

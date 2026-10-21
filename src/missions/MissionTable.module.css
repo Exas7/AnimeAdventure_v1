@@ -1,0 +1,150 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filters button {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-size: 0.85em;
+}
+
+.filters .activeFilter {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.count {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.scroll {
+  min-height: 0;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  vertical-align: top;
+}
+
+.table td p {
+  margin: 0 0 2px;
+}
+
+.cell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: var(--panel-raised);
+}
+
+.quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+.right {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* The director's side panel: one card per mission. */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9em;
+  text-align: left;
+}
+
+.card:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.status.active {
+  color: var(--accent);
+}
+
+.status.done {
+  color: #22c55e;
+}

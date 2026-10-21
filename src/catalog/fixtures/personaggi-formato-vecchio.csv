@@ -1,0 +1,166 @@
+﻿nome;possibile starter;prezzo;tier;saga;razza;negoziante
+Son Goku (inizio);sì;;C+;Saiyan;Saiyan;-
+Son Goku (metà);-;1900;B+;Freezer;Saiyan;-
+Son Goku (metà) SSJ;-;2500;A;Freezer;Saiyan;-
+Son Goku (fine);-;2500;A;Majin Bu;Saiyan;-
+Son Goku (fine) SSJ;-;2800;A+;Majin Bu;Saiyan;-
+Son Goku (fine) SSJ2;-;3800;S;Majin Bu;Saiyan;-
+Son Goku (fine) SSJ3;-;4200;S+;Majin Bu;Saiyan;-
+Son Goku (GT);-;1900;B+;GT;Saiyan;-
+Son Goku (GT) SSJ;-;2800;A+;GT;Saiyan;-
+Son Goku (GT) SSJ3;-;3800;S;GT;Saiyan;-
+Son Goku SSJ4;-;5500;SS;GT;Saiyan;-
+Son Goku (bambino);sì;;C;Dragon Ball;Saiyan;-
+Son Goku (bambino) Oozaru;-;2200;A-;Dragon Ball;Saiyan;-
+Son Gohan (bambino);sì;;C;Saiyan;Ibrido Saiyan-terrestre;-
+Son Gohan (ragazzo);-;1900;B+;Cell;Ibrido Saiyan-terrestre;-
+Son Gohan (ragazzo) SSJ;-;2800;A+;Cell;Ibrido Saiyan-terrestre;-
+Son Gohan (ragazzo) SSJ2;-;3800;S;Cell;Ibrido Saiyan-terrestre;-
+Son Gohan;-;2500;A;Majin Bu;Ibrido Saiyan-terrestre;-
+Son Gohan SSJ;-;2800;A+;Majin Bu;Ibrido Saiyan-terrestre;-
+Son Gohan SSJ2;-;3800;S;Majin Bu;Ibrido Saiyan-terrestre;-
+Great Saiyaman;-;1700;B;Majin Bu;Ibrido Saiyan-terrestre;-
+Son Gohan (Ultimate);-;4200;S+;Majin Bu;Ibrido Saiyan-terrestre;-
+Son Gohan (futuro);-;1900;B+;Film e speciali;Ibrido Saiyan-terrestre;-
+Son Gohan (futuro) SSJ;-;2500;A;Film e speciali;Ibrido Saiyan-terrestre;-
+Son Goten;-;1700;B;Majin Bu;Ibrido Saiyan-terrestre;-
+Son Goten SSJ;-;2500;A;Majin Bu;Ibrido Saiyan-terrestre;-
+Vegeta (scouter);-;1700;B;Saiyan;Saiyan;-
+Vegeta (scouter) Oozaru;-;2500;A;Saiyan;Saiyan;-
+Vegeta;-;1900;B+;Cell;Saiyan;-
+Vegeta SSJ;-;2500;A;Cell;Saiyan;-
+Super Vegeta;-;2800;A+;Cell;Saiyan;-
+Vegeta (seconda forma);-;2500;A;Majin Bu;Saiyan;-
+Vegeta (seconda forma) SSJ;-;2800;A+;Majin Bu;Saiyan;-
+Vegeta (seconda forma) SSJ2;-;3800;S;Majin Bu;Saiyan;-
+Majin Vegeta;-;3800;S;Majin Bu;Saiyan;-
+Vegeta SSJ4;-;5500;SS;GT;Saiyan;-
+Trunks (spada);-;1900;B+;Cell;Ibrido Saiyan-terrestre;-
+Trunks (spada) SSJ;-;2500;A;Cell;Ibrido Saiyan-terrestre;-
+Trunks;-;1900;B+;Cell;Ibrido Saiyan-terrestre;-
+Trunks SSJ;-;2500;A;Cell;Ibrido Saiyan-terrestre;-
+Super Trunks;-;2800;A+;Cell;Ibrido Saiyan-terrestre;-
+Trunks (bambino);-;1700;B;Majin Bu;Ibrido Saiyan-terrestre;-
+Trunks (bambino) SSJ;-;2500;A;Majin Bu;Ibrido Saiyan-terrestre;-
+Gotenks;-;2800;A+;Majin Bu;Ibrido Saiyan-terrestre;-
+Gotenks SSJ;-;3400;S-;Majin Bu;Ibrido Saiyan-terrestre;-
+Gotenks SSJ3;-;4200;S+;Majin Bu;Ibrido Saiyan-terrestre;-
+Vegetto;-;5000;SS-;Majin Bu;Saiyan;-
+Super Vegetto;-;6000;SS+;Majin Bu;Saiyan;-
+Super Gogeta;-;6000;SS+;Film e speciali;Saiyan;-
+Gogeta SSJ4;-;6000;SS+;GT;Saiyan;-
+Piccolo (inizio);sì;;C+;Saiyan;Namecciano;-
+Piccolo (fine);-;2500;A;Cell;Namecciano;-
+Krilin;sì;;C;Saiyan;Terrestre;-
+Yamcha;sì;;C;Saiyan;Terrestre;-
+Tenshinhan;sì;;C+;Saiyan;Terrestre;-
+Jiaozi;-;;D+;Saiyan;Terrestre;-
+Yajirobe;-;;D+;Saiyan;Terrestre;-
+Muten Roshi;-;;D+;Dragon Ball;Terrestre;sì
+Muten Roshi (massima potenza);-;2500;A;Dragon Ball;Terrestre;-
+Videl;-;;C-;Majin Bu;Terrestre;-
+Great Saiyaman 2-go;sì;;C;Majin Bu;Terrestre;-
+Mr. Satan;-;;E;Cell;Terrestre;-
+Kaioshin;-;1900;B+;Majin Bu;Kaioshin;-
+Kibitoshin;-;2500;A;Majin Bu;Kaioshin;-
+Uub;-;2500;A;Majin Bu;Terrestre;-
+Super Uub;-;3400;S-;GT;Terrestre;-
+Pan;-;1700;B;GT;Ibrido Saiyan-terrestre;-
+Nail;-;1700;B;Freezer;Namecciano;-
+Bardock;sì;1500;B-;Film e speciali;Saiyan;-
+Bardock Oozaru;-;2200;A-;Film e speciali;Saiyan;-
+Selypa;sì;;C;Film e speciali;Saiyan;-
+Selypa Oozaru;-;2200;A-;Film e speciali;Saiyan;-
+Re Vegeta;sì;1500;B-;Saiyan;Saiyan;-
+Re Vegeta Oozaru;-;2200;A-;Saiyan;Saiyan;-
+Raditz;sì;;C+;Saiyan;Saiyan;-
+Raditz Oozaru;-;2200;A-;Saiyan;Saiyan;-
+Nappa;-;2200;A-;Saiyan;Saiyan;-
+Nappa Oozaru;-;2200;A-;Saiyan;Saiyan;-
+Saibaiman;-;;D;Saiyan;Saibaiman;-
+Zarbon;sì;;C+;Freezer;Alieno;-
+Zarbon (trasformato);sì;1500;B-;Freezer;Alieno;-
+Dodoria;sì;;C+;Freezer;Alieno;-
+Kyui;sì;;C;Freezer;Alieno;-
+Appule;-;;D;Freezer;Alieno;-
+Soldato di Freeza;-;;D;Freezer;Alieno;-
+Ginyu;-;1900;B+;Freezer;Alieno;-
+Recoome;-;1700;B;Freezer;Alieno;-
+Butter;-;2800;A+;Freezer;Alieno;-
+Jeeth;-;2200;A-;Freezer;Alieno;-
+Guldo;sì;;C;Freezer;Alieno;-
+Freeza (prima forma);-;1700;B;Freezer;Razza di Freezer;-
+Freeza (seconda forma);-;1900;B+;Freezer;Razza di Freezer;-
+Freeza (terza forma);-;1900;B+;Freezer;Razza di Freezer;-
+Freeza (forma finale);-;4200;S+;Freezer;Razza di Freezer;-
+Freeza (massima potenza);-;4200;S+;Freezer;Razza di Freezer;-
+Mecha Freeza;-;2500;A;Cell;Cyborg;-
+Re Cold;-;2500;A;Cell;Razza di Freezer;-
+C-16;-;2500;A;Cell;Androide;-
+C-17;-;2500;A;Cell;Androide;-
+C-18;-;2800;A+;Cell;Androide;-
+C-19;-;5000;SS-;Cell;Androide;-
+Dr. Gero (C-20);-;5000;SS-;Cell;Androide;-
+Cell (prima forma);-;3800;S;Cell;Bio-androide;-
+Cell (seconda forma);-;3800;S;Cell;Bio-androide;-
+Cell (forma perfetta);-;2800;A+;Cell;Bio-androide;-
+Cell (perfetto, massima potenza);-;5500;SS;Cell;Bio-androide;-
+Cell Jr.;-;1700;B;Cell;Bio-androide;-
+Majin Buu (buono);-;2800;A+;Majin Bu;Majin;-
+Majin Buu (puro male);-;2800;A+;Majin Bu;Majin;-
+Super Buu;-;3800;S;Majin Bu;Majin;-
+Super Buu (Gotenks assorbito);-;4200;S+;Majin Bu;Majin;-
+Super Buu (Son Gohan assorbito);-;5500;SS;Majin Bu;Majin;-
+Majin Buu (puro);-;5500;SS;Majin Bu;Majin;-
+Dabura;-;2800;A+;Majin Bu;Demone;-
+Bobbidi;-;;D-;Majin Bu;Alieno;-
+Spopovitch;sì;;C;Majin Bu;Terrestre;-
+Paikuhan;-;4200;S+;Film e speciali;Alieno;-
+Garlic Jr.;sì;;C;Film e speciali;Demone;-
+Super Garlic Jr.;-;1700;B;Film e speciali;Demone;-
+Dr. Uiro;-;1700;B;Film e speciali;Terrestre (cyborg);-
+Turles;-;1700;B;Film e speciali;Saiyan;-
+Turles Oozaru;-;2200;A-;Film e speciali;Saiyan;-
+Slug;-;2200;A-;Film e speciali;Namecciano;-
+Slug (gigante);-;3400;S-;Film e speciali;Namecciano;-
+Sauzer;sì;1500;B-;Film e speciali;Alieno;-
+Cooler;-;2500;A;Film e speciali;Razza di Freezer;-
+Cooler (forma finale);-;3400;S-;Film e speciali;Razza di Freezer;-
+Metal Cooler;-;3400;S-;Film e speciali;Cyborg;-
+C-13;-;2500;A;Film e speciali;Androide;-
+Super C-13;-;3400;S-;Film e speciali;Androide;-
+Broli;-;2800;A+;Film e speciali;Saiyan;-
+Broli SSJ;-;3800;S;Film e speciali;Saiyan;-
+Broli Super Saiyan Leggendario;-;5000;SS-;Film e speciali;Saiyan;-
+Zangya;-;1700;B;Film e speciali;Alieno;-
+Bojack;-;2500;A;Film e speciali;Alieno;-
+Bojack (massima potenza);-;3400;S-;Film e speciali;Alieno;-
+Janemba;-;3800;S;Film e speciali;Demone;-
+Super Janemba;-;5500;SS;Film e speciali;Demone;-
+Hildegarn;-;6000;SS+;Film e speciali;Mostro;-
+Tapion;-;3400;S-;Film e speciali;Alieno;-
+Baby Vegeta;-;2800;A+;GT;Tsufuru;-
+Super Baby 1;-;3800;S;GT;Tsufuru;-
+Super Baby 2;-;4200;S+;GT;Tsufuru;-
+Baby Oozaru;-;5000;SS-;GT;Tsufuru;-
+Super C-17;-;4200;S+;GT;Androide;-
+Su Shenron;-;3800;S;GT;Drago malvagio;-
+Ii Shenron;-;4200;S+;GT;Drago malvagio;-
+Super Ii Shenron;-;6000;SS+;GT;Drago malvagio;-
+Son Gohan (nonno);-;;D+;Dragon Ball;Terrestre;sì
+Tao Pai Pai;sì;;C;Dragon Ball;Terrestre;-
+Tao Pai Pai (cyborg);sì;;C+;Dragon Ball;Terrestre (cyborg);-
+Piccolo Daimao;sì;;C+;Dragon Ball;Namecciano;-
+Tambourine;sì;;C;Dragon Ball;Namecciano;-
+C-8;-;;C-;Dragon Ball;Androide;-
+Generale Blue;-;;E;Dragon Ball;Terrestre;-
+Namu;-;;D+;Dragon Ball;Terrestre;-
+Akkuman;-;;D;Dragon Ball;Demone;-
+Chichi (bambina);-;;D-;Dragon Ball;Terrestre;-
+Robot di Pilaf;-;;D;Dragon Ball;Robot;-
+Robot di Pilaf (combinato);-;;C-;Dragon Ball;Robot;-
+Arale;-;6000;SS+;Extra;Androide;-
+Kami;-;;;Dragon Ball;Namecciano;sì
+Karin;-;;;Dragon Ball;Gatto;sì
+Bulma;-;;;Dragon Ball;Terrestre;sì
+Baba la Veggente;-;;;Dragon Ball;Terrestre;sì

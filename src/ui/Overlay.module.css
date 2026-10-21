@@ -1,0 +1,98 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(2, 6, 23, 0.7);
+  animation: fade 0.2s ease-out;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.showdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.8em 1.6em;
+  border: 3px solid var(--danger);
+  border-radius: 0.8em;
+  background: var(--panel);
+  font-size: clamp(12px, 2.4cqmin, 30px);
+}
+
+.showdownSlot {
+  width: 5.4em;
+  height: 5.4em;
+  font-size: 0.85em;
+}
+
+.showdownTitle {
+  margin: 0;
+  color: var(--danger);
+  font-size: 2em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Two rows, one per player, with VS between them (spec 018). */
+.teams {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4em;
+}
+
+/* Name pinned on the left, cards in the middle column: an empty right
+   column as wide as the left one keeps the cards centred under VS. */
+.team {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.team h3 {
+  justify-self: start;
+  margin: 0;
+  font-size: 1.3em;
+  white-space: nowrap;
+}
+
+.team ol {
+  display: flex;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.p1 h3 {
+  color: var(--p1);
+}
+
+.p2 h3 {
+  color: var(--p2);
+}
+
+.versus {
+  align-self: center;
+  color: var(--danger);
+  font-size: 1.6em;
+  font-weight: 900;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

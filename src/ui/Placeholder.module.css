@@ -1,0 +1,43 @@
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* A real image (spec 013): small ones fill the square, big ones show the whole picture. */
+.picture {
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.picture.fill img {
+  object-fit: contain;
+}
+
+.small {
+  width: 72px;
+  height: 72px;
+  font-size: 12px;
+}
+
+.fill {
+  width: 100%;
+  height: 100%;
+  font-size: inherit;
+}

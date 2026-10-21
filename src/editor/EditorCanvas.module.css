@@ -1,0 +1,158 @@
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #0b1222;
+  touch-action: none;
+  user-select: none;
+}
+
+.cell {
+  cursor: crosshair;
+}
+
+.path {
+  cursor: alias;
+}
+
+.panning {
+  cursor: grab;
+}
+
+/* Choosing the cell that opens a path (D-027). */
+.picking,
+.picking .node circle {
+  cursor: crosshair;
+}
+
+.background {
+  fill: #13213a;
+}
+
+/* Same colours as the game board (spec 013). */
+.edge {
+  fill: none;
+  stroke: #dc2626;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.locked {
+  stroke: #f1f5f9;
+  stroke-dasharray: 14 12;
+}
+
+.edge.selected {
+  stroke: #facc15;
+  stroke-width: 9;
+}
+
+.edgeHit {
+  fill: none;
+  stroke: transparent;
+  cursor: pointer;
+}
+
+.node circle {
+  stroke: #0f172a;
+  stroke-width: 4;
+  cursor: pointer;
+}
+
+.empty {
+  fill: #ef4444;
+}
+
+.special {
+  fill: #a855f7;
+}
+
+.start {
+  fill: #ffffff;
+  stroke: #94a3b8 !important;
+  stroke-width: 6 !important;
+}
+
+.shop {
+  fill: #ffffff;
+  stroke: #10b981 !important;
+  stroke-width: 6 !important;
+}
+
+.character {
+  fill: #ffffff;
+  stroke: #f59e0b !important;
+  stroke-width: 6 !important;
+}
+
+.node.selected circle {
+  stroke: #facc15 !important;
+  stroke-width: 7 !important;
+}
+
+.node .keyRing {
+  fill: none;
+  stroke: #facc15;
+  stroke-width: 4;
+  stroke-dasharray: 7 5;
+  pointer-events: none;
+}
+
+.typeLabel {
+  fill: #000000;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.idLabel {
+  fill: #fde68a;
+  font-size: 12px;
+  font-weight: 600;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #0f172a;
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+.selectionRect {
+  fill: rgba(250, 204, 21, 0.12);
+  stroke: #facc15;
+  stroke-dasharray: 8 6;
+  stroke-width: 2;
+}
+
+.connectLine {
+  stroke: #facc15;
+  stroke-width: 5;
+  stroke-dasharray: 10 8;
+  pointer-events: none;
+}
+
+.insertHandle {
+  cursor: copy;
+}
+
+.insertHandle circle {
+  fill: #0f172a;
+  stroke: #facc15;
+  stroke-width: 2;
+}
+
+.insertHandle text {
+  fill: #facc15;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.curvePoint {
+  fill: #facc15;
+  stroke: #0f172a;
+  stroke-width: 2;
+  cursor: move;
+}

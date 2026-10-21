@@ -1,0 +1,1033 @@
+import { useCallback, useEffect, useState } from 'react';
+import {
+  canUndo,
+  cellMission,
+  cellNumber,
+  LASTING_MISSIONS,
+  missionsDone,
+  missionsOf,
+  createGame,
+  currentState,
+  isRepeatInteraction,
+  PLAYER_IDS,
+  SaveFileError,
+  turnRuleWarnings,
+  testItems,
+  type Game,
+  type GameMap,
+  type CellContent,
+  type Character,
+  type GameAction,
+  type GameContext,
+  type GameSetup,
+  type PlayerId,
+  type Warning,
+} from '../engine';
+import { importCatalog, summarizeCatalog } from '../catalog/importCatalog';
+import { loadAutosave } from '../storage/autosave';
+import { saveCatalog } from '../storage/catalogStore';
+import { listEpisodes, loadEpisode, newEpisodeId, saveEpisode } from '../storage/episodeLibrary';
+import { listSpecialKeepers } from '../storage/keeperStore';
+import { listMaps } from '../storage/mapLibrary';
+import { loadMissionCatalog, loadQuestions } from '../storage/missionStore';
+import { loadTexts } from '../storage/textStore';
+import { fillMissingLists } from '../included/fillIncluded';
+import { listIncludedMaps, loadAnyMap } from '../included/includedMaps';
+import type { CatalogMission, QuestionEntry } from '../missions/catalog';
+import { newEpisode } from '../episode/newEpisode';
+import { randomReport, type RandomReport } from '../episode/randomReport';
+import { DEFAULT_PER_SHOP, nextEpisodeName, randomEpisode } from '../episode/stepRandomize';
+import type { TextLibrary } from '../episode/textLibrary';
+import { listReadyPowers, saveReadyPower } from '../storage/powerStore';
+import type { StarterProposals } from '../starters/proposals';
+import type { ReadyPowerDraft } from '../starters/ReadyPowerForm';
+import { makeReadyPower, newReadyPowerId, type ReadyPower } from '../starters/readyPowers';
+import {
+  canStart,
+  chooseCard,
+  showOther,
+  startChoice,
+  starterChoiceView,
+  type StarterChoice,
+} from '../starters/starterChoice';
+import { MapsSection } from '../editor/MapsSection';
+import { EpisodesSection } from '../episode/EpisodesSection';
+import {
+  preparationReport,
+  prepareEpisodeContent,
+  withoutEmptyCharacterCells,
+} from '../episode/playEpisode';
+import type { ScreenPoint } from '../ui/Board';
+import type { ShopActions } from '../ui/ShopScreen';
+import { PlayerPanel, type PlayerPanelActions } from '../ui/PlayerPanel';
+import { Stage } from '../ui/Stage';
+import { CellEditor } from './CellEditor';
+import { decideClick, type PendingAction } from './confirmation';
+import { ContextMenu, type MenuState } from './ContextMenu';
+import { CorrectionsPanel } from './CorrectionsPanel';
+import { DiscardGameDialog } from './DiscardGameDialog';
+import { downloadGame, readGameFile } from './fileIO';
+import { LogPanel } from './LogPanel';
+import { MessageBar } from './MessageBar';
+import { MissionNotices } from './MissionNotices';
+import { missionRows } from '../missions/missionList';
+import { MissionTable } from '../missions/MissionTable';
+import { isPostponed, NOTHING_POSTPONED, postpone, type NotYet } from './notYet';
+import { buildSetup, defaultNewGameForm, playerNames, type NewGameForm } from './newGame';
+import { orderChoices, type MapChoice } from './mapGroups';
+import { NewGameScreen, NewGameUnavailable } from './NewGameScreen';
+import { pawnDropAction, pawnDropWarnings } from './pawnDrop';
+import {
+  challengeScreen,
+  chooseAnswer,
+  closeShown,
+  describeScreen,
+  exploreBoard,
+  isExploring,
+  nextLine,
+  openPreview,
+  showPreviewToAll,
+  shownInDirector,
+  type DirectorPreview,
+  type DirectorScreens,
+} from './screens';
+import { showdownDue } from './showdown';
+import { StarterChoiceStage } from './StarterChoiceStage';
+import { sheetProblemsNotice } from './startMenu';
+import { StartScreen } from './StartScreen';
+import { Toolbar } from './Toolbar';
+import { useGameSession } from './useGameSession';
+import styles from './DirectorApp.module.css';
+import { describeError } from '../describeError';
+
+/** How many import errors to list before "e altri N". */
+const MAX_IMPORT_ERRORS = 5;
+
+type Screen = 'loading' | 'start' | 'newGame' | 'starterChoice' | 'play' | 'maps' | 'episodes';
+
+/** The director window: the only one that changes the game (D-005). */
+export function DirectorApp() {
+  const session = useGameSession();
+  const { game, perform, showError } = session;
+  const [screen, setScreen] = useState<Screen>('loading');
+  const [saved, setSaved] = useState<Game | null>(null);
+  // Imported character list (D-017); null until one is imported (spec 010).
+  const [importedCatalog, setImportedCatalog] = useState<Character[] | null>(null);
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const [pending, setPending] = useState<PendingAction | null>(null);
+  // Edit mode (spec 004, 2.2): what opens is private to the director window.
+  const [editMode, setEditMode] = useState(false);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+  // Chosen in "Nuova partita": a map of the library (D-018) or a prepared
+  // episode with its content (D-019). Null choices: still loading.
+  const [mapChoices, setMapChoices] = useState<MapChoice[] | null>(null);
+  const [newGameMap, setNewGameMap] = useState<{
+    id: string;
+    map: GameMap;
+    episodeContent: Record<string, CellContent> | null;
+    /** The episode's special shopkeepers (D-035): they join the game's list. */
+    keepers: Character[];
+  } | null>(null);
+  // "Randomizza tutto" on a map (spec 030, D-046): what it did, and the
+  // name of the episode once saved with "Salva anche come puntata".
+  const [randomized, setRandomized] = useState<{
+    report: RandomReport;
+    round: number;
+    savedName: string | null;
+  } | null>(null);
+  // What "Randomizza tutto" draws from, read when "Nuova partita" opens.
+  const [randomLibraries, setRandomLibraries] = useState<{
+    specialKeepers: Character[];
+    missions: CatalogMission[];
+    questions: QuestionEntry[];
+    texts: TextLibrary;
+    episodeNames: string[];
+  } | null>(null);
+  // "Nuova partita" and its scene of the starter choice (spec 025): the form
+  // and the choice are kept when going from one to the other.
+  const [newGameForm, setNewGameForm] = useState<NewGameForm | null>(null);
+  const [choice, setChoice] = useState<StarterChoice | null>(null);
+  // The list of ready powers for the proposals (D-037).
+  const [readyPowers, setReadyPowers] = useState<ReadyPower[]>([]);
+  // Completed missions answered "Non ancora": quiet until the turn changes (spec 026, 2.4).
+  const [notYet, setNotYet] = useState<NotYet>(NOTHING_POSTPONED);
+  // What changed when an episode started (spec 007, 2.7): stays until closed.
+  const [startNotice, setStartNotice] = useState<string[]>([]);
+  // "Chiudi e cancella partita" waiting for the host's confirmation (D-030).
+  const [discardAsked, setDiscardAsked] = useState(false);
+  // A character's scene, or the board, for the director only, over what the stream shows (D-032).
+  const [preview, setPreview] = useState<DirectorPreview | null>(null);
+
+  // Any change to the game (another action, undo, end of turn) cancels a pending second click.
+  useEffect(() => {
+    setPending(null);
+  }, [game]);
+
+  useEffect(() => {
+    let cancelled = false;
+    // What the browser lacks comes from the files of the project (D-045).
+    fillMissingLists()
+      .then(({ catalog }) => {
+        if (!cancelled) {
+          setImportedCatalog(catalog);
+        }
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) {
+          showError(`La lista dei personaggi salvata non è leggibile: ${describeError(cause)}`);
+        }
+      });
+    loadAutosave()
+      .then((autosaved) => {
+        if (!cancelled) {
+          setSaved(autosaved);
+        }
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) {
+          showError(`Il salvataggio automatico non è leggibile: ${describeError(cause)}`);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setScreen('start');
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showError]);
+
+  const { undo, redo } = session;
+  useEffect(() => {
+    if (screen !== 'play') {
+      return undefined;
+    }
+    // The same keys as in the editors: Ctrl+Z, and Ctrl+Y or Ctrl+Shift+Z (spec 021).
+    const onKeyDown = (event: KeyboardEvent) => {
+      const typing =
+        event.target instanceof Element && event.target.closest('input, select, textarea');
+      if (!(event.ctrlKey || event.metaKey) || typing) {
+        return;
+      }
+      const key = event.key.toLowerCase();
+      if (key === 'y' || (key === 'z' && event.shiftKey)) {
+        event.preventDefault();
+        redo();
+      } else if (key === 'z') {
+        event.preventDefault();
+        undo();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [screen, undo, redo]);
+
+  const closeMenu = useCallback(() => setMenu(null), []);
+
+  // While the scene of the starter choice is open, the stream shows it (spec 025, 2.4).
+  const choiceView =
+    screen === 'starterChoice' && newGameForm && choice && importedCatalog
+      ? starterChoiceView(
+          newGameForm.proposals,
+          choice,
+          playerNames(newGameForm),
+          newGameForm.startingCoins,
+          [...importedCatalog, ...(newGameMap?.keepers ?? [])],
+        )
+      : null;
+  const choiceKey = choiceView ? JSON.stringify(choiceView) : null;
+  const { setStarterChoice } = session;
+  useEffect(() => {
+    setStarterChoice(choiceView);
+    // The key changes exactly when what the scene shows changes.
+  }, [choiceKey, setStarterChoice]);
+
+  // Another game: the preview of the previous one goes away.
+  const startSession = (next: Game) => {
+    session.start(next);
+    setPreview(null);
+  };
+  const closeDiscardDialog = useCallback(() => setDiscardAsked(false), []);
+
+  const startGame = (setup: GameSetup) => {
+    try {
+      if (newGameMap?.episodeContent) {
+        // The chosen starters leave the episode's map (spec 007, 2.7).
+        const shops = setup.map.nodes.filter((node) => node.type === 'shop');
+        const prepared = prepareEpisodeContent(
+          setup.content,
+          setup.catalog,
+          [setup.players.p1.starter.characterId, setup.players.p2.starter.characterId],
+          new Set(shops.map((node) => node.id)),
+        );
+        // Character cells left empty do not exist in a game (D-023).
+        const map = withoutEmptyCharacterCells(setup.map, prepared.content);
+        startSession(createGame({ ...setup, map, content: prepared.content }));
+        setStartNotice(preparationReport(prepared));
+      } else {
+        const map = withoutEmptyCharacterCells(setup.map, setup.content);
+        startSession(createGame({ ...setup, map }));
+        setStartNotice([]);
+      }
+      setScreen('play');
+    } catch (cause) {
+      showError(`Impossibile iniziare la partita: ${describeError(cause)}`);
+    }
+  };
+
+  const loadFile = (file: File) => {
+    readGameFile(file)
+      .then((loaded) => {
+        startSession(loaded);
+        setScreen('play');
+      })
+      .catch((cause: unknown) => {
+        showError(cause instanceof SaveFileError ? cause.message : describeError(cause));
+      });
+  };
+
+  // New games: cells start empty on a map, or with the episode's content.
+  const newGameContext: GameContext | null =
+    newGameMap && importedCatalog
+      ? {
+          map: newGameMap.map,
+          catalog: [...importedCatalog, ...newGameMap.keepers],
+          items: testItems,
+        }
+      : null;
+  const newGameContent: Record<string, CellContent> = newGameMap?.episodeContent ?? {};
+
+  const refreshPowers = () =>
+    listReadyPowers()
+      .then(setReadyPowers)
+      .catch((cause: unknown) => showError(`Impossibile leggere i poteri: ${describeError(cause)}`));
+
+  // "Nuovo potere…" (spec 025, 2.3): into the list first, then into the proposal.
+  const createPower = async (draft: ReadyPowerDraft): Promise<ReadyPower | null> => {
+    const power = makeReadyPower(newReadyPowerId(), draft.cardText, draft.effect);
+    try {
+      await saveReadyPower(power);
+      await refreshPowers();
+      return power;
+    } catch (cause) {
+      showError(`Potere non aggiunto: ${describeError(cause)}`);
+      return null;
+    }
+  };
+
+  const openNewGame = () => {
+    setScreen('newGame');
+    setMapChoices(null);
+    void refreshPowers();
+    Promise.all([listSpecialKeepers(), loadMissionCatalog(), loadQuestions(), loadTexts(), listEpisodes()])
+      .then(([specialKeepers, missions, questions, texts, episodes]) =>
+        setRandomLibraries({
+          specialKeepers,
+          missions,
+          questions,
+          texts,
+          episodeNames: episodes.map((entry) => entry.name),
+        }),
+      )
+      .catch((cause: unknown) => showError(`Impossibile leggere le librerie: ${describeError(cause)}`));
+    Promise.all([listMaps(), listIncludedMaps(), listEpisodes()])
+      .then(([maps, included, episodes]) => {
+        if (included.errors.length > 0) {
+          showError(`Mappe base non lette: ${included.errors.join(' ')}`);
+        }
+        // Episodes, maps, base maps (spec 033, 2.1): the first one is proposed;
+        // a new browser has only the base maps (spec 036).
+        const choices = orderChoices([
+          ...episodes.map(
+            (entry): MapChoice => ({ id: entry.id, name: entry.name, kind: 'episode' }),
+          ),
+          ...maps.map((entry): MapChoice => ({ id: entry.id, name: entry.name, kind: 'map' })),
+          ...included.maps.map(
+            (entry): MapChoice => ({ id: entry.id, name: entry.map.name, kind: 'included' }),
+          ),
+        ]);
+        setMapChoices(choices);
+        // Keep the last choice if it still exists, otherwise take the first one.
+        const choice = choices.find((entry) => entry.id === newGameMap?.id) ?? choices[0];
+        if (choice) {
+          selectNewGameMap(choice);
+        } else {
+          setNewGameMap(null);
+        }
+      })
+      .catch((cause: unknown) => showError(`Impossibile leggere la libreria: ${describeError(cause)}`));
+  };
+
+  // Another map or episode: the form starts again from its proposals (spec 025, 2.3).
+  const useNewGameMap = (next: NonNullable<typeof newGameMap>, starters?: StarterProposals) => {
+    setNewGameMap(next);
+    setNewGameForm(defaultNewGameForm(next.map, starters));
+    setChoice(null);
+    setRandomized(null);
+  };
+
+  // "Randomizza tutto" (spec 030, 2.3): starters, shops, characters and
+  // missions on the chosen map; names, coins and start cells stay.
+  const randomizeNewGame = () => {
+    if (!newGameMap || !newGameForm || !importedCatalog || !randomLibraries) {
+      return;
+    }
+    const { specialKeepers, missions, questions, texts } = randomLibraries;
+    const result = randomEpisode(newGameMap.map, {
+      catalog: importedCatalog,
+      specialKeepers,
+      powers: readyPowers,
+      texts,
+      missions: { catalog: missions, questions, items: testItems },
+      perShop: DEFAULT_PER_SHOP,
+      random: Math.random,
+    });
+    const episode = newEpisode(
+      { name: '', map: newGameMap.map, content: result.content, starters: result.starters },
+      specialKeepers,
+    );
+    setNewGameMap({ ...newGameMap, episodeContent: episode.content, keepers: episode.keepers ?? [] });
+    setNewGameForm({ ...newGameForm, proposals: result.starters });
+    setChoice(null);
+    const report = randomReport(
+      newGameMap.map,
+      episode.content,
+      [...importedCatalog, ...specialKeepers],
+      testItems,
+      result,
+    );
+    setRandomized((current) => ({ report, round: (current?.round ?? 0) + 1, savedName: null }));
+  };
+
+  // "Salva anche come puntata": the starters as they are now, changes included.
+  const saveRandomAsEpisode = () => {
+    if (!newGameMap?.episodeContent || !newGameForm || !randomLibraries || !randomized) {
+      return;
+    }
+    const name = nextEpisodeName(newGameMap.map.name, randomLibraries.episodeNames);
+    const episode = newEpisode(
+      { name, map: newGameMap.map, content: newGameMap.episodeContent, starters: newGameForm.proposals },
+      newGameMap.keepers,
+    );
+    saveEpisode(newEpisodeId(), episode)
+      .then(() => {
+        setRandomized({ ...randomized, savedName: name });
+        setRandomLibraries({ ...randomLibraries, episodeNames: [...randomLibraries.episodeNames, name] });
+      })
+      .catch((cause: unknown) => showError(`Puntata non salvata: ${describeError(cause)}`));
+  };
+
+  const selectNewGameMap = (mapChoice: MapChoice) => {
+    const { id } = mapChoice;
+    if (mapChoice.kind === 'episode') {
+      loadEpisode(id)
+        .then((episode) =>
+          episode
+            ? useNewGameMap(
+                {
+                  id,
+                  map: episode.map,
+                  episodeContent: episode.content,
+                  keepers: episode.keepers ?? [],
+                },
+                episode.starters,
+              )
+            : showError('Questa puntata non si riesce più a leggere.'),
+        )
+        .catch((cause: unknown) => showError(`Impossibile aprire la puntata: ${describeError(cause)}`));
+      return;
+    }
+    loadAnyMap(id)
+      .then((map) =>
+        map
+          ? useNewGameMap({ id, map, episodeContent: null, keepers: [] })
+          : showError('Questa mappa non si riesce più a leggere.'),
+      )
+      .catch((cause: unknown) => showError(`Impossibile aprire la mappa: ${describeError(cause)}`));
+  };
+
+  const importCatalogFile = (file: File) => {
+    file
+      .text()
+      .then(async (text) => {
+        const result = importCatalog(text);
+        if (!result.ok) {
+          const shown = result.errors.slice(0, MAX_IMPORT_ERRORS);
+          const more = result.errors.length - shown.length;
+          showError(
+            `Lista non importata, resta quella di prima. ${shown.join(' ')}` +
+              (more > 0 ? ` E altri ${more} errori.` : ''),
+          );
+          return;
+        }
+        await saveCatalog(result.catalog);
+        setImportedCatalog(result.catalog);
+        session.clearError();
+        // Wrong sheet values do not stop the import: they count as empty (spec 037, 2.2).
+        setStartNotice(sheetProblemsNotice(result.sheetProblems));
+      })
+      .catch((cause: unknown) => showError(`Impossibile importare la lista: ${describeError(cause)}`));
+  };
+
+  // The game stays in progress and the stream keeps showing it (spec 010).
+  const openStartMenu = () => {
+    setMenu(null);
+    setEditingNodeId(null);
+    setPending(null);
+    setScreen('start');
+  };
+
+  // The game and its automatic save are deleted: no game is left to resume (spec 019).
+  const discardGame = () => {
+    setDiscardAsked(false);
+    setPreview(null);
+    setMenu(null);
+    setEditMode(false);
+    setEditingNodeId(null);
+    setPending(null);
+    setStartNotice([]);
+    setSaved(null);
+    setScreen('start');
+    session.discard().catch((cause: unknown) =>
+      showError(
+        `La partita è chiusa, ma il salvataggio automatico non si è cancellato (${describeError(cause)}): ` +
+          'ricaricando la pagina potrebbe tornare.',
+      ),
+    );
+  };
+
+  const openStream = () => {
+    window.open(`${window.location.pathname}?view=stream`, 'arkanite-stream', 'popup,width=1280,height=800');
+  };
+
+  const messages = (
+    <MessageBar
+      warnings={session.warnings}
+      pending={pending?.warnings}
+      pendingIsMove={pending?.action.type === 'move' || pending?.action.type === 'placePawn'}
+      error={session.error}
+      onCloseError={session.clearError}
+      notice={startNotice}
+      onCloseNotice={() => setStartNotice([])}
+    />
+  );
+
+  if (screen === 'loading') {
+    return <div className={styles.loading}>Caricamento…</div>;
+  }
+  if (screen === 'maps') {
+    return (
+      <>
+        {messages}
+        <MapsSection onBack={() => setScreen('start')} showError={showError} />
+      </>
+    );
+  }
+  if (screen === 'episodes') {
+    return (
+      <>
+        {messages}
+        <EpisodesSection
+          catalog={importedCatalog ?? []}
+          onBack={() => setScreen('start')}
+          showError={showError}
+        />
+      </>
+    );
+  }
+  if (screen === 'start' || (screen === 'play' && !game)) {
+    return (
+      <>
+        {messages}
+        <StartScreen
+          saved={game ?? saved}
+          catalog={importedCatalog ? summarizeCatalog(importedCatalog) : null}
+          onImportCatalog={importCatalogFile}
+          onResume={() => {
+            // A game in progress goes on as it was; otherwise the automatic save.
+            if (game) {
+              setScreen('play');
+            } else if (saved) {
+              startSession(saved);
+              setScreen('play');
+            }
+          }}
+          onNewGame={openNewGame}
+          onLoadFile={loadFile}
+          onOpenMaps={() => setScreen('maps')}
+          onOpenEpisodes={() => setScreen('episodes')}
+        />
+      </>
+    );
+  }
+  if (screen === 'starterChoice' && choiceView && choice && newGameForm && newGameContext) {
+    const form = newGameForm;
+    return (
+      <>
+        {messages}
+        <StarterChoiceStage
+          view={choiceView}
+          firstPlayer={form.firstPlayer}
+          canStart={canStart(form.proposals, choice)}
+          onChoose={(index) => setChoice(chooseCard(choice, index))}
+          onShowOther={() => setChoice(showOther(choice))}
+          onBack={() => setScreen('newGame')}
+          onStart={() => startGame(buildSetup(form, choice, newGameContext, newGameContent))}
+          onOpenStream={openStream}
+        />
+      </>
+    );
+  }
+  if (screen === 'newGame' || screen === 'starterChoice' || !game) {
+    // Without a character list or a map there is nothing to start (spec 010).
+    const missing = !importedCatalog ? 'catalog' : mapChoices?.length === 0 ? 'map' : null;
+    return (
+      <>
+        {messages}
+        {missing ? (
+          <NewGameUnavailable
+            missing={missing}
+            onOpenMaps={() => setScreen('maps')}
+            onBack={() => setScreen('start')}
+          />
+        ) : newGameContext && newGameMap && newGameForm && mapChoices ? (
+          <NewGameScreen
+            key={newGameMap.id}
+            mapChoices={mapChoices}
+            selectedMapId={newGameMap.id}
+            onSelectMap={(id) => {
+              const mapChoice = mapChoices.find((entry) => entry.id === id);
+              if (mapChoice) {
+                selectNewGameMap(mapChoice);
+              }
+            }}
+            context={newGameContext}
+            content={newGameContent}
+            form={newGameForm}
+            onChange={setNewGameForm}
+            readyPowers={readyPowers}
+            onCreatePower={createPower}
+            onOpenChoice={() => {
+              setChoice((current) => current ?? startChoice(newGameForm.firstPlayer));
+              setScreen('starterChoice');
+            }}
+            onBackToMenu={() => setScreen('start')}
+            onResumeGame={game ? () => setScreen('play') : undefined}
+            onRandomize={
+              mapChoices.find((entry) => entry.id === newGameMap.id)?.kind === 'episode'
+                ? undefined
+                : randomizeNewGame
+            }
+            random={randomized ? { report: randomized.report, round: randomized.round } : null}
+            savedAsEpisode={randomized?.savedName ?? null}
+            onSaveAsEpisode={saveRandomAsEpisode}
+          />
+        ) : (
+          <div className={styles.loading}>Caricamento…</div>
+        )}
+      </>
+    );
+  }
+
+  const state = currentState(game);
+  const name = (playerId: PlayerId) => state.players[playerId].name;
+
+  // Off-rule moves, interactions and purchases, and an end of turn with
+  // actions left, ask for a second click first (D-013, D-014, D-015, D-033).
+  const tryWithRules = (action: GameAction, onDone?: () => void) =>
+    askThenPerform(action, turnRuleWarnings(state, action, game), onDone);
+
+  const askThenPerform = (action: GameAction, warnings: Warning[], onDone?: () => void) => {
+    const decision = decideClick(pending, action, warnings);
+    if (decision.kind === 'ask') {
+      setPending(decision.pending);
+      return;
+    }
+    if (perform(decision.action, { alreadyShown: decision.alreadyShown })) {
+      onDone?.();
+    }
+  };
+
+  const isShop = (nodeId: string) =>
+    game.map.nodes.find((candidate) => candidate.id === nodeId)?.type === 'shop';
+  // A special cell's meaning, after its number in the menu (spec 034, 2.5).
+  const specialMeaning = (nodeId: string) => {
+    const node = game.map.nodes.find((candidate) => candidate.id === nodeId);
+    const note = node?.type === 'special' ? node.note?.trim() : undefined;
+    return note ? ` · ${note}` : '';
+  };
+
+  // What the stream shows and the director's preview on top of it (D-032).
+  const screens: DirectorScreens = { shared: session.overlay, preview };
+  const applyScreens = (next: DirectorScreens) => {
+    if (next.shared !== session.overlay) {
+      session.setOverlay(next.shared);
+    }
+    setPreview(next.preview);
+  };
+  // "Esplora Regia": only the double click works on the board (spec 020, 2.3).
+  const exploring = isExploring(screens);
+  const cellName = (nodeId: string) =>
+    game.catalog.find((character) => character.id === state.cells[nodeId]?.characterId)?.name ??
+    `casella ${cellNumber(nodeId)}`;
+
+  const handleNodeClick = (nodeId: string) => {
+    if (editMode) {
+      setEditingNodeId(nodeId);
+      return;
+    }
+    // Pawns move by dragging them (D-026): a click on another cell does nothing.
+    if (state.players[state.currentPlayer].position !== nodeId) {
+      return;
+    }
+    if (isShop(nodeId)) {
+      // Entering the shop uses no action (spec 002, section 4).
+      session.setOverlay({ kind: 'shop', nodeId });
+      return;
+    }
+    // Any cell with a character can be interacted with (D-016). Reopening the
+    // scene where the player already interacted counts nothing (spec 020, 2.4).
+    if (state.cells[nodeId]?.characterId !== undefined) {
+      const open = () => session.setOverlay(challengeScreen(nodeId));
+      if (isRepeatInteraction(state, nodeId)) {
+        open();
+      } else {
+        tryWithRules({ type: 'interact', nodeId }, open);
+      }
+    }
+  };
+
+  // A double click shows any character's scene to the director only (D-032).
+  // On the cell of the current pawn the click has already opened it for
+  // everyone, except on the explored board, where clicks do nothing.
+  const handleNodeDoubleClick = (nodeId: string) => {
+    if (
+      editMode ||
+      isShop(nodeId) ||
+      state.cells[nodeId]?.characterId === undefined ||
+      (!exploring && state.players[state.currentPlayer].position === nodeId)
+    ) {
+      return;
+    }
+    applyScreens(openPreview(screens, nodeId));
+  };
+
+  // "Mostra al pubblico" (spec 020, 2.3): it is the interaction of the turn
+  // only where the current pawn stands, with the same rules as the click.
+  const showPreviewToPublic = () => {
+    if (preview?.kind !== 'challenge') {
+      return;
+    }
+    const show = () => applyScreens(showPreviewToAll(screens));
+    const { nodeId } = preview;
+    if (state.players[state.currentPlayer].position === nodeId && !isRepeatInteraction(state, nodeId)) {
+      tryWithRules({ type: 'interact', nodeId }, show);
+    } else {
+      show();
+    }
+  };
+
+  const showNextLine = () => {
+    const shown = shownInDirector(screens);
+    const lineCount = shown?.kind === 'challenge' ? (state.cells[shown.nodeId]?.lines?.length ?? 0) : 0;
+    applyScreens(nextLine(screens, lineCount));
+  };
+
+  const handlePawnDrop = (playerId: PlayerId, nodeId: string) => {
+    const action = pawnDropAction(state, playerId, nodeId);
+    if (action?.type === 'move') {
+      tryWithRules(action);
+    } else if (action) {
+      // The other player's pawn: a second drop on the same cell, every time (D-033).
+      askThenPerform(action, pawnDropWarnings(state, playerId));
+    }
+  };
+
+  const openNodeMenu = (nodeId: string, at: ScreenPoint) =>
+    setMenu({
+      at,
+      title: `Casella ${cellNumber(nodeId)}${specialMeaning(nodeId)}`,
+      items: [
+        ...(isShop(nodeId)
+          ? [{ label: 'Apri negozio', run: () => session.setOverlay({ kind: 'shop', nodeId }) }]
+          : []),
+        ...PLAYER_IDS.map((playerId) => ({
+          label: `${name(playerId)} conquista questa casella`,
+          run: () => perform({ type: 'setConquest', nodeId, player: playerId }),
+        })),
+        {
+          label: 'Casella di nuovo libera',
+          run: () => perform({ type: 'setConquest', nodeId, player: null }),
+        },
+        ...PLAYER_IDS.map((playerId) => ({
+          label: `Metti qui la pedina di ${name(playerId)} (senza contare l'azione)`,
+          run: () => perform({ type: 'placePawn', player: playerId, nodeId }),
+        })),
+      ],
+    });
+
+  const openEdgeMenu = (edgeId: string, at: ScreenPoint) => {
+    const locks = state.edgeLocks[edgeId];
+    const edge = game.map.edges.find((candidate) => candidate.id === edgeId);
+    const lockText = (playerId: PlayerId) =>
+      `${name(playerId)} ${locks?.[playerId] ? 'chiuso' : 'aperto'}`;
+    setMenu({
+      at,
+      title: [`Percorso: ${lockText('p1')} · ${lockText('p2')}`, edge?.lockNote]
+        .filter(Boolean)
+        .join(' — '),
+      items: [
+        { label: 'Sblocca per entrambi', run: () => perform({ type: 'setEdgeLock', edgeId, players: 'both', locked: false }) },
+        { label: 'Blocca per entrambi', run: () => perform({ type: 'setEdgeLock', edgeId, players: 'both', locked: true }) },
+        ...PLAYER_IDS.flatMap((playerId) => [
+          { label: `Sblocca solo per ${name(playerId)}`, run: () => perform({ type: 'setEdgeLock', edgeId, players: playerId, locked: false }) },
+          { label: `Blocca solo per ${name(playerId)}`, run: () => perform({ type: 'setEdgeLock', edgeId, players: playerId, locked: true }) },
+        ]),
+      ],
+    });
+  };
+
+  const panelActions = (playerId: PlayerId): PlayerPanelActions => ({
+    setCoins: (coins) => perform({ type: 'setCoins', player: playerId, coins }),
+    addCharacter: (characterId) => perform({ type: 'addCharacter', player: playerId, characterId }),
+    removeCharacter: (characterId) =>
+      perform({ type: 'removeCharacter', player: playerId, characterId }),
+    usePower: (powerId) => perform({ type: 'usePower', player: playerId, powerId }),
+    setPowerUses: (powerId, uses) =>
+      perform({ type: 'setPowerUses', player: playerId, powerId, uses }),
+    addItem: (itemId) => perform({ type: 'addToInventory', player: playerId, itemId }),
+    removeItem: (itemId) => perform({ type: 'removeFromInventory', player: playerId, itemId }),
+    completeMission: (nodeId) => perform({ type: 'completeMission', nodeId, player: playerId }),
+    abandonMission: (missionId) => perform({ type: 'abandonMission', missionId }),
+  });
+
+  // Missions whose condition came true (D-040): the host gives the reward with one click.
+  const missionNotices = missionsDone(state)
+    .filter((active) => !isPostponed(notYet, state.turn, active.id))
+    .map((active) => ({
+      id: active.id,
+      nodeId: active.nodeId,
+      player: active.player,
+      text: `Missione di ${cellName(active.nodeId)} completata da ${name(active.player)}`,
+    }));
+
+  const priceActions: ShopActions = {
+    setCharacterPrice: (characterId, price) =>
+      perform({ type: 'setCharacterPrice', characterId, price }),
+    setItemPrice: (itemId, price) => perform({ type: 'setItemPrice', itemId, price }),
+  };
+
+  const shopActions = (shopNodeId: string): ShopActions => ({
+    ...priceActions,
+    buyCharacter: (characterId) =>
+      tryWithRules({ type: 'buyCharacter', shopNodeId, characterId }),
+    buyItem: (itemId) => tryWithRules({ type: 'buyItem', shopNodeId, itemId }),
+  });
+
+  // Pawns together at the end of a turn: the showdown opens by itself, and the
+  // host can close it and play on (D-029). Ending a turn never moves a pawn,
+  // so the positions before it are the ones after it.
+  const endTurn = () =>
+    tryWithRules({ type: 'endTurn' }, () => {
+      if (showdownDue(state)) {
+        session.setOverlay({ kind: 'showdown' });
+      }
+    });
+
+  const toggleEditMode = () => {
+    setEditMode((on) => !on);
+    setEditingNodeId(null);
+  };
+
+  const current = state.currentPlayer;
+  // On a screen open on both windows: hide it in the director only (spec 020, 2.3).
+  const exploreButton = (
+    <button onClick={() => applyScreens(exploreBoard(screens))}>Esplora Regia</button>
+  );
+
+  return (
+    <div className={styles.director}>
+      <Toolbar
+        state={state}
+        canUndo={canUndo(game)}
+        canRedo={session.canRedo}
+        layout={session.layout}
+        onEndTurn={endTurn}
+        onUndo={undo}
+        onRedo={redo}
+        onShowdown={() => session.setOverlay({ kind: 'showdown' })}
+        onSaveFile={() => downloadGame(game)}
+        onLoadFile={loadFile}
+        onOpenStream={openStream}
+        onNewGame={openNewGame}
+        onOpenStartMenu={openStartMenu}
+        onDiscardGame={() => setDiscardAsked(true)}
+        onLayoutChange={session.setLayout}
+        editMode={editMode}
+        onToggleEditMode={toggleEditMode}
+      />
+      {messages}
+      <main className={styles.main}>
+        <div className={`${styles.boardArea} ${editMode ? styles.editing : ''}`}>
+          <Stage
+            map={game.map}
+            catalog={game.catalog}
+            items={game.items}
+            state={state}
+            overlay={shownInDirector(screens)}
+            previewOnly={preview !== null}
+            onNodeClick={exploring ? undefined : handleNodeClick}
+            onNodeDoubleClick={editMode ? undefined : handleNodeDoubleClick}
+            onNextLine={showNextLine}
+            onAnswer={(answer) => applyScreens(chooseAnswer(screens, answer))}
+            onNodeMenu={exploring ? undefined : openNodeMenu}
+            onEdgeMenu={exploring ? undefined : openEdgeMenu}
+            onEdgeClick={editMode && !exploring ? openEdgeMenu : undefined}
+            onPawnDrop={editMode || exploring ? undefined : handlePawnDrop}
+            onCloseNotification={session.closeNotification}
+            challengeControls={(nodeId, character) => {
+              // The buttons follow the mission (spec 026, 2.3); without one, "Assegna" as before.
+              const mission = cellMission(state.cells[nodeId]);
+              const shown = shownInDirector(screens);
+              const answer = shown?.kind === 'challenge' ? shown.answer : undefined;
+              const close = () => applyScreens(closeShown(screens));
+              const complete = (label: string) => (
+                <button
+                  title={`Il premio va a ${name(current)}`}
+                  onClick={() => perform({ type: 'completeMission', nodeId, player: current })}
+                >
+                  {label}
+                </button>
+              );
+              return (
+                <>
+                  {!mission && character && (
+                    <button onClick={() => perform({ type: 'assign', nodeId, player: current })}>
+                      Assegna a {name(current)}
+                    </button>
+                  )}
+                  {mission?.type === 'fight' && (
+                    <>
+                      {complete(mission.condition === 'transform' ? 'Si è trasformato' : 'Vinta')}
+                      <button onClick={close}>Persa</button>
+                    </>
+                  )}
+                  {mission?.type === 'quiz' &&
+                    answer !== undefined &&
+                    (answer === mission.quiz?.correct ? (
+                      complete('Dai il premio')
+                    ) : (
+                      <span>Risposta sbagliata: nessun premio, la casella resta libera.</span>
+                    ))}
+                  {mission?.type === 'quiz' && answer === undefined && (
+                    <span>Clicca la risposta data da {name(current)}.</span>
+                  )}
+                  {mission?.type === 'other' && complete('Completata')}
+                  {mission && LASTING_MISSIONS.includes(mission.type) && (
+                    <button
+                      title={`La missione va tra quelle in corso di ${name(current)}`}
+                      onClick={() => perform({ type: 'acceptMission', nodeId, player: current })}
+                    >
+                      Accetta
+                    </button>
+                  )}
+                  {preview ? (
+                    <button onClick={showPreviewToPublic}>Mostra al pubblico</button>
+                  ) : (
+                    exploreButton
+                  )}
+                  <button onClick={close}>Chiudi</button>
+                </>
+              );
+            }}
+            showdownControls={
+              <>
+                {exploreButton}
+                <button onClick={() => session.setOverlay(null)}>Chiudi</button>
+              </>
+            }
+            shopActions={shopActions}
+            shopControls={
+              <>
+                {exploreButton}
+                <button onClick={() => session.setOverlay(null)}>Chiudi</button>
+              </>
+            }
+          />
+          {exploring && session.overlay && (
+            <div className={styles.exploring}>
+              <span className={styles.directorOnly}>Solo in regia</span>
+              <span>
+                Sullo stream: {describeScreen(session.overlay, cellName)}. Doppio clic su un
+                personaggio per l'anteprima.
+              </span>
+              <button onClick={() => applyScreens(closeShown(screens))}>Torna allo stream</button>
+            </div>
+          )}
+          {editMode && editingNodeId && (
+            <CellEditor
+              key={editingNodeId}
+              context={game}
+              state={state}
+              nodeId={editingNodeId}
+              shopActions={priceActions}
+              onClose={() => setEditingNodeId(null)}
+              onSave={(content) => {
+                if (perform({ type: 'setCellContent', nodeId: editingNodeId, content })) {
+                  setEditingNodeId(null);
+                }
+              }}
+            />
+          )}
+        </div>
+        <aside className={styles.side}>
+          <MissionNotices
+            notices={missionNotices}
+            onReward={(id) => {
+              const notice = missionNotices.find((candidate) => candidate.id === id);
+              if (notice) {
+                perform({ type: 'completeMission', nodeId: notice.nodeId, player: notice.player });
+              }
+            }}
+            onNotYet={(id) => setNotYet((previous) => postpone(previous, state.turn, id))}
+          />
+          {PLAYER_IDS.map((playerId) => (
+            <PlayerPanel
+              key={playerId}
+              playerId={playerId}
+              player={state.players[playerId]}
+              catalog={game.catalog}
+              items={game.items}
+              isCurrent={current === playerId}
+              missions={missionsOf(state, playerId, game.catalog)}
+              actions={panelActions(playerId)}
+            />
+          ))}
+          <details className={styles.section}>
+            <summary>Missioni della puntata</summary>
+            {/* Director only (spec 029, 2.4): a click opens the scene as a preview. */}
+            <MissionTable
+              compact
+              rows={missionRows(game.map, state.cells, game.catalog, game.items, state)}
+              playerNames={{ p1: name('p1'), p2: name('p2') }}
+              onRowClick={(nodeId) => applyScreens(openPreview(screens, nodeId))}
+            />
+          </details>
+          <details className={styles.section}>
+            <summary>Correzioni</summary>
+            <CorrectionsPanel state={state} perform={perform} />
+          </details>
+          <details className={styles.section} open>
+            <summary>Registro</summary>
+            <LogPanel game={game} />
+          </details>
+        </aside>
+      </main>
+      {menu && <ContextMenu menu={menu} onClose={closeMenu} />}
+      {discardAsked && (
+        <DiscardGameDialog onCancel={closeDiscardDialog} onConfirm={discardGame} />
+      )}
+    </div>
+  );
+}

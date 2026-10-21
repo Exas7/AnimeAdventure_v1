@@ -1,0 +1,110 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.toolbar button,
+.fileButton {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-size: 0.95em;
+}
+
+.toolbar .arrow {
+  min-width: 2.4em;
+  padding: 2px 8px;
+  font-size: 1.25em;
+  line-height: 1.2;
+}
+
+.toolbar button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.fileButton {
+  cursor: pointer;
+}
+
+.turn {
+  font-size: 1.1em;
+}
+
+.p1 strong {
+  color: var(--p1);
+}
+
+.p2 strong {
+  color: var(--p2);
+}
+
+.counter {
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--panel-raised);
+  font-size: 1.25em;
+  font-weight: 700;
+}
+
+/* Actions still available: the host should not forget them. */
+.counterOpen {
+  background: var(--accent);
+  color: #000000;
+}
+
+.group {
+  display: flex;
+  gap: 6px;
+}
+
+.toolbar .primary {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.toolbar .showdown {
+  border-color: var(--danger);
+  color: #fecaca;
+}
+
+/* Far from "Fine turno" and "Annulla": it deletes the game, after a confirmation. */
+.toolbar .discard {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 22%, var(--panel-raised));
+  color: #fecaca;
+}
+
+.toolbar .editToggle {
+  border-color: #a855f7;
+}
+
+.toolbar .editOn {
+  background: #a855f7;
+  color: #000000;
+  font-weight: 700;
+}
+
+.layout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+.layout select {
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}

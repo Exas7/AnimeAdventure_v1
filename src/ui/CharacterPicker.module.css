@@ -1,0 +1,135 @@
+/* Character menu: field, search bar and one tile per saga (spec 017). */
+.picker {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ".picker" raises the weight of the rule above the panels' own button styles. */
+.picker .field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+}
+
+.picker .field[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+
+.value,
+.placeholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--muted);
+}
+
+.arrow {
+  color: var(--muted);
+}
+
+/* Floats above every panel: its place on screen is set from the field. */
+.menu {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.search {
+  margin: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.search:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  padding: 0 8px 8px;
+  overflow-y: auto;
+}
+
+.empty {
+  margin: 4px 2px 8px;
+  color: var(--muted);
+}
+
+.tile {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
+
+.tileHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  text-align: left;
+}
+
+.tileLabel {
+  flex: 1;
+}
+
+.tileArrow,
+.count {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.characters {
+  margin: 0;
+  padding: 0 4px 6px;
+  list-style: none;
+}
+
+.characters button {
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.characters button:hover {
+  background: var(--bg);
+}
+
+.characters .chosen {
+  color: var(--accent);
+  font-weight: 700;
+}

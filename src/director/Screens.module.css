@@ -1,0 +1,236 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-height: 100%;
+  padding: 40px 24px;
+  overflow: auto;
+}
+
+/* Screen titles in the comic font (spec 024, 2.2). */
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.choices button,
+.fileChoice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 22px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.choices .primary {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.choices small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.players {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 520px));
+  gap: 18px;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.p1 {
+  border-color: var(--p1);
+}
+
+.p2 {
+  border-color: var(--p2);
+}
+
+.player > label,
+.row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.player input,
+.player select,
+.row select {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.player > button {
+  align-self: flex-start;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 1em;
+}
+
+/* Guides about the proposed starters (spec 025): shown, never blocking (D-008). */
+.guides {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(1058px, 100%);
+  padding: 8px 12px;
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+}
+
+.guides p {
+  margin: 0;
+}
+
+/* The map tiles and the tendine of "Randomizza tutto" (spec 033), as wide as the players. */
+.tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(1058px, 100%);
+}
+
+.tiles .note {
+  margin-bottom: 8px;
+}
+
+.mapButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mapButtons button {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-raised);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.mapButtons .chosen {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  font-weight: 700;
+}
+
+.chosenName {
+  color: var(--accent);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.extraGroup + .extraGroup {
+  margin-top: 10px;
+}
+
+.extraGroup h4 {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.95em;
+}
+
+.row {
+  display: flex;
+  gap: 24px;
+}
+
+.mapList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(820px, 100%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mapList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.mapList li > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mapActions {
+  display: flex;
+  gap: 6px;
+}
+
+.mapActions button {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+}
+
+.mapActions .danger {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #ffffff;
+}

@@ -1,0 +1,63 @@
+/* Comic fonts kept in the project, so they work offline (D-036, spec 024). */
+@font-face {
+  font-family: 'Bangers';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/Bangers.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Permanent Marker';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/PermanentMarker.woff2') format('woff2');
+}
+
+:root {
+  /* Spec 024: A for the starter cards, B for team names, C for titles and coins. */
+  --font-card: 'Bangers', Impact, sans-serif;
+  --font-team: 'Permanent Marker', 'Comic Sans MS', cursive;
+  --font-display: 'Bangers', Impact, sans-serif;
+
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-raised: #273449;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #f59e0b;
+  --p1: #facc15;
+  --p2: #3b82f6;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}

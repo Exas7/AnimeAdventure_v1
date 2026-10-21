@@ -1,0 +1,193 @@
+import { describe, expect, it } from 'vitest';
+import { checkMap } from '../editor/mapEdit';
+import { serializeMap } from '../editor/mapFile';
+import { testItems, testMap } from '../engine';
+import { tierRank } from '../episode/fill';
+import { randomEpisode } from '../episode/stepRandomize';
+import { EMPTY_TEXT_LIBRARY } from '../episode/textLibrary';
+import { DEFAULT_READY_POWERS } from '../starters/readyPowers';
+import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
+import { includedMapId, isIncludedMapId, listIncludedMaps, readIncludedMaps } from './includedMaps';
+
+describe('the lists that come with the app (spec 030, criterion 5)', () => {
+  it('read without errors: 166 characters, 45 missions, 45 questions', () => {
+    const catalog = includedCatalog();
+    expect(catalog).toHaveLength(166);
+    expect(catalog.filter((character) => character.possibleStarter)).toHaveLength(24);
+    // Spec 031: 5 new missions, for fewer fights (it was 39); spec 034: Cell + Cell Jr.
+    expect(includedMissions(catalog)).toHaveLength(45);
+    expect(includedQuestions()).toHaveLength(45);
+  });
+
+  it('the challenge Cell + Cell Jr., given by Cell (forma perfetta) (spec 034, criterion 7)', () => {
+    const catalog = includedCatalog();
+    const id = (name: string) => catalog.find((character) => character.name === name)?.id;
+    const cell = includedMissions(catalog).find(
+      (entry) => 'characterId' in entry.giver && entry.giver.characterId === id('Cell (forma perfetta)'),
+    );
+    expect(cell?.mission).toMatchObject({
+      type: 'fight',
+      format: '2v2',
+      condition: 'win',
+      opponents: [id('Cell (forma perfetta)'), id('Cell Jr.')],
+    });
+  });
+
+  it('every character has its person (spec 031, criterion 5)', () => {
+    const catalog = includedCatalog();
+    expect(catalog.every((character) => character.person)).toBe(true);
+    const person = (name: string) => catalog.find((character) => character.name === name)?.person;
+    expect(person('Son Gohan SSJ2')).toBe(person('Great Saiyaman'));
+    expect(person('Son Gohan (nonno)')).not.toBe(person('Son Gohan'));
+    expect(person('Metal Cooler')).toBe(person('Cooler'));
+    expect(person('Trunks (bambino)')).not.toBe(person('Trunks'));
+  });
+
+  it('fights on Pianeta Nameck: at most 70% of the Character cells on average (spec 031 and 034)', async () => {
+    const catalog = includedCatalog();
+    const map = (await listIncludedMaps()).maps.find((entry) => entry.id === 'inclusa:Pianeta_Nameck')?.map;
+    if (!map) {
+      throw new Error('Pianeta Nameck is missing');
+    }
+    const random = seeded(31);
+    const runs = 50;
+    let fights = 0;
+    for (let run = 0; run < runs; run++) {
+      const { content } = randomEpisode(map, {
+        catalog,
+        specialKeepers: [],
+        powers: DEFAULT_READY_POWERS,
+        texts: EMPTY_TEXT_LIBRARY,
+        missions: { catalog: includedMissions(catalog), questions: includedQuestions(), items: testItems },
+        perShop: 3,
+        random,
+      });
+      fights += Object.values(content).filter((cell) => cell.mission?.type === 'fight').length;
+    }
+    // The conductor (spec 034): 60-65% is right, 50-70% is fine.
+    const characterCells = map.nodes.filter((node) => node.type === 'character').length;
+    expect(fights / runs / characterCells).toBeLessThanOrEqual(0.7);
+  });
+
+  it('on Pianeta Nameck: who opens a grey road fights or gives "Batti", stronger than the others; no target off the board (spec 034, criterion 3)', async () => {
+    const catalog = includedCatalog();
+    const map = (await listIncludedMaps()).maps.find((entry) => entry.id === 'inclusa:Pianeta_Nameck')?.map;
+    if (!map) {
+      throw new Error('Pianeta Nameck is missing');
+    }
+    const locked = map.edges.filter((edge) => edge.locked);
+    const openers = new Set(locked.map((edge) => edge.unlockNodeId));
+    const behind = new Set(locked.map((edge) => (edge.from === edge.unlockNodeId ? edge.to : edge.from)));
+    const rank = (id: string | undefined) => tierRank(catalog.find((character) => character.id === id)?.tier);
+    const ranks = { openers: [] as number[], others: [] as number[] };
+    const random = seeded(34);
+    for (let run = 0; run < 100; run++) {
+      const { content } = randomEpisode(map, {
+        catalog,
+        specialKeepers: [],
+        powers: DEFAULT_READY_POWERS,
+        texts: EMPTY_TEXT_LIBRARY,
+        missions: { catalog: includedMissions(catalog), questions: includedQuestions(), items: testItems },
+        perShop: 3,
+        random,
+      });
+      const board = new Set(Object.values(content).flatMap((cell) => (cell.characterId ? [cell.characterId] : [])));
+      const sold = new Set(Object.values(content).flatMap((cell) => cell.forSale ?? []));
+      for (const node of map.nodes.filter((entry) => entry.type === 'character')) {
+        const cell = content[node.id];
+        const mission = cell?.mission;
+        if (mission?.type === 'goTo' || mission?.type === 'defeat') {
+          expect(board.has(mission.targetId ?? '')).toBe(true);
+        }
+        if (mission?.type === 'bring') {
+          expect(board.has(mission.targetId ?? '') || sold.has(mission.targetId ?? '')).toBe(true);
+        }
+        const value = rank(cell?.characterId);
+        if (openers.has(node.id)) {
+          expect(['fight', 'defeat']).toContain(mission?.type);
+          if (value !== null) ranks.openers.push(value);
+        } else if (!behind.has(node.id) && value !== null) {
+          ranks.others.push(value);
+        }
+      }
+    }
+    const average = (list: number[]) => list.reduce((sum, value) => sum + value, 0) / list.length;
+    expect(average(ranks.openers)).toBeGreaterThan(average(ranks.others) + 2);
+  });
+});
+
+describe('the maps that come with the app (spec 030, criterion 6)', () => {
+  it('a file is read as a map, with the name written inside; a broken one is reported', async () => {
+    const result = await readIncludedMaps({
+      '/assets/maps/incluse/Prova.json': () => Promise.resolve(serializeMap(testMap)),
+      '/assets/maps/incluse/Rotta.json': () => Promise.resolve('{"format":"altro"}'),
+    });
+    expect(result.maps).toEqual([{ id: 'inclusa:Prova', map: testMap }]);
+    expect(result.errors).toEqual(['Rotta.json: Il file non è una mappa.']);
+  });
+
+  it('their codes never look like those of the library', () => {
+    expect(includedMapId('../../assets/maps/incluse/Pianeta_Nameck.json')).toBe('inclusa:Pianeta_Nameck');
+    expect(isIncludedMapId('inclusa:Pianeta_Nameck')).toBe(true);
+    expect(isIncludedMapId(crypto.randomUUID())).toBe(false);
+  });
+
+  it('the three default maps, each with its background (spec 036, criterion 1)', async () => {
+    const { maps, errors } = await listIncludedMaps();
+    expect(errors).toEqual([]);
+    expect(maps.map((entry) => [entry.id, entry.map.name]).sort()).toEqual([
+      ['inclusa:Inferi', 'Inferi'],
+      ['inclusa:Pianeta_Nameck', 'Pianeta Nameck'],
+      ['inclusa:Pianeta_dei_Kaioshin', 'Pianeta dei Kaioshin'],
+    ]);
+    for (const { map } of maps) {
+      expect(map.background?.image.startsWith('data:image/jpeg;base64,')).toBe(true);
+    }
+  });
+
+  it('each follows the map rules, with the size of Nameck (spec 036, criterion 2)', async () => {
+    for (const { map } of (await listIncludedMaps()).maps) {
+      const count = (type: string) => map.nodes.filter((node) => node.type === type).length;
+      expect(checkMap(map), map.name).toEqual([]);
+      expect(count('start'), map.name).toBe(2);
+      expect(count('shop'), map.name).toBe(2);
+      expect(count('special'), map.name).toBe(0);
+      expect(map.nodes.length, map.name).toBeGreaterThanOrEqual(90);
+      expect(map.nodes.length, map.name).toBeLessThanOrEqual(115);
+      expect(count('character'), map.name).toBeGreaterThanOrEqual(35);
+      expect(count('character'), map.name).toBeLessThanOrEqual(45);
+      const roads = map.edges.filter((edge) => edge.locked && edge.unlockNodeId).length;
+      expect(roads, map.name).toBeGreaterThanOrEqual(6);
+      expect(roads, map.name).toBeLessThanOrEqual(8);
+    }
+  });
+
+  it('the two starts are near two opposite corners (spec 036, criterion 3)', async () => {
+    for (const { map } of (await listIncludedMaps()).maps) {
+      const [a, b] = map.nodes.filter((node) => node.type === 'start');
+      if (!a || !b) {
+        throw new Error(`${map.name}: two starts expected`);
+      }
+      // Each start in a corner quarter of the map, the two in opposite quarters.
+      const quarter = (node: { x: number; y: number }): [number, number] => [
+        node.x < 0.25 ? -1 : node.x > 0.75 ? 1 : 0,
+        node.y < 0.25 ? -1 : node.y > 0.75 ? 1 : 0,
+      ];
+      const [ax, ay] = quarter(a);
+      const [bx, by] = quarter(b);
+      expect([ax, ay, bx, by].every((value) => value !== 0), map.name).toBe(true);
+      expect(ax === -bx && ay === -by, map.name).toBe(true);
+    }
+  });
+});
+
+/** Repeatable "random" numbers (mulberry32): the same seed, the same episodes. */
+function seeded(seed: number): () => number {
+  let state = seed;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let value = Math.imul(state ^ (state >>> 15), 1 | state);
+    value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}

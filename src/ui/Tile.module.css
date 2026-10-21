@@ -1,0 +1,54 @@
+.tile {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.header::-webkit-details-marker {
+  display: none;
+}
+
+/* The arrow: right when closed, down when open. */
+.header::before {
+  content: '▶';
+  display: inline-block;
+  color: var(--muted);
+  font-size: 0.75em;
+  transition: transform 0.15s;
+}
+
+.tile[open] > .header::before {
+  transform: rotate(90deg);
+}
+
+.title {
+  font-weight: 700;
+}
+
+.count {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--panel-raised);
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.detail {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+.body {
+  padding: 0 14px 12px;
+}

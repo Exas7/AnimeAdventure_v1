@@ -1,0 +1,196 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.toolbar button,
+.fileButton,
+.panel button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-size: 0.95em;
+  cursor: pointer;
+}
+
+.toolbar button:disabled,
+.panel button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar .active {
+  border-color: #facc15;
+  background: #facc15;
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Undo and redo as arrows (spec 010): anticlockwise and clockwise. */
+.toolbar .arrow {
+  min-width: 2.4em;
+  padding: 2px 8px;
+  font-size: 1.25em;
+  line-height: 1.2;
+}
+
+.toolbar .primary {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* Backgrounds of assets/maps (spec 011): looks like the toolbar buttons. */
+.backgroundMenu {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  font-size: 0.95em;
+  cursor: pointer;
+}
+
+.nameInput {
+  width: 12em;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.inline select,
+.panel select {
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 12px;
+}
+
+.messages p {
+  margin: 4px 0 0;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.info {
+  background: color-mix(in srgb, #10b981 22%, transparent);
+  color: #a7f3d0;
+}
+
+.warning {
+  background: color-mix(in srgb, var(--warning) 22%, transparent);
+  color: #fde68a;
+}
+
+.issue {
+  background: var(--panel);
+  color: #fde68a;
+  font-weight: 400 !important;
+}
+
+.main {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 0;
+  margin-top: 8px;
+}
+
+.canvasArea {
+  min-width: 0;
+  min-height: 0;
+  padding: 0 8px 8px 16px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 16px 16px;
+}
+
+.panel h3 {
+  margin: 8px 0 6px;
+  font-size: 1em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* A value shown in the panel, e.g. the cell that opens a path. */
+.value {
+  color: var(--text);
+}
+
+.picking {
+  color: #facc15;
+  font-weight: 600;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.small {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.small p {
+  margin: 0 0 6px;
+}

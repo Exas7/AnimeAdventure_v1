@@ -1,0 +1,116 @@
+/* The window never scrolls: the main area takes the space left by the
+   toolbar and the warnings strip (which may be absent), and the side column
+   scrolls inside it, so a growing log cannot push the board and enlarge it. */
+.director {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.main {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) 470px;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.boardArea {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  border: 3px solid transparent;
+}
+
+/* "Esplora Regia": the board for the director only, while the stream keeps
+   its screen (spec 020). At the bottom: warnings and notifications use the top. */
+.exploring {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 48px);
+  padding: 8px 12px;
+  border: 2px solid var(--danger);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+}
+
+.directorOnly {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 6px;
+  background: var(--danger);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.exploring button {
+  flex: none;
+}
+
+/* Edit mode: a coloured frame, in the director window only. */
+.editing {
+  border-color: #a855f7;
+  border-radius: 12px;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.section {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.section summary {
+  margin-bottom: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.section button {
+  padding: 2px 8px;
+}
+
+.side button,
+.boardArea button {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  padding: 4px 10px;
+}
+
+.side button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--muted);
+}

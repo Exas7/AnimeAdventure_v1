@@ -1,0 +1,11 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.heading {
+  margin: 0;
+  font-size: 1.1em;
+}

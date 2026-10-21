@@ -1,0 +1,85 @@
+/* The preview of a challenge sizes itself on this area, as on the stream stage. */
+.stage {
+  position: relative;
+  container-type: size;
+}
+
+.stage button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.buttons .primary {
+  border-color: #a855f7;
+  font-weight: 700;
+}
+
+.library summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.library h4 {
+  margin: 10px 0 4px;
+  font-size: 0.9em;
+}
+
+.library ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.library li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--panel-raised);
+  font-size: 0.9em;
+}
+
+.library li button {
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+}
+
+/* Map mode (spec 015): a reminder that the library map does not change. */
+.modeNote {
+  margin: 8px 16px 0;
+}
+
+/* "Starter" mode (spec 025, 2.2): the two players' proposals side by side. */
+.starters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 18px;
+  height: 100%;
+  padding: 12px 4px;
+  overflow-y: auto;
+}
+
+/* "Elenco" (spec 029, 2.2): all the missions instead of the map. */
+.missionList {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px 4px;
+}

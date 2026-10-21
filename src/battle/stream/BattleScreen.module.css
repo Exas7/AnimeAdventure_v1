@@ -1,0 +1,809 @@
+/*
+ * The simulated fight on the stream (spec 035, 2.11). Sizes in cqw/cqh follow
+ * the scene, so the stream stays the same at any window size. Every animation
+ * lasts one beat (--beat, set by the component): the time the test page
+ * keeps the event on screen.
+ */
+.scene {
+  position: relative;
+  container-type: size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) 17cqh;
+  gap: 1.5cqh;
+  width: 100%;
+  height: 100%;
+  padding: 2.5cqh 2.5cqw;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 50% at 50% 50%, #1f3a66 0%, transparent 70%),
+    radial-gradient(40% 40% at 12% 85%, #2a1d4d 0%, transparent 70%),
+    linear-gradient(180deg, #101a33 0%, #0a0f1f 100%);
+  color: #ffffff;
+}
+
+.a {
+  --side: var(--p1);
+  --toward: 1;
+}
+
+.b {
+  --side: var(--p2);
+  --toward: -1;
+}
+
+.tier {
+  color: var(--accent);
+}
+
+/* ---- Top: the two on the field, as in BT3 ---------------------------- */
+
+.hud {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12cqw;
+}
+
+.vs {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  font-family: var(--font-display);
+  font-size: 4.5cqw;
+  color: var(--accent);
+  text-shadow: 0 0.3cqw 0 #000000;
+}
+
+.hudSide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8cqh;
+  min-width: 0;
+}
+
+.hudSide.b {
+  align-items: flex-end;
+}
+
+.hudName {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 2.5cqw;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bars {
+  display: flex;
+  gap: 0.3cqw;
+  width: 100%;
+}
+
+/* Side B drains from the outside in, mirrored. */
+.hudSide.b .bars {
+  transform: scaleX(-1);
+}
+
+.bar {
+  flex: 1;
+  height: 1.1cqh;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 0.3cqw;
+  background: #0b1220;
+}
+
+.large .bar {
+  height: 3cqh;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #86efac 0%, #22c55e 45%, #15803d 100%);
+  transition: width 0.35s ease-out;
+}
+
+.hudLine {
+  display: flex;
+  align-items: center;
+  gap: 1.5cqw;
+  width: 100%;
+}
+
+.hudSide.b .hudLine {
+  flex-direction: row-reverse;
+}
+
+.hpText {
+  font-size: 1.5cqw;
+  font-variant-numeric: tabular-nums;
+}
+
+.gauge {
+  width: 14cqw;
+  height: 1cqh;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+}
+
+.gaugeFill {
+  display: block;
+  height: 100%;
+  background: var(--side);
+  transition: width 0.3s;
+}
+
+/* ---- Middle: teams at the sides, the two fighters in the arena -------- */
+
+.middle {
+  display: grid;
+  grid-template-columns: 11cqw minmax(0, 1fr) 11cqw;
+  gap: 2cqw;
+  min-height: 0;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9cqh;
+  min-height: 0;
+}
+
+.teamName {
+  margin: 0;
+  font-family: var(--font-team);
+  font-size: 1.6cqw;
+  color: var(--side);
+  white-space: nowrap;
+}
+
+.member {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4cqh;
+  padding: 0.35cqw;
+  border: 0.2cqw solid transparent;
+  border-radius: 0.6cqw;
+  background: rgb(8 12 24 / 0.55);
+}
+
+.member.onField {
+  border-color: var(--side);
+}
+
+.memberPicture {
+  height: 6.5cqh;
+  font-size: 0.85cqw;
+}
+
+.out {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.arena {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 0;
+}
+
+.fighter {
+  position: relative;
+  z-index: 1;
+  width: 34%;
+  height: 85%;
+  max-height: 48cqh;
+  font-size: 2.2cqw;
+  filter: drop-shadow(0 0 1.2cqw var(--side));
+  animation-duration: var(--beat);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* ---- How the fighters move ---------------------------------------------- */
+
+.lunge {
+  animation-name: lunge;
+}
+
+.shake {
+  animation-name: shake;
+}
+
+.cast {
+  animation-name: cast;
+}
+
+.dash {
+  animation-name: dash;
+}
+
+.bounce {
+  animation-name: bounce;
+}
+
+.hit {
+  animation-name: hit;
+}
+
+.dodge {
+  animation-name: dodge;
+}
+
+.meet {
+  animation-name: meet;
+}
+
+.meetLose {
+  animation-name: meetLose;
+}
+
+.swept {
+  animation-name: swept;
+}
+
+.knockback {
+  animation-name: knockback;
+}
+
+.slideIn {
+  animation-name: slideIn;
+}
+
+.fall {
+  animation-name: fall;
+}
+
+.victory {
+  animation-name: victory;
+}
+
+.defeated {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+@keyframes lunge {
+  35% {
+    transform: translateX(calc(var(--toward) * 4cqw));
+  }
+}
+
+@keyframes shake {
+  20% {
+    transform: translateX(calc(var(--toward) * -1.4cqw));
+  }
+  40% {
+    transform: translateX(calc(var(--toward) * 0.8cqw));
+  }
+  60% {
+    transform: translateX(calc(var(--toward) * -0.4cqw));
+  }
+}
+
+@keyframes cast {
+  30%,
+  60% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 3cqw var(--side)) brightness(1.25);
+  }
+}
+
+@keyframes dash {
+  35%,
+  55% {
+    transform: translateX(calc(var(--toward) * 30cqw));
+  }
+}
+
+@keyframes bounce {
+  35% {
+    transform: translateX(calc(var(--toward) * 28cqw));
+  }
+  50% {
+    transform: translateX(calc(var(--toward) * 20cqw)) rotate(calc(var(--toward) * -10deg));
+  }
+}
+
+@keyframes hit {
+  0%,
+  38% {
+    transform: none;
+  }
+  45% {
+    transform: translateX(calc(var(--toward) * -2.5cqw));
+    filter: drop-shadow(0 0 2cqw #ffffff) brightness(2);
+  }
+  60% {
+    transform: translateX(calc(var(--toward) * 1cqw));
+  }
+}
+
+@keyframes dodge {
+  30%,
+  60% {
+    transform: translateY(-14cqh) scale(0.95);
+  }
+}
+
+@keyframes meet {
+  30%,
+  60% {
+    transform: translateX(calc(var(--toward) * 17cqw));
+  }
+}
+
+@keyframes meetLose {
+  30%,
+  45% {
+    transform: translateX(calc(var(--toward) * 17cqw));
+  }
+  65% {
+    transform: translateX(calc(var(--toward) * -4cqw)) rotate(calc(var(--toward) * -14deg));
+  }
+}
+
+@keyframes swept {
+  30% {
+    transform: translateX(calc(var(--toward) * 14cqw));
+  }
+  50% {
+    transform: translateX(calc(var(--toward) * -4cqw)) rotate(calc(var(--toward) * -14deg));
+    filter: drop-shadow(0 0 2cqw #ffffff) brightness(2);
+  }
+}
+
+@keyframes knockback {
+  0%,
+  80% {
+    transform: none;
+  }
+  88% {
+    transform: translateX(calc(var(--toward) * -5cqw)) rotate(calc(var(--toward) * -10deg));
+    filter: drop-shadow(0 0 2cqw #ffffff) brightness(2);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(calc(var(--toward) * -30cqw));
+    opacity: 0;
+  }
+  50% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fall {
+  40% {
+    transform: rotate(calc(var(--toward) * -15deg)) translateY(3cqh);
+  }
+  100% {
+    transform: rotate(calc(var(--toward) * -80deg)) translateY(12cqh);
+    opacity: 0.3;
+  }
+}
+
+@keyframes victory {
+  20%,
+  60% {
+    transform: translateY(-5cqh);
+  }
+  40%,
+  80% {
+    transform: none;
+  }
+  100% {
+    filter: drop-shadow(0 0 3cqw var(--side));
+  }
+}
+
+/* ---- Beams, the waves clash, sparks and damage numbers ------------------ */
+
+/* Between the fighters: they stand on 34% each side. */
+.beam,
+.struggle {
+  position: absolute;
+  top: 50%;
+  height: 5cqh;
+  margin-top: -2.5cqh;
+  border-radius: 999px;
+  animation-duration: var(--beat);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.fromA {
+  --beam: var(--p1);
+}
+
+.fromB {
+  --beam: var(--p2);
+}
+
+.beam {
+  left: 30%;
+  width: 40%;
+  background: linear-gradient(180deg, var(--beam) 0%, #ffffff 50%, var(--beam) 100%);
+  box-shadow: 0 0 2.5cqw var(--beam);
+}
+
+.beam.fromA {
+  transform-origin: left center;
+}
+
+.beam.fromB {
+  transform-origin: right center;
+}
+
+.reach {
+  animation-name: reach;
+}
+
+.fizzle {
+  animation-name: fizzle;
+}
+
+@keyframes reach {
+  0% {
+    transform: scaleX(0);
+  }
+  40%,
+  75% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes fizzle {
+  0% {
+    transform: scaleX(0);
+  }
+  30% {
+    transform: scaleX(0.45);
+    opacity: 1;
+  }
+  70%,
+  100% {
+    transform: scaleX(0.45) scaleY(0.1);
+    opacity: 0;
+  }
+}
+
+/* Waves clash: two beams push at a meeting point that moves back and forth, then one passes. */
+.struggle {
+  background: linear-gradient(180deg, var(--beam) 0%, #ffffff 50%, var(--beam) 100%);
+  box-shadow: 0 0 3cqw var(--beam);
+}
+
+.struggle.fromA {
+  left: 30%;
+}
+
+.struggle.fromB {
+  right: 30%;
+}
+
+.struggle.fromA.winsA {
+  animation-name: pushWinning;
+}
+
+.struggle.fromB.winsA {
+  animation-name: pushLosing;
+}
+
+.struggle.fromA.winsB {
+  animation-name: pushLosing;
+}
+
+.struggle.fromB.winsB {
+  animation-name: pushWinning;
+}
+
+/* Widths in % of the arena: the two beams always add up to the 40% between the fighters. */
+@keyframes pushWinning {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 20%;
+  }
+  35% {
+    width: 24%;
+  }
+  50% {
+    width: 16%;
+  }
+  65% {
+    width: 23%;
+  }
+  85%,
+  92% {
+    width: 40%;
+    opacity: 1;
+  }
+  100% {
+    width: 40%;
+    opacity: 0;
+  }
+}
+
+@keyframes pushLosing {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 20%;
+  }
+  35% {
+    width: 16%;
+  }
+  50% {
+    width: 24%;
+  }
+  65% {
+    width: 17%;
+  }
+  85%,
+  100% {
+    width: 0%;
+  }
+}
+
+.junction {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 9cqh;
+  height: 9cqh;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ffffff 30%, var(--accent) 55%, transparent 72%);
+  animation-duration: var(--beat);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.junction.winsA {
+  animation-name: junctionWinsA;
+}
+
+.junction.winsB {
+  animation-name: junctionWinsB;
+}
+
+@keyframes junctionWinsA {
+  0% {
+    left: 30%;
+    opacity: 0;
+  }
+  20% {
+    left: 50%;
+    opacity: 1;
+  }
+  35% {
+    left: 54%;
+  }
+  50% {
+    left: 46%;
+  }
+  65% {
+    left: 53%;
+  }
+  85% {
+    left: 70%;
+    opacity: 1;
+  }
+  100% {
+    left: 70%;
+    opacity: 0;
+  }
+}
+
+@keyframes junctionWinsB {
+  0% {
+    left: 70%;
+    opacity: 0;
+  }
+  20% {
+    left: 50%;
+    opacity: 1;
+  }
+  35% {
+    left: 46%;
+  }
+  50% {
+    left: 54%;
+  }
+  65% {
+    left: 47%;
+  }
+  85% {
+    left: 30%;
+    opacity: 1;
+  }
+  100% {
+    left: 30%;
+    opacity: 0;
+  }
+}
+
+/* Rushes clash: a flash where the two meet. */
+.spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 14cqh;
+  height: 14cqh;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ffffff 25%, var(--accent) 50%, transparent 70%);
+  animation: spark var(--beat) ease-out both;
+}
+
+@keyframes spark {
+  0%,
+  25% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  35% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  65%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.damage {
+  position: absolute;
+  top: 12%;
+  z-index: 3;
+  translate: -50% 0;
+  font-family: var(--font-display);
+  font-size: 3.4cqw;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-shadow:
+    0 0 0.6cqw #ef4444,
+    0 0.3cqw 0 #000000;
+  white-space: nowrap;
+  animation-duration: var(--beat);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* Over the fighter hit: the fighters' middles are at 17% and 83%. */
+.onA {
+  left: 17%;
+}
+
+.onB {
+  left: 83%;
+}
+
+.early {
+  animation-name: damageEarly;
+}
+
+.mid {
+  animation-name: damageMiddle;
+}
+
+.late {
+  animation-name: damageLate;
+}
+
+@keyframes damageEarly {
+  0% {
+    transform: translateY(2cqh);
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-3cqh);
+    opacity: 0;
+  }
+}
+
+@keyframes damageMiddle {
+  0%,
+  40% {
+    transform: translateY(2cqh);
+    opacity: 0;
+  }
+  50%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-3cqh);
+    opacity: 0.6;
+  }
+}
+
+@keyframes damageLate {
+  0%,
+  82% {
+    transform: translateY(2cqh);
+    opacity: 0;
+  }
+  90%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---- Bottom: the big writing ------------------------------------------- */
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.title {
+  max-width: 95cqw;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 5cqw;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  text-shadow: 0 0.35cqw 0 #000000;
+  overflow-wrap: anywhere;
+  animation: pop min(400ms, var(--beat)) ease-out both;
+}
+
+.detail {
+  max-width: 90cqw;
+  margin: 0.8cqh 0 0;
+  font-size: 1.8cqw;
+  overflow-wrap: anywhere;
+  animation: appear 0.25s ease-out both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}

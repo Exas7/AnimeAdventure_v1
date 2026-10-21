@@ -1,0 +1,118 @@
+/* A zero-height anchor where the messages hang: they float over the screen
+   and never push the board down or make it smaller (spec 016). */
+.anchor {
+  position: relative;
+  z-index: 20;
+  height: 0;
+}
+
+.bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(1000px, calc(100vw - 32px));
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  transform: translateX(-50%);
+  animation: slide-down 220ms ease-out;
+  /* The board underneath stays usable; only the close buttons take clicks. */
+  pointer-events: none;
+}
+
+.bar button {
+  pointer-events: auto;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.bar p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.warning {
+  background: color-mix(in srgb, var(--warning) 22%, transparent);
+  color: #fde68a;
+}
+
+/* Waiting for a second click: nothing has happened on the stream yet (D-013). */
+.pending {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border: 2px solid var(--warning);
+  border-radius: 8px;
+}
+
+.pending p {
+  background: color-mix(in srgb, var(--warning) 30%, transparent);
+  color: #fde68a;
+}
+
+.pending .hint {
+  background: transparent;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.error {
+  background: color-mix(in srgb, var(--danger) 25%, transparent);
+  color: #fecaca;
+}
+
+.error button {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.2em;
+}
+
+/* Director-only information that stays until closed (spec 007, 2.7). */
+.notice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 36px 4px 4px;
+  border: 2px solid #10b981;
+  border-radius: 8px;
+}
+
+.notice p {
+  background: color-mix(in srgb, #10b981 18%, transparent);
+  color: #a7f3d0;
+  font-weight: 500;
+}
+
+.notice button {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  border: none;
+  background: transparent;
+  color: #a7f3d0;
+  font-size: 1.2em;
+}

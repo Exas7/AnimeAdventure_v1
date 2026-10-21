@@ -1,0 +1,136 @@
+/* Sizes in em follow the stage size (see Stage and Overlay), so the stream stays readable. */
+.shop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  max-width: 96%;
+  max-height: 96%;
+  padding: 0.9em 1.2em;
+  overflow: auto;
+  border: 3px solid #10b981;
+  border-radius: 0.8em;
+  background: var(--panel);
+  font-size: clamp(12px, 2.3cqmin, 26px);
+}
+
+/* Director side panel: fixed small size, one column. */
+.compact {
+  max-width: 100%;
+  max-height: none;
+  font-size: 14px;
+}
+
+.compact .columns {
+  grid-template-columns: 1fr;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.keeper {
+  width: 3.6em;
+  height: 3.6em;
+  flex: none;
+  font-size: 0.7em;
+}
+
+.title {
+  margin: 0;
+  color: #34d399;
+  font-size: 1.6em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4em;
+}
+
+.columns h3 {
+  margin: 0 0 0.4em;
+  font-size: 1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.25em 0.4em;
+  border-radius: 0.4em;
+  background: var(--panel-raised);
+}
+
+.thumb {
+  width: 2.6em;
+  height: 2.6em;
+  flex: none;
+  font-size: 0.55em;
+}
+
+.name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.price {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status {
+  padding: 0.05em 0.5em;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+/* Sold, sold out or already bought: a guide, still buyable (D-015). */
+.grey {
+  opacity: 0.45;
+}
+
+.list button,
+.actions button {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 14px;
+}

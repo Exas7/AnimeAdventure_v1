@@ -1,0 +1,76 @@
+/* Director-only panel over the board (edit mode): never sent to the stream. */
+.editor {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(560px, 90%);
+  padding: 14px 16px;
+  overflow-y: auto;
+  border: 2px solid #a855f7;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.badge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #10b981;
+  color: #000000;
+  font-size: 0.7em;
+}
+
+.private {
+  color: #c4b5fd;
+  font-size: 0.85em;
+}
+
+.editor button {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+}
+
+.editor button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.privateShop {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.privateShop h3 {
+  margin: 0 0 4px;
+  font-size: 1em;
+}
+
+.hint {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.85em;
+}

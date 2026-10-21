@@ -1,0 +1,196 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 100%;
+  padding: 40px 24px;
+  overflow: auto;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% 18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+    radial-gradient(ellipse at 50% 115%, color-mix(in srgb, var(--p2) 24%, transparent), transparent 60%);
+}
+
+/* The channel's image (assets/layout/pagina-iniziale), darkened so the menu stays readable. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+}
+
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    color-mix(in srgb, var(--bg) 68%, transparent),
+    color-mix(in srgb, var(--bg) 90%, transparent)
+  );
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0.05em 0.05em 0 #000;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(320px, 100%);
+}
+
+.item {
+  position: relative;
+}
+
+/* All the same size, the saved game's two lines included (spec 024, 2.1),
+   in the font of the starter cards (spec 024, change of 20 October). */
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  height: 62px;
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel-raised) 92%, transparent);
+  color: var(--text);
+  font-family: var(--font-card);
+  font-size: 1.45em;
+  letter-spacing: 0.05em;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.button:hover {
+  border-color: var(--accent);
+  background: var(--panel-raised);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.primary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The saved game's players and turn stay in the plain font, small and readable. */
+.button small {
+  color: var(--muted);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.55em;
+  letter-spacing: 0;
+}
+
+/* The hint: beside the button on mouse hover or keyboard focus, gone when the mouse leaves. */
+.hint {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 14px);
+  z-index: 1;
+  width: 280px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.9em;
+  line-height: 1.4;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition:
+    opacity 0.12s,
+    transform 0.12s,
+    visibility 0.12s;
+}
+
+.hint::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  border: 7px solid transparent;
+  border-right-color: var(--border);
+  transform: translateY(-50%);
+}
+
+.item:hover .hint,
+.item:has(:focus-visible) .hint {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%);
+}
+
+/* A narrow window has no room beside the menu: the hint goes under the button. */
+@media (max-width: 960px) {
+  .hint {
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translate(-50%, -4px);
+  }
+
+  .hint::before {
+    top: auto;
+    right: auto;
+    bottom: 100%;
+    left: 50%;
+    border-right-color: transparent;
+    border-bottom-color: var(--border);
+    transform: translateX(-50%);
+  }
+
+  .item:hover .hint,
+  .item:has(:focus-visible) .hint {
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .hint {
+    transition: none;
+  }
+}
+
+.status {
+  max-width: 640px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9em;
+  text-align: center;
+}

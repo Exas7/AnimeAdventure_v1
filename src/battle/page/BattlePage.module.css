@@ -1,0 +1,326 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 1200px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 1.1em;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* Only the page's own buttons: the character menu keeps its look. */
+.page :where(.actions, .controls, .knobs, .memberButtons) button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-raised);
+  color: var(--text);
+}
+
+.page :where(.actions, .controls, .knobs, .memberButtons) button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.primary {
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* The two sides keep the players' colours of the game. */
+.a {
+  --side: var(--p1);
+}
+
+.b {
+  --side: var(--p2);
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.team,
+.knobs,
+.stats,
+.fight {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.team {
+  border-top: 4px solid var(--side);
+}
+
+.teamName {
+  margin: 0;
+  font-family: var(--font-team);
+  font-size: 1.3em;
+  font-weight: 400;
+  color: var(--side);
+}
+
+.lineUp {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+  padding-left: 22px;
+}
+
+.member::marker {
+  color: var(--muted);
+}
+
+.memberHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.memberName {
+  font-weight: 700;
+}
+
+.memberButtons {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.page .memberButtons button {
+  padding: 1px 8px;
+}
+
+.tier,
+.badge {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--panel-raised);
+  color: var(--accent);
+  font-size: 0.85em;
+  font-weight: 700;
+}
+
+.badge {
+  color: var(--text);
+}
+
+.sheet {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.knobGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 20px;
+  margin-bottom: 12px;
+}
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.knobLabel {
+  font-size: 0.9em;
+}
+
+.actions,
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.statList {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+
+.statList dt {
+  color: var(--muted);
+}
+
+.statList dd {
+  margin: 0;
+}
+
+.fight {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.speeds {
+  display: flex;
+  gap: 4px;
+}
+
+.chosen {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The last event, large: what the stream will show (2.11). */
+.banner {
+  min-height: 2.6em;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.6em;
+  letter-spacing: 0.03em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+
+.gauge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.gaugeTrack {
+  width: 120px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--panel-raised);
+  overflow: hidden;
+}
+
+.gaugeFill {
+  display: block;
+  height: 100%;
+  background: var(--side);
+  transition: width 0.2s;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
+
+.onField {
+  border-color: var(--side);
+}
+
+.out {
+  opacity: 0.4;
+}
+
+.cardName {
+  font-weight: 700;
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+/* One segment per bar of 10,000 HP, as in BT3. */
+.hpBars {
+  display: flex;
+  gap: 3px;
+}
+
+.hpBar {
+  flex: 1;
+  height: 10px;
+  border-radius: 2px;
+  background: #0b1220;
+  overflow: hidden;
+}
+
+.hpFill {
+  display: block;
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.25s;
+}
+
+.hpText {
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+.log {
+  max-height: 320px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--bg);
+  overflow: auto;
+  list-style: none;
+  font-size: 0.9em;
+}
+
+.log li {
+  padding: 2px 0;
+}
+
+.exchange {
+  display: inline-block;
+  min-width: 2.5em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
