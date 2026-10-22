@@ -7,6 +7,7 @@ import {
 } from 'react';
 import type { CellContent, Character, GameMap, Point } from '../engine';
 import { nodesInRect } from '../editor/mapEdit';
+import { useTwoFingers } from '../editor/twoFingers';
 import { panBy, zoomAt, type ViewBox } from '../editor/viewBox';
 import { BoardLayers } from '../ui/Board';
 import { boardSize, contentView } from '../ui/boardModel';
@@ -22,6 +23,8 @@ interface PrepCanvasProps {
   panning: boolean;
   onViewChange(view: ViewBox): void;
   onSelect(nodeIds: string[]): void;
+  /** «Selezione multipla» on the phone (spec 054, 2.2): a tap adds or removes, as with Shift. */
+  multiSelect?: boolean;
 }
 
 type Drag =
@@ -55,8 +58,27 @@ export function PrepCanvas(props: PrepCanvasProps) {
     return { x: point.x / size.width, y: point.y / size.height };
   };
 
+  // Two fingers move and zoom the view (spec 054, 2.1); the second one cancels a selection rectangle.
+  const fingers = useTwoFingers(
+    (clientX, clientY) => {
+      const point = eventPoint(clientX, clientY);
+      return { x: point.x * size.width, y: point.y * size.height };
+    },
+    view,
+    size,
+    props.onViewChange,
+    () => {
+      drag.current = null;
+      setRect(null);
+    },
+  );
+
   const onPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
+    if (fingers.down(event)) {
+      return;
+    }
+    const multi = event.shiftKey || Boolean(props.multiSelect);
     if (event.button === 1 || panning) {
       drag.current = { kind: 'pan', lastClient: { x: event.clientX, y: event.clientY } };
       return;
@@ -68,7 +90,7 @@ export function PrepCanvas(props: PrepCanvasProps) {
       (event.target as Element).closest('[data-node-id]')?.getAttribute('data-node-id') ?? null;
     if (nodeId) {
       props.onSelect(
-        event.shiftKey
+        multi
           ? selected.includes(nodeId)
             ? selected.filter((id) => id !== nodeId)
             : [...selected, nodeId]
@@ -77,11 +99,14 @@ export function PrepCanvas(props: PrepCanvasProps) {
       return;
     }
     const point = eventPoint(event.clientX, event.clientY);
-    drag.current = { kind: 'rect', start: point, additive: event.shiftKey };
+    drag.current = { kind: 'rect', start: point, additive: multi };
     setRect({ a: point, b: point });
   };
 
   const onPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (fingers.move(event)) {
+      return;
+    }
     const current = drag.current;
     if (current?.kind === 'pan') {
       props.onViewChange(
@@ -98,7 +123,10 @@ export function PrepCanvas(props: PrepCanvasProps) {
     }
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (fingers.up(event)) {
+      return;
+    }
     const current = drag.current;
     drag.current = null;
     if (current?.kind !== 'rect') {
@@ -129,6 +157,7 @@ export function PrepCanvas(props: PrepCanvasProps) {
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
       onWheel={onWheel}
       onContextMenu={(event) => event.preventDefault()}
     >

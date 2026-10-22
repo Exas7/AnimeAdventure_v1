@@ -1,0 +1,156 @@
+/* The simulated fight on the phone (spec 052, 2.7): full screen, over the game. */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.choose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.team,
+.faces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 84px;
+  padding: 4px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.member > div:first-child {
+  width: 64px;
+  height: 64px;
+}
+
+.picked {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.order {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  min-width: 22px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.memberName {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.75em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.face {
+  width: 52px;
+  height: 52px;
+}
+
+.versus {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.vs {
+  color: var(--danger);
+  font-size: 1.4em;
+  font-weight: 800;
+}
+
+.buttons,
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.buttons button,
+.controls button {
+  min-height: 40px;
+  padding: 6px 14px;
+}
+
+.buttons button:disabled {
+  opacity: 0.45;
+}
+
+.primary {
+  background: var(--button-primary);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+/* The fight keeps the 16:9 shape of the stream, as large as the phone allows. */
+.arena {
+  container-type: size;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.battle {
+  width: min(100cqw, 100cqh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.controls {
+  justify-content: center;
+  padding: 6px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.active {
+  outline: 2px solid var(--accent);
+}
+
+.outcome {
+  font-weight: 700;
+}

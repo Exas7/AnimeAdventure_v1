@@ -52,6 +52,10 @@ import type { CatalogMission, QuestionEntry } from '../missions/catalog';
 import { contentAfterMapChange, type DroppedContent } from './mapChange';
 import { forgetLine, rememberLines, type TextLibrary } from './textLibrary';
 import { PrepCanvas } from './PrepCanvas';
+import { PhoneEditTools } from '../editor/PhoneEditTools';
+import { usePhoneFold } from '../editor/PhoneFold';
+import { boardSize } from '../ui/boardModel';
+import { isPhoneVersion } from '../phone/phoneMode';
 import mapStyles from '../editor/MapEditor.module.css';
 import styles from './EpisodeEditor.module.css';
 import { describeError } from '../describeError';
@@ -100,6 +104,10 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
   // Modes (spec 015, spec 025): characters on the map as in a game, the map
   // itself, or the starters proposed to the players.
   const [mode, setMode] = useState<'content' | 'map' | 'starters'>('content');
+  // The phone (spec 054): buttons instead of wheel and keys.
+  const [phone] = useState(isPhoneVersion);
+  const [multiSelect, setMultiSelect] = useState(false);
+  const fold = usePhoneFold(phone);
   // "Personaggi" mode shows the map or the list of all the missions (spec 029, 2.2).
   const [listView, setListView] = useState(false);
   const [tool, setTool] = useState<Tool>('select');
@@ -319,8 +327,9 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
   const previewMission = cellMission(preview?.content);
 
   return (
-    <div className={mapStyles.editor}>
+    <div className={`${mapStyles.editor} ${fold.rootClass}`}>
       <header className={mapStyles.toolbar}>
+        {fold.closeBar}
         <button onClick={exit}>← Puntate</button>
         <label className={mapStyles.inline}>
           Puntata
@@ -404,6 +413,30 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
             ↻
           </button>
           <button onClick={() => setView(fullView(map))}>Adatta</button>
+          {phone && mode !== 'starters' && (
+            <PhoneEditTools
+              view={view}
+              size={boardSize(map)}
+              onViewChange={setView}
+              multiSelect={multiSelect}
+              onMultiSelect={setMultiSelect}
+              onDelete={
+                mode === 'map'
+                  ? () => changeMap(history, deleteSelection(map, shownMapSelection), NO_SELECTION)
+                  : undefined
+              }
+              onDuplicate={
+                mode === 'map'
+                  ? () => {
+                      const copy = duplicateSelection(map, shownMapSelection, { x: 0.03, y: 0.03 });
+                      changeMap(history, copy.map, copy.selection);
+                    }
+                  : undefined
+              }
+              canDelete={shownMapSelection.nodes.length + shownMapSelection.edges.length > 0}
+              canDuplicate={shownMapSelection.nodes.length > 0}
+            />
+          )}
         </div>
         {mode === 'content' && (
           <div className={mapStyles.group}>
@@ -447,6 +480,7 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
             mode === 'starters' || (mode === 'content' && listView) ? '' : styles.stage
           }`}
         >
+          {fold.reopen}
           {mode === 'starters' ? (
             <div className={styles.starters}>
               {(['p1', 'p2'] as const).map((player) => (
@@ -484,6 +518,7 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
               panning={panning}
               onViewChange={setView}
               onSelect={setSelected}
+              multiSelect={multiSelect}
             />
           ) : (
             <EditorCanvas
@@ -498,6 +533,7 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
               onCommit={(next, nextSelection) => changeMap(history, next, nextSelection)}
               pickingFor={pickingFor}
               onPickingChange={setPickingFor}
+              multiSelect={multiSelect}
             />
           )}
           {mode === 'content' && preview && (
@@ -529,6 +565,7 @@ export function EpisodeEditor(props: EpisodeEditorProps) {
         </div>
 
         <div className={mapStyles.side}>
+          {fold.closeSide}
           <div className={mapStyles.messages}>
             {exitAsked && (
               <p className={mapStyles.warning}>

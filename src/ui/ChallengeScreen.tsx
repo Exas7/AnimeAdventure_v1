@@ -24,6 +24,8 @@ interface ChallengeScreenProps {
   answer?: number;
   /** Director only: the right answer is marked, and a click gives the player's answer. */
   onAnswer?: (index: number) => void;
+  /** The phone (spec 052, 2.6): the player answers, so the right answer is not marked before. */
+  hideRightAnswer?: boolean;
   /** Director buttons; absent on the stream. */
   children?: ReactNode;
 }
@@ -61,7 +63,7 @@ export function ChallengeScreen(props: ChallengeScreenProps) {
           </h2>
           {reward && <p className={styles.reward}>Premio: {reward}</p>}
           {quiz ? (
-            <Quiz quiz={quiz} answer={props.answer} onAnswer={props.onAnswer} />
+            <Quiz quiz={quiz} answer={props.answer} onAnswer={props.onAnswer} hideRightAnswer={props.hideRightAnswer} />
           ) : (
             text !== undefined &&
             (onBalloonClick ? (
@@ -95,6 +97,7 @@ interface QuizProps {
   quiz: QuizQuestion;
   answer: number | undefined;
   onAnswer?: (index: number) => void;
+  hideRightAnswer?: boolean;
 }
 
 /**
@@ -102,8 +105,9 @@ interface QuizProps {
  * Once the host clicks the player's answer, it turns green or red and the
  * right one lights up; before that, only the director sees which is right.
  */
-function Quiz({ quiz, answer, onAnswer }: QuizProps) {
+function Quiz({ quiz, answer, onAnswer, hideRightAnswer = false }: QuizProps) {
   const answered = answer !== undefined;
+  const marked = onAnswer !== undefined && !hideRightAnswer;
   return (
     <>
       <p className={styles.balloon}>{quiz.question}</p>
@@ -113,7 +117,7 @@ function Quiz({ quiz, answer, onAnswer }: QuizProps) {
             styles.answer,
             answered && index === quiz.correct ? styles.right : '',
             answered && index === answer && index !== quiz.correct ? styles.wrong : '',
-            !answered && onAnswer && index === quiz.correct ? styles.hint : '',
+            !answered && marked && index === quiz.correct ? styles.hint : '',
           ].join(' ');
           const body = (
             <>
@@ -127,7 +131,8 @@ function Quiz({ quiz, answer, onAnswer }: QuizProps) {
                 <button
                   className={classes}
                   onClick={() => onAnswer(index)}
-                  title={index === quiz.correct ? 'Risposta giusta' : undefined}
+                  disabled={hideRightAnswer && answered}
+                  title={marked && index === quiz.correct ? 'Risposta giusta' : undefined}
                 >
                   {body}
                 </button>

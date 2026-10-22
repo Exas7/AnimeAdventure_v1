@@ -18,6 +18,9 @@ import {
   type Selection,
 } from './mapEdit';
 import { fullView, type ViewBox } from './viewBox';
+import { PhoneEditTools } from './PhoneEditTools';
+import { usePhoneFold } from './PhoneFold';
+import { isPhoneVersion } from '../phone/phoneMode';
 import styles from './MapEditor.module.css';
 import { describeError } from '../describeError';
 
@@ -57,6 +60,10 @@ export function MapEditor(props: MapEditorProps) {
   const [panning, setPanning] = useState(false);
   // Path whose opening cell is being chosen on the map (D-027).
   const [pickingFor, setPickingFor] = useState<string | null>(null);
+  // The phone (spec 054): buttons instead of wheel and keys.
+  const [phone] = useState(isPhoneVersion);
+  const [multiSelect, setMultiSelect] = useState(false);
+  const fold = usePhoneFold(phone);
 
   const map = history.present;
   const size = boardSize(map);
@@ -215,6 +222,18 @@ export function MapEditor(props: MapEditorProps) {
       );
   };
 
+  // «Elimina» and «Duplica» on the phone: what Canc and Ctrl+D do (spec 054, 2.2).
+  const shownSelection = existingSelection(map, selection);
+  const deleteSelected = () => {
+    setHistory(commit(history, deleteSelection(map, shownSelection)));
+    setSelection(NO_SELECTION);
+  };
+  const duplicateSelected = () => {
+    const copy = duplicateSelection(map, shownSelection, { x: 0.03, y: 0.03 });
+    setHistory(commit(history, copy.map));
+    setSelection(copy.selection);
+  };
+
   // Leaving with unsaved changes asks for a second click (spec 006, 2.6).
   const exit = () => {
     if (dirty && !exitAsked) {
@@ -225,8 +244,9 @@ export function MapEditor(props: MapEditorProps) {
   };
 
   return (
-    <div className={styles.editor}>
+    <div className={`${styles.editor} ${fold.rootClass}`}>
       <header className={styles.toolbar}>
+        {fold.closeBar}
         <button onClick={exit}>← Libreria</button>
         <div className={styles.group}>
           {TOOLS.map((entry) => (
@@ -266,6 +286,19 @@ export function MapEditor(props: MapEditorProps) {
             ↻
           </button>
           <button onClick={() => setView(fullView(map))}>Adatta</button>
+          {phone && (
+            <PhoneEditTools
+              view={view}
+              size={size}
+              onViewChange={setView}
+              multiSelect={multiSelect}
+              onMultiSelect={setMultiSelect}
+              onDelete={deleteSelected}
+              onDuplicate={duplicateSelected}
+              canDelete={shownSelection.nodes.length + shownSelection.edges.length > 0}
+              canDuplicate={shownSelection.nodes.length > 0}
+            />
+          )}
         </div>
         <div className={styles.group}>
           <label className={styles.fileButton}>
@@ -344,6 +377,7 @@ export function MapEditor(props: MapEditorProps) {
 
       <main className={styles.main}>
         <div className={styles.canvasArea}>
+          {fold.reopen}
           <EditorCanvas
             map={map}
             tool={tool}
@@ -356,10 +390,12 @@ export function MapEditor(props: MapEditorProps) {
             onCommit={apply}
             pickingFor={pickingFor}
             onPickingChange={setPickingFor}
+            multiSelect={multiSelect}
           />
         </div>
         {/* Messages live in the side column, so the drawing area never jumps. */}
         <div className={styles.side}>
+          {fold.closeSide}
           <div className={styles.messages}>
             {exitAsked && (
               <p className={styles.warning}>

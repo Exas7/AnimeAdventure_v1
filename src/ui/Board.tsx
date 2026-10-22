@@ -43,6 +43,11 @@ interface BoardProps {
   onPawnDrop?: (player: PlayerId, nodeId: string) => void;
   /** Cells where a travel item can take the pawn (spec 047), on both windows. */
   highlighted?: ReadonlySet<string>;
+  /**
+   * The phone (spec 052, 2.5): the highlighted cells get a glow this large,
+   * in board units, that a finger can tap.
+   */
+  tapRadius?: number;
 }
 
 const LINE_HEIGHT = 17;
@@ -76,6 +81,15 @@ export function Board(props: BoardProps) {
         highlighted={props.highlighted}
       />
 
+      {props.tapRadius !== undefined && props.onNodeClick && props.highlighted && (
+        <TapTargets
+          view={view}
+          cells={props.highlighted}
+          radius={props.tapRadius}
+          onTap={props.onNodeClick}
+        />
+      )}
+
       <Pawns
         view={view}
         onPawnDrop={props.onPawnDrop}
@@ -84,6 +98,31 @@ export function Board(props: BoardProps) {
         onNodeMenu={props.onNodeMenu}
       />
     </svg>
+  );
+}
+
+/** Large round targets around the highlighted cells, under the pawns (spec 052, 2.5). */
+function TapTargets(props: {
+  view: BoardView;
+  cells: ReadonlySet<string>;
+  radius: number;
+  onTap(nodeId: string): void;
+}) {
+  return (
+    <g>
+      {props.view.nodes
+        .filter((node) => props.cells.has(node.id))
+        .map((node) => (
+          <circle
+            key={node.id}
+            className={styles.tapTarget}
+            cx={node.x}
+            cy={node.y}
+            r={Math.max(node.radius + 10, props.radius)}
+            onClick={() => props.onTap(node.id)}
+          />
+        ))}
+    </g>
   );
 }
 

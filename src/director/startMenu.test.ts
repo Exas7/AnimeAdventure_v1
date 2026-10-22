@@ -32,6 +32,11 @@ describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 05
     expect(startMenu(false).map((item) => item.stars)).toEqual([1, 2, 3, 4, 5]);
   });
 
+  it('on the phone: the same menu without "Carica partita da file" (spec 052, 2.2)', () => {
+    expect(startMenu(true, true).map((item) => item.id)).toEqual(['resume', 'newGame', 'episodes', 'maps', 'themes']);
+    expect(startMenu(false, true).some((item) => item.id === 'loadFile')).toBe(false);
+  });
+
   it('every button has its own hint', () => {
     const hints = startMenu(true).map((item) => item.hint.trim());
     expect(hints.every((hint) => hint.length > 0)).toBe(true);

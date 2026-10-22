@@ -94,6 +94,14 @@
 }
 
 /* A cell a travel item can reach (spec 047): a pulsing ring, on director and stream. */
+/* The phone (spec 052, 2.5): the cells to tap glow, large enough for a finger. */
+.tapTarget {
+  fill: color-mix(in srgb, #facc15 22%, transparent);
+  stroke: #facc15;
+  stroke-width: 4;
+  cursor: pointer;
+}
+
 .reachable {
   fill: none;
   stroke: #facc15;

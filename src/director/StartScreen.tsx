@@ -22,6 +22,8 @@ interface StartScreenProps {
   onImportCatalog(file: File): void;
   onOpenMaps(): void;
   onOpenEpisodes(): void;
+  /** The phone version (spec 052, 2.2): no «Regia» under the title, no file loading. */
+  phone?: boolean;
 }
 
 /** First screen of the director window (spec 003, 2.1; spec 024; spec 042; spec 050). */
@@ -67,11 +69,11 @@ export function StartScreen(props: StartScreenProps) {
         <header className={styles.header}>
           <ThemeSymbol place="head" />
           <h1 className={styles.title}>Anime Adventure</h1>
-          <p className={styles.subtitle}>Regia</p>
+          {!props.phone && <p className={styles.subtitle}>Regia</p>}
         </header>
 
         <nav className={styles.menu} aria-label="Menu iniziale">
-          {startMenu(savedState !== null).map((item) => (
+          {startMenu(savedState !== null, props.phone).map((item) => (
             <div
               key={item.id}
               className={item.stars === null ? `${styles.item} ${styles.resume}` : styles.item}

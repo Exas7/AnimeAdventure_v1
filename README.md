@@ -17,6 +17,12 @@ Il gioco ha due finestre:
 Chrome): si apre la regia; per lo stream premi «Apri stream». Le partite
 restano salvate nel tuo browser.
 
+**Da telefono o tablet**, in orizzontale, lo stesso indirizzo apre il
+gioco senza regia: 1 contro 1 passandosi il telefono, oppure contro l'IA
+(Facile, Normale, Difficile), con i combattimenti simulati. Gli editor
+delle mappe e delle puntate si usano col dito. Da Impostazioni avanzate →
+«Versione telefono» la si può accendere anche sul PC.
+
 > Progetto di fan, non ufficiale e senza scopo di lucro. Dragon Ball e i
 > suoi personaggi appartengono ai rispettivi proprietari. Le immagini
 > degli oggetti del negozio vengono dal web o sono generate e appartengono

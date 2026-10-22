@@ -102,6 +102,10 @@ import { catalogImportedNotice } from './startMenu';
 import { StartScreen } from './StartScreen';
 import { Toolbar } from './Toolbar';
 import { useGameSession } from './useGameSession';
+import { PhoneGame } from '../phone/PhoneGame';
+import { OpponentChoice } from '../phone/OpponentChoice';
+import { aiStarterIndex } from '../ai/brain';
+import type { AiLevel } from '../engine';
 import styles from './DirectorApp.module.css';
 import { describeError } from '../describeError';
 
@@ -110,8 +114,16 @@ const MAX_IMPORT_ERRORS = 5;
 
 type Screen = 'loading' | 'start' | 'newGame' | 'starterChoice' | 'play' | 'maps' | 'episodes';
 
+interface DirectorAppProps {
+  /**
+   * The phone version (spec 052, D-083): the same menu, new game, starter
+   * choice and editors, but the game is played on the phone, without stream.
+   */
+  phone?: boolean;
+}
+
 /** The director window: the only one that changes the game (D-005). */
-export function DirectorApp() {
+export function DirectorApp({ phone = false }: DirectorAppProps) {
   const session = useGameSession();
   const { game, perform, showError } = session;
   const [screen, setScreen] = useState<Screen>('loading');
@@ -168,6 +180,8 @@ export function DirectorApp() {
   const [travel, setTravel] = useState<TravelChoice | null>(null);
   // A character's scene, or the board, for the director only, over what the stream shows (D-032).
   const [preview, setPreview] = useState<DirectorPreview | null>(null);
+  // On the phone: another player, or the AI at a level (spec 053, 2.1). The AI is always G2.
+  const [aiLevel, setAiLevel] = useState<AiLevel | null>(null);
 
   // Any change to the game (another action, undo, end of turn) cancels a pending second click.
   useEffect(() => {
@@ -211,7 +225,8 @@ export function DirectorApp() {
 
   const { undo, redo } = session;
   useEffect(() => {
-    if (screen !== 'play') {
+    // On the phone «Annulla» has its own limits (D-085): no keys.
+    if (screen !== 'play' || phone) {
       return undefined;
     }
     // The same keys as in the editors: Ctrl+Z, and Ctrl+Y or Ctrl+Shift+Z (spec 021).
@@ -232,7 +247,7 @@ export function DirectorApp() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [screen, undo, redo]);
+  }, [screen, phone, undo, redo]);
 
   // The cells of the travel item, on both windows (spec 047).
   const { setHighlight } = session;
@@ -277,12 +292,26 @@ export function DirectorApp() {
     // The key changes exactly when what the scene shows changes.
   }, [choiceKey, setStarterChoice]);
 
+  // The AI chooses its starter by itself when the scene shows its proposals (spec 053, 2.1).
+  const aiChoosing =
+    phone && aiLevel !== null && screen === 'starterChoice' && choice?.showing === 'p2' && choice.chosen.p2 === null;
+  useEffect(() => {
+    if (aiChoosing && choice && newGameForm && importedCatalog && aiLevel) {
+      const catalog = [...importedCatalog, ...(newGameMap?.keepers ?? [])];
+      setChoice(chooseCard(choice, aiStarterIndex(newGameForm.proposals.p2, catalog, aiLevel, Math.random)));
+    }
+  }, [aiChoosing, choice, newGameForm, importedCatalog, newGameMap, aiLevel]);
+
   // Another game: the preview of the previous one goes away.
   const startSession = (next: Game) => {
     session.start(next);
     setPreview(null);
   };
   const closeDiscardDialog = useCallback(() => setDiscardAsked(false), []);
+
+  // A phone game against the AI remembers it (D-086).
+  const withOpponent = (next: Game): Game =>
+    phone && aiLevel ? { ...next, opponent: { player: 'p2', level: aiLevel } } : next;
 
   const startGame = (setup: GameSetup) => {
     try {
@@ -297,11 +326,11 @@ export function DirectorApp() {
         );
         // Character cells left empty do not exist in a game (D-023).
         const map = withoutEmptyCharacterCells(setup.map, prepared.content);
-        startSession(createGame({ ...setup, map, content: prepared.content }));
+        startSession(withOpponent(createGame({ ...setup, map, content: prepared.content })));
         setStartNotice(preparationReport(prepared));
       } else {
         const map = withoutEmptyCharacterCells(setup.map, setup.content);
-        startSession(createGame({ ...setup, map }));
+        startSession(withOpponent(createGame({ ...setup, map })));
         setStartNotice([]);
       }
       setScreen('play');
@@ -396,7 +425,11 @@ export function DirectorApp() {
   // Another map or episode: the form starts again from its proposals (spec 025, 2.3).
   const useNewGameMap = (next: NonNullable<typeof newGameMap>, starters?: StarterProposals) => {
     setNewGameMap(next);
-    setNewGameForm(defaultNewGameForm(next.map, starters));
+    const form = defaultNewGameForm(next.map, starters);
+    // Against the AI, G2 is called «IA» again in the new form (spec 053, 2.1).
+    setNewGameForm(
+      phone && aiLevel ? { ...form, players: { ...form.players, p2: { ...form.players.p2, name: 'IA' } } } : form,
+    );
     setChoice(null);
     setRandomized(null);
   };
@@ -597,6 +630,7 @@ export function DirectorApp() {
           onLoadFile={loadFile}
           onOpenMaps={() => setScreen('maps')}
           onOpenEpisodes={() => setScreen('episodes')}
+          phone={phone}
         />
       </>
     );
@@ -614,7 +648,7 @@ export function DirectorApp() {
           onShowOther={() => setChoice(showOther(choice))}
           onBack={() => setScreen('newGame')}
           onStart={() => startGame(buildSetup(form, choice, newGameContext, newGameContent))}
-          onOpenStream={openStream}
+          onOpenStream={phone ? undefined : openStream}
         />
       </>
     );
@@ -662,10 +696,44 @@ export function DirectorApp() {
             random={randomized ? { report: randomized.report, round: randomized.round } : null}
             savedAsEpisode={randomized?.savedName ?? null}
             onSaveAsEpisode={saveRandomAsEpisode}
+            header={
+              phone ? (
+                <OpponentChoice
+                  level={aiLevel}
+                  onChange={(level) => {
+                    setAiLevel(level);
+                    // The AI is called «IA» until the player gives it another name.
+                    const p2 = newGameForm.players.p2;
+                    const name = level ? (p2.name === 'G2' ? 'IA' : p2.name) : p2.name === 'IA' ? 'G2' : p2.name;
+                    setNewGameForm({ ...newGameForm, players: { ...newGameForm.players, p2: { ...p2, name } } });
+                  }}
+                />
+              ) : undefined
+            }
           />
         ) : (
           <div className={styles.loading}>Caricamento…</div>
         )}
+      </>
+    );
+  }
+
+  if (phone) {
+    return (
+      <>
+        {messages}
+        <PhoneGame
+          session={session}
+          game={game}
+          onMenu={openStartMenu}
+          onGameOver={(next) => {
+            // The game is over (spec 052, 2.9): deleted, as «Chiudi e cancella partita».
+            discardGame();
+            if (next === 'newGame') {
+              openNewGame();
+            }
+          }}
+        />
       </>
     );
   }

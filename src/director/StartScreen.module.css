@@ -290,6 +290,54 @@
   }
 }
 
+/*
+ * A short screen, as a phone held sideways (spec 052, 2.2): smaller title and
+ * buttons, so the whole menu fits without scrolling. No hints: a finger has
+ * no hover.
+ */
+@media (max-height: 520px) {
+  .page {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .column {
+    gap: 8px;
+  }
+
+  .header {
+    gap: 4px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .menu {
+    gap: 6px;
+  }
+
+  .resume {
+    margin-bottom: 2px;
+  }
+
+  .button,
+  .resume .button {
+    height: 40px;
+    font-size: 1.1em;
+  }
+
+  .icon,
+  .resume .icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
 /* Smaller than the menu and in the plain font: what is behind it is on trial (spec 042, D-068). */
 .advanced {
   --button-press: 0px;

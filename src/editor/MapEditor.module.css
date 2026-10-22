@@ -196,3 +196,102 @@
 .small p {
   margin: 0 0 6px;
 }
+
+/*
+ * The phone (spec 054, 2.4): small toolbar and side column, both foldable,
+ * so the map stays the largest part of the screen.
+ */
+.phone .main {
+  grid-template-columns: minmax(0, 1fr) 200px;
+  margin-top: 2px;
+}
+
+.phone .toolbar {
+  gap: 3px 6px;
+  padding: 3px 4px;
+  font-size: 0.72em;
+  border-bottom-width: 3px;
+}
+
+.phone .group {
+  gap: 2px;
+}
+
+.phone .toolbar button,
+.phone .fileButton,
+.phone .backgroundMenu {
+  min-height: 28px;
+  padding: 1px 7px;
+  border-width: 1px;
+  border-radius: 6px;
+}
+
+.phone .toolbar .arrow {
+  min-width: 1.8em;
+  padding: 0 5px;
+  font-size: 1.1em;
+}
+
+.phone .canvasArea {
+  position: relative;
+  padding: 0 4px 4px;
+}
+
+.phone .side {
+  font-size: 0.8em;
+}
+
+.phone .panel {
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.phone.barClosed .toolbar,
+.phone.sideClosed .side {
+  display: none;
+}
+
+.phone.sideClosed .main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* «▴» and «Chiudi pannello ⟩»: fold the toolbar and the side column. */
+.fold {
+  min-height: 28px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-raised);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.foldSide {
+  align-self: flex-end;
+  margin: 4px 6px 0;
+  font-size: 0.9em;
+}
+
+/* «☰ Menu» and «⟨ Pannello»: over the map, they bring back what is folded. */
+.reopen {
+  position: absolute;
+  top: 4px;
+  z-index: 3;
+  min-height: 30px;
+  padding: 2px 12px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--panel-raised);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.4);
+  color: var(--text);
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.reopenBar {
+  left: 8px;
+}
+
+.reopenSide {
+  right: 8px;
+}

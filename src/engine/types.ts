@@ -486,8 +486,19 @@ export interface HistoryEntry {
   events: string[];
 }
 
+/** How well the AI of the phone plays (spec 053). */
+export type AiLevel = 'easy' | 'normal' | 'hard';
+
+/** The AI opponent of a phone game (spec 053, D-086): which player it is, at which level. */
+export interface Opponent {
+  player: PlayerId;
+  level: AiLevel;
+}
+
 /** A game in progress. This is exactly what gets saved to file. */
 export interface Game extends GameContext {
   /** Never empty: the first entry is the start of the game. */
   history: HistoryEntry[];
+  /** A phone game against the AI (D-086); missing in a game between two people. */
+  opponent?: Opponent;
 }

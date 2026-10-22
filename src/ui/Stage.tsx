@@ -33,12 +33,16 @@ interface StageProps {
   onNextLine?: () => void;
   /** A click on a quiz answer: the player's answer (spec 026, 2.5). */
   onAnswer?: (index: number) => void;
+  /** The phone (spec 052, 2.6): the right answer is not marked before the player answers. */
+  hideRightAnswer?: boolean;
   onNodeMenu?: (nodeId: string, at: ScreenPoint) => void;
   onEdgeMenu?: (edgeId: string, at: ScreenPoint) => void;
   onEdgeClick?: (edgeId: string, at: ScreenPoint) => void;
   onPawnDrop?: (player: PlayerId, nodeId: string) => void;
   /** Cells where a travel item can take the pawn (spec 047). */
   highlighted?: ReadonlySet<string>;
+  /** The phone (spec 052, 2.5): highlighted cells are large targets for a finger. */
+  tapRadius?: number;
   onCloseNotification?: (notificationId: number) => void;
   challengeControls?: (nodeId: string, character: Character | undefined) => ReactNode;
   showdownControls?: ReactNode;
@@ -73,6 +77,7 @@ export function Stage(props: StageProps) {
         onEdgeClick={props.onEdgeClick}
         onPawnDrop={props.onPawnDrop}
         highlighted={props.highlighted}
+        tapRadius={props.tapRadius}
       />
       {challenge && (
         <ChallengeScreen
@@ -87,6 +92,7 @@ export function Stage(props: StageProps) {
           quiz={mission?.type === 'quiz' ? mission.quiz : undefined}
           answer={challenge.answer}
           onAnswer={props.onAnswer}
+          hideRightAnswer={props.hideRightAnswer}
         >
           {props.challengeControls?.(challenge.nodeId, challengeCharacter)}
         </ChallengeScreen>

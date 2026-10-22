@@ -12,7 +12,8 @@ interface StarterChoiceStageProps {
   onShowOther(): void;
   onBack(): void;
   onStart(): void;
-  onOpenStream(): void;
+  /** Missing on the phone, which has no stream (spec 052, 2.3). */
+  onOpenStream?: () => void;
 }
 
 /**
@@ -34,11 +35,13 @@ export function StarterChoiceStage(props: StarterChoiceStageProps) {
         <button className={styles.primary} disabled={!props.canStart} onClick={props.onStart}>
           Inizia partita
         </button>
-        <button onClick={props.onOpenStream}>Apri stream</button>
+        {props.onOpenStream && <button onClick={props.onOpenStream}>Apri stream</button>}
         <span className={styles.note}>
           {props.canStart
             ? 'Tutti e due hanno scelto: «Inizia partita» apre il tabellone.'
-            : 'Clic su una scheda per sceglierla: lo stream mostra la stessa scena.'}
+            : props.onOpenStream
+              ? 'Clic su una scheda per sceglierla: lo stream mostra la stessa scena.'
+              : "Tocca la scheda scelta, poi passa all'altro giocatore."}
         </span>
       </header>
       <div className={styles.area}>

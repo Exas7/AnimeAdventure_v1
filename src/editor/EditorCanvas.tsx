@@ -17,6 +17,7 @@ import {
   updateEdge,
   type Selection,
 } from './mapEdit';
+import { useTwoFingers } from './twoFingers';
 import { panBy, zoomAt, type ViewBox } from './viewBox';
 import styles from './EditorCanvas.module.css';
 
@@ -40,14 +41,33 @@ interface EditorCanvasProps {
    */
   pickingFor: string | null;
   onPickingChange(edgeId: string | null): void;
+  /** «Selezione multipla» on the phone (spec 054, 2.2): a tap adds or removes, as with Shift. */
+  multiSelect?: boolean;
 }
+
+/** Holding a curve point this long removes it, as a double click (spec 054, 2.3). */
+const LONG_PRESS_MS = 500;
+/** Screen pixels a finger may wander and still be holding still. */
+const STILL_PX = 6;
 
 type Drag =
   | { kind: 'pan'; lastClient: Point }
   | { kind: 'move'; start: Point; nodeIds: string[]; moved: boolean }
   | { kind: 'rect'; start: Point; additive: boolean }
   | { kind: 'connect'; from: string }
-  | { kind: 'curve'; edgeId: string; index: number; base: GameMap };
+  | {
+      kind: 'curve';
+      edgeId: string;
+      index: number;
+      base: GameMap;
+      /** An existing point (not a "+"): held still, it is removed (spec 054, 2.3). */
+      removable: boolean;
+      startClient: Point;
+      pressedAt: number;
+      moved: boolean;
+    }
+  /** A finger on an empty spot with the cell tool: the cell comes when it is lifted (spec 054, 2.1). */
+  | { kind: 'tap'; point: Point };
 
 const RADIUS: Record<NodeType, number> = { empty: 12, special: 18, start: 30, shop: 30, character: 30 };
 const TYPE_LABEL: Record<NodeType, string> = {
@@ -104,10 +124,28 @@ export function EditorCanvas(props: EditorCanvasProps) {
     return { x: point.x / size.width, y: point.y / size.height };
   };
 
+  // Two fingers move and zoom the view; the second one cancels what the first was doing.
+  const fingers = useTwoFingers(
+    (clientX, clientY) => toBoard(eventPoint(clientX, clientY)),
+    view,
+    size,
+    props.onViewChange,
+    () => {
+      drag.current = null;
+      setDraft(null);
+      setRect(null);
+      setConnectLine(null);
+    },
+  );
+
   const onPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     const target = event.target as Element;
     const point = eventPoint(event.clientX, event.clientY);
     event.currentTarget.setPointerCapture(event.pointerId);
+    if (fingers.down(event)) {
+      return;
+    }
+    const multi = event.shiftKey || Boolean(props.multiSelect);
 
     if (event.button === 1 || panning) {
       drag.current = { kind: 'pan', lastClient: { x: event.clientX, y: event.clientY } };
@@ -133,12 +171,19 @@ export function EditorCanvas(props: EditorCanvasProps) {
     if (curveHandle) {
       const edgeId = curveHandle.getAttribute('data-curve-edge') ?? '';
       const index = Number(curveHandle.getAttribute('data-curve-index'));
-      const base =
-        curveHandle.getAttribute('data-curve-kind') === 'insert'
-          ? addCurvePoint(map, edgeId, index, point)
-          : map;
+      const inserting = curveHandle.getAttribute('data-curve-kind') === 'insert';
+      const base = inserting ? addCurvePoint(map, edgeId, index, point) : map;
       setDraft(base);
-      drag.current = { kind: 'curve', edgeId, index, base };
+      drag.current = {
+        kind: 'curve',
+        edgeId,
+        index,
+        base,
+        removable: !inserting,
+        startClient: { x: event.clientX, y: event.clientY },
+        pressedAt: Date.now(),
+        moved: false,
+      };
       return;
     }
 
@@ -157,6 +202,11 @@ export function EditorCanvas(props: EditorCanvasProps) {
       if (nodeId) {
         props.onSelect({ nodes: [nodeId], edges: [] });
       } else if (!edgeId) {
+        if (event.pointerType === 'touch') {
+          // Not yet: a second finger may come to zoom instead.
+          drag.current = { kind: 'tap', point };
+          return;
+        }
         const added = addNode(map, point, newCellType);
         props.onCommit(added.map, { nodes: [added.nodeId], edges: [] });
       }
@@ -165,7 +215,7 @@ export function EditorCanvas(props: EditorCanvasProps) {
 
     // Select tool.
     if (nodeId) {
-      if (event.shiftKey) {
+      if (multi) {
         props.onSelect(toggle(selection, 'nodes', nodeId));
         return;
       }
@@ -177,16 +227,17 @@ export function EditorCanvas(props: EditorCanvasProps) {
       return;
     }
     if (edgeId) {
-      props.onSelect(
-        event.shiftKey ? toggle(selection, 'edges', edgeId) : { nodes: [], edges: [edgeId] },
-      );
+      props.onSelect(multi ? toggle(selection, 'edges', edgeId) : { nodes: [], edges: [edgeId] });
       return;
     }
-    drag.current = { kind: 'rect', start: point, additive: event.shiftKey };
+    drag.current = { kind: 'rect', start: point, additive: multi };
     setRect({ a: point, b: point });
   };
 
   const onPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (fingers.move(event)) {
+      return;
+    }
     const current = drag.current;
     if (!current) {
       return;
@@ -220,21 +271,48 @@ export function EditorCanvas(props: EditorCanvasProps) {
         setConnectLine((line) => (line ? { from: line.from, to: toBoard(point) } : line));
         break;
       case 'curve':
-        setDraft(moveCurvePoint(current.base, current.edgeId, current.index, point));
+        current.moved ||=
+          Math.hypot(event.clientX - current.startClient.x, event.clientY - current.startClient.y) > STILL_PX;
+        if (current.moved || !current.removable) {
+          setDraft(moveCurvePoint(current.base, current.edgeId, current.index, point));
+        }
+        break;
+      case 'tap':
         break;
     }
   };
 
   const onPointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (fingers.up(event)) {
+      return;
+    }
     const current = drag.current;
     drag.current = null;
     if (!current) {
       return;
     }
     switch (current.kind) {
-      case 'move':
+      case 'tap': {
+        const added = addNode(map, current.point, newCellType);
+        props.onCommit(added.map, { nodes: [added.nodeId], edges: [] });
+        break;
+      }
       case 'curve':
-        if (draftRef.current && (current.kind === 'curve' || current.moved)) {
+        // Held still on a point: it goes away, as with a double click (spec 054, 2.3).
+        if (current.removable && !current.moved) {
+          if (Date.now() - current.pressedAt >= LONG_PRESS_MS) {
+            props.onCommit(removeCurvePoint(map, current.edgeId, current.index));
+          }
+          setDraft(null);
+          break;
+        }
+        if (draftRef.current) {
+          props.onCommit(draftRef.current);
+        }
+        setDraft(null);
+        break;
+      case 'move':
+        if (draftRef.current && current.moved) {
           props.onCommit(draftRef.current);
         }
         setDraft(null);
@@ -292,6 +370,7 @@ export function EditorCanvas(props: EditorCanvasProps) {
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
       onWheel={onWheel}
       onContextMenu={(event) => event.preventDefault()}
     >

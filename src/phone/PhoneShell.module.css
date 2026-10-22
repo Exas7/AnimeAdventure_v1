@@ -1,0 +1,47 @@
+/* The phone version (spec 052, 2.1): landscape only. */
+.shell {
+  height: 100%;
+  /* No double-tap zoom: taps act at once. */
+  touch-action: manipulation;
+}
+
+.app {
+  height: 100%;
+}
+
+.rotate {
+  display: none;
+}
+
+@media (orientation: portrait) {
+  .app {
+    display: none;
+  }
+
+  .rotate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1.4em;
+    text-align: center;
+  }
+}
+
+.rotate p {
+  margin: 0;
+}
+
+.icon {
+  font-size: 3em;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.7em;
+}

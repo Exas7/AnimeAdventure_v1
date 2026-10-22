@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { cellNumber, PLAYER_IDS, type CellContent, type GameContext, type PlayerId } from '../engine';
 import type { RandomReport } from '../episode/randomReport';
 import { InfoButton } from '../ui/InfoButton';
@@ -55,6 +55,8 @@ interface NewGameScreenProps {
   /** The name of the episode saved with "Salva anche come puntata"; null before it. */
   savedAsEpisode: string | null;
   onSaveAsEpisode(): void;
+  /** Under the title: on the phone, the choice of the opponent (spec 053, 2.1). */
+  header?: ReactNode;
 }
 
 /**
@@ -81,6 +83,7 @@ export function NewGameScreen(props: NewGameScreenProps) {
   return (
     <div className={styles.screen}>
       <h1 className={styles.title}>Nuova partita</h1>
+      {props.header}
       <MapTiles
         choices={props.mapChoices}
         selectedId={props.selectedMapId}

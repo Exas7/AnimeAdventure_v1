@@ -1,0 +1,142 @@
+/* The game on the phone (spec 052, 2.4): the map as large as possible, a narrow column at the right. */
+.game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(190px, 28vw, 300px);
+  height: 100%;
+  overflow: hidden;
+}
+
+.board {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 4px;
+}
+
+/* A finger is bigger than a mouse: the buttons of the scenes grow. */
+.board button {
+  min-height: 36px;
+  padding: 4px 12px;
+}
+
+.banner,
+.message {
+  position: absolute;
+  left: 50%;
+  z-index: 5;
+  max-width: calc(100% - 24px);
+  padding: 6px 12px;
+  border-radius: 8px;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+.banner {
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-raised);
+}
+
+.message {
+  top: 10px;
+  background: var(--warning);
+  color: #111827;
+  font-weight: 600;
+}
+
+.full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+  background: var(--bg);
+  text-align: center;
+}
+
+.pass {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2em;
+}
+
+.winner {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.4em;
+}
+
+.p1 {
+  color: var(--p1);
+}
+
+.p2 {
+  color: var(--p2);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.buttons button {
+  min-height: 44px;
+  padding: 6px 18px;
+}
+
+.primary {
+  background: var(--button-primary);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--backdrop);
+}
+
+.dialogBox {
+  max-width: min(90vw, 420px);
+  padding: 16px;
+  border: 3px solid var(--frame-mid);
+  border-radius: 10px;
+  background: var(--panel);
+  text-align: center;
+}
+
+/* The AI's turn (spec 053, 2.2): at the top of the map, with «Salta». */
+.aiBanner {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 4px 14px;
+  border: 2px solid var(--p2);
+  border-radius: 999px;
+  background: var(--panel-raised);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.summary {
+  max-width: min(90vw, 520px);
+  max-height: 55vh;
+  margin: 0;
+  padding: 0 0 0 20px;
+  overflow-y: auto;
+  text-align: left;
+}
