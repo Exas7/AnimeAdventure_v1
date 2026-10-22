@@ -1,15 +1,24 @@
 import type { Character } from '../engine';
 import { hasStoredCatalog, loadCatalog, saveCatalog } from '../storage/catalogStore';
 import { loadMissionCatalog, loadQuestions, saveMissionCatalog, saveQuestions } from '../storage/missionStore';
-import { missionsFingerprint } from './fingerprint';
+import { missionsFingerprint, pricesFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 
 /**
- * The fingerprint of the included missions before spec 063 (codes left
- * out): a browser that still has that list, never changed, gets the new one
- * with more coins (spec 063, 2.3). Any other list stays as it is.
+ * The fingerprints of the included missions of before (codes left out): a
+ * browser that still has one of those lists, never changed, gets the new one
+ * with more coins (spec 063 and 066, 2.3). Any other list stays as it is.
  */
 export const MISSIONS_BEFORE_063 = '06dfb42d';
+export const MISSIONS_BEFORE_066 = '21906f4f';
+const OLD_MISSIONS = [MISSIONS_BEFORE_063, MISSIONS_BEFORE_066];
+
+/**
+ * The fingerprint of codes and prices of the included characters before
+ * spec 066: a character list with all of them unchanged gets the new prices,
+ * and keeps everything else (spec 066, 2.3).
+ */
+export const PRICES_BEFORE_066 = 'bc4e6e98';
 
 export interface FilledLists {
   /** The character list to use: the browser's, or the included one just saved. */
@@ -21,7 +30,8 @@ export interface FilledLists {
 /**
  * At start (spec 030, D-045): what the browser does not have comes from the
  * files of the project; what it has is never touched, except the included
- * missions of before spec 063, never changed, which get the new coins.
+ * missions and prices of before, never changed, which get the new values
+ * (spec 063 and 066).
  */
 export async function fillMissingLists(): Promise<FilledLists> {
   const filled: string[] = [];
@@ -30,6 +40,10 @@ export async function fillMissingLists(): Promise<FilledLists> {
     catalog = includedCatalog();
     await saveCatalog(catalog);
     filled.push('lista dei personaggi');
+  } else if (catalog && pricesFingerprint(catalog) === PRICES_BEFORE_066) {
+    catalog = withPricesOf(catalog, includedCatalog());
+    await saveCatalog(catalog);
+    filled.push('prezzi aggiornati');
   }
   // The names of the missions refer to the list: without a readable one they cannot be read.
   if (catalog) {
@@ -37,7 +51,7 @@ export async function fillMissingLists(): Promise<FilledLists> {
     if (stored.length === 0) {
       await saveMissionCatalog(includedMissions(catalog));
       filled.push('missioni');
-    } else if (missionsFingerprint(stored) === MISSIONS_BEFORE_063) {
+    } else if (OLD_MISSIONS.includes(missionsFingerprint(stored))) {
       await saveMissionCatalog(includedMissions(catalog));
       filled.push('missioni aggiornate');
     }
@@ -47,4 +61,13 @@ export async function fillMissingLists(): Promise<FilledLists> {
     filled.push('domande');
   }
   return { catalog, filled };
+}
+
+/** The list with the prices of `included`, character by character; the rest as it was. */
+export function withPricesOf(catalog: Character[], included: Character[]): Character[] {
+  const prices = new Map(included.map((character) => [character.id, character.price]));
+  return catalog.map((character) => {
+    const price = prices.get(character.id);
+    return price === undefined ? character : { ...character, price };
+  });
 }

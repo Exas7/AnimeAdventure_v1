@@ -1,8 +1,10 @@
+import type { Character } from '../engine';
 import type { CatalogMission } from '../missions/catalog';
 
-// A short fingerprint of a mission list, to recognise in a browser the list
-// that came from the included files and was never changed (spec 063, 2.3).
-// The codes are left out: each copy of the list draws its own.
+// A short fingerprint of a list, to recognise in a browser the list that
+// came from the included files and was never changed (spec 063, 2.3; spec
+// 066, 2.3). The codes of the missions are left out: each copy of the list
+// draws its own.
 
 /** The same JSON for the same values, whatever the order of the keys. */
 function canonical(value: unknown): string {
@@ -30,4 +32,9 @@ function fnv1a(text: string): string {
 
 export function missionsFingerprint(missions: readonly CatalogMission[]): string {
   return fnv1a(canonical(missions.map(({ id: _id, ...rest }) => rest)));
+}
+
+/** Only codes and prices: the other columns of the list grew over time. */
+export function pricesFingerprint(catalog: readonly Character[]): string {
+  return fnv1a(canonical(catalog.map((character) => [character.id, character.price ?? null])));
 }

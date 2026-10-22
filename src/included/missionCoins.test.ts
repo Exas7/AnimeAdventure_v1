@@ -1,56 +1,89 @@
 import { describe, expect, it } from 'vitest';
+import type { Character } from '../engine';
 import type { CatalogMission } from '../missions/catalog';
-import { MISSIONS_BEFORE_063 } from './fillIncluded';
-import { missionsFingerprint } from './fingerprint';
+import { MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, PRICES_BEFORE_066, withPricesOf } from './fillIncluded';
+import { missionsFingerprint, pricesFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions } from './includedLists';
 
 const missions = () => includedMissions(includedCatalog());
 const isStory = (entry: CatalogMission) => 'group' in entry.giver && entry.giver.group === 'story';
+const turnsToWait = ({ mission }: CatalogMission) =>
+  mission.type === 'wait' || mission.type === 'skipTurns' ? (mission.turns ?? 0) : 0;
 
-describe('the missions give coins (spec 063, criterion 1)', () => {
-  it('every mission that gives the character of the cell gives 300 coins, plus 400 a turn to wait or skip', () => {
-    for (const { mission } of missions().filter((entry) => entry.mission.reward.cellCharacter)) {
-      const turns = mission.type === 'wait' || mission.type === 'skipTurns' ? (mission.turns ?? 0) : 0;
-      expect(mission.reward.coins).toBe(300 + 400 * turns);
+/** The prices of spec 066 (spec 066, 2.1): new price -> price of before. */
+const PRICES_THEN: Record<number, number> = {
+  1000: 1500, 1100: 1700, 1200: 1900, 1400: 2200, 1600: 2500, 1800: 2800,
+  2200: 3400, 2500: 3800, 2700: 4200, 3200: 5000, 3600: 5500, 3900: 6000,
+};
+
+describe('the missions give coins (spec 063 and 066, criterion 1)', () => {
+  it('every mission that gives the character of the cell gives 400 coins, plus 500 a turn to wait or skip', () => {
+    for (const entry of missions().filter((candidate) => candidate.mission.reward.cellCharacter)) {
+      expect(entry.mission.reward.coins).toBe(400 + 500 * turnsToWait(entry));
     }
   });
 
-  it('the missions of the story pay more: 1,200 to wait 2 turns or skip 1, 600 for a quiz', () => {
+  it('the missions of the story pay more: 1,500 to wait 2 turns or skip 1, 800 for a quiz', () => {
     const story = missions().filter(isStory);
     const coins = (type: string) => story.filter((entry) => entry.mission.type === type).map((entry) => entry.mission.reward.coins);
-    expect(coins('wait')).toEqual([1200]);
-    expect(coins('skipTurns')).toEqual([1200]);
-    expect(coins('quiz')).toEqual([600]);
+    expect(coins('wait')).toEqual([1500]);
+    expect(coins('skipTurns')).toEqual([1500]);
+    expect(coins('quiz')).toEqual([800]);
   });
 
-  it("Bulma and Chichi's waits of 3 turns give 1,200 coins as well as their characters", () => {
-    const waits = missions().filter(
-      (entry) => !isStory(entry) && entry.mission.type === 'wait' && !entry.mission.reward.cellCharacter,
-    );
+  it("Bulma and Chichi's waits of 3 turns give 1,500 coins as well as their characters; Bobbidi's fight 2,000", () => {
+    const others = missions().filter((entry) => !isStory(entry) && !entry.mission.reward.cellCharacter);
+    const waits = others.filter((entry) => entry.mission.type === 'wait');
     expect(waits).toHaveLength(2);
     for (const { mission } of waits) {
-      expect(mission.reward.coins).toBe(1200);
+      expect(mission.reward.coins).toBe(1500);
       expect(mission.reward.characters?.length).toBe(1);
     }
+    expect(others.filter((entry) => entry.mission.type === 'fight').map((entry) => entry.mission.reward.coins)).toEqual([2000]);
   });
 });
 
-describe('a browser with the untouched missions of before gets the new ones (spec 063, criterion 3)', () => {
-  /** The included list as it was before spec 063: the same missions with the coins of then. */
-  function before(list: CatalogMission[]): CatalogMission[] {
-    // Story: wait, skip, quiz; Chichi's quiz; Bobbidi's fight.
-    const then: Record<string, number> = { 'story:wait': 400, 'story:skipTurns': 600, 'story:quiz': 300, quiz: 300, fight: 800 };
+describe('the characters cost 35% less (spec 066, criterion 1)', () => {
+  it('from 1,000 to 3,900, by tier; the tiers C, D, E are not sold', () => {
+    const prices = includedCatalog().map((character) => character.price);
+    const sold = prices.filter((price): price is number => price !== undefined);
+    expect(Math.min(...sold)).toBe(1000);
+    expect(Math.max(...sold)).toBe(3900);
+    expect(sold.every((price) => PRICES_THEN[price] !== undefined)).toBe(true);
+  });
+});
+
+describe('a browser with the untouched lists of before gets the new values (spec 063, criterion 3; spec 066, criterion 2)', () => {
+  /** The included missions with the coins given by `coins` (none where it gives undefined). */
+  function withCoins(list: CatalogMission[], coins: (entry: CatalogMission) => number | undefined): CatalogMission[] {
     return list.map((entry) => {
-      const { coins, ...reward } = entry.mission.reward;
-      const key = isStory(entry) ? `story:${entry.mission.type}` : entry.mission.reward.cellCharacter ? '' : entry.mission.type;
-      const old = coins === 1500 && key === 'fight' ? 800 : then[key];
-      return { ...entry, mission: { ...entry.mission, reward: old ? { ...reward, coins: old } : reward } };
+      const { coins: _now, ...reward } = entry.mission.reward;
+      const then = coins(entry);
+      return { ...entry, mission: { ...entry.mission, reward: then === undefined ? reward : { ...reward, coins: then } } };
     });
   }
 
-  it('the list of before has the fingerprint the app looks for; the new one does not', () => {
-    expect(missionsFingerprint(before(missions()))).toBe(MISSIONS_BEFORE_063);
-    expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_063);
+  /** Before spec 063: coins only from the story, Chichi's quiz and Bobbidi's fight. */
+  const before063 = (entry: CatalogMission) => {
+    if (entry.mission.reward.cellCharacter) {
+      return undefined;
+    }
+    const then: Record<string, number> = { 'story:wait': 400, 'story:skipTurns': 600, 'story:quiz': 300, quiz: 300, fight: 800 };
+    return then[isStory(entry) ? `story:${entry.mission.type}` : entry.mission.type];
+  };
+
+  /** Spec 063: 300 + 400 a turn with the character; 1,200, 600 and 1,500 without. */
+  const before066 = (entry: CatalogMission) => {
+    if (entry.mission.reward.cellCharacter) {
+      return 300 + 400 * turnsToWait(entry);
+    }
+    return entry.mission.type === 'quiz' ? 600 : entry.mission.type === 'fight' ? 1500 : 1200;
+  };
+
+  it('the mission lists of before have the fingerprints the app looks for; the new one does not', () => {
+    expect(missionsFingerprint(withCoins(missions(), before063))).toBe(MISSIONS_BEFORE_063);
+    expect(missionsFingerprint(withCoins(missions(), before066))).toBe(MISSIONS_BEFORE_066);
+    expect([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066]).not.toContain(missionsFingerprint(missions()));
   });
 
   it('the fingerprint leaves out the codes, and changes with any reward', () => {
@@ -61,5 +94,31 @@ describe('a browser with the untouched missions of before gets the new ones (spe
       index === 0 ? { ...entry, mission: { ...entry.mission, reward: { ...entry.mission.reward, coins: 1 } } } : entry,
     );
     expect(missionsFingerprint(changed)).not.toBe(missionsFingerprint(list));
+  });
+
+  /** The included characters with the prices of before spec 066. */
+  const pricesBefore066 = (): Character[] =>
+    includedCatalog().map((character) =>
+      character.price === undefined ? character : { ...character, price: PRICES_THEN[character.price] },
+    );
+
+  it('the character list of before has the fingerprint the app looks for; the new one does not', () => {
+    expect(pricesFingerprint(pricesBefore066())).toBe(PRICES_BEFORE_066);
+    expect(pricesFingerprint(includedCatalog())).not.toBe(PRICES_BEFORE_066);
+  });
+
+  it('the prices fingerprint looks only at codes and prices: one price changed is enough to keep the list', () => {
+    const before = pricesBefore066();
+    const otherColumns = before.map((character) => ({ ...character, villain: !character.villain }));
+    expect(pricesFingerprint(otherColumns)).toBe(PRICES_BEFORE_066);
+    const onePrice = before.map((character, index) => (index === 0 ? { ...character, price: 1234 } : character));
+    expect(pricesFingerprint(onePrice)).not.toBe(PRICES_BEFORE_066);
+  });
+
+  it('the list of before takes the new prices and keeps everything else', () => {
+    const before = pricesBefore066().map((character) => ({ ...character, villain: !character.villain }));
+    const updated = withPricesOf(before, includedCatalog());
+    expect(updated.map((character) => character.price)).toEqual(includedCatalog().map((character) => character.price));
+    expect(updated.map((character) => character.villain)).toEqual(before.map((character) => character.villain));
   });
 });
