@@ -6,10 +6,6 @@
 
 .stage button {
   padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .buttons {
@@ -20,7 +16,7 @@
 }
 
 .buttons .primary {
-  border-color: #a855f7;
+  box-shadow: var(--button-shadow), inset 0 0 0 2px #a855f7;
   font-weight: 700;
 }
 
@@ -58,6 +54,8 @@
   padding: 0 4px;
   border: none;
   background: transparent;
+  box-shadow: none;
+  --button-press: 0px;
 }
 
 /* Map mode (spec 015): a reminder that the library map does not change. */

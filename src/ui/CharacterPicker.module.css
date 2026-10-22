@@ -14,8 +14,10 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
+  box-shadow: none;
   color: var(--text);
   text-align: left;
+  --button-press: 0px;
 }
 
 .picker .field[aria-expanded='true'] {
@@ -94,9 +96,11 @@
   padding: 6px 10px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: var(--text);
   font-weight: 700;
   text-align: left;
+  --button-press: 0px;
 }
 
 .tileLabel {
@@ -121,8 +125,10 @@
   border: none;
   border-radius: 6px;
   background: transparent;
+  box-shadow: none;
   color: var(--text);
   text-align: left;
+  --button-press: 0px;
 }
 
 .characters button:hover {

@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(2, 6, 23, 0.7);
+  background: var(--backdrop);
   animation: fade 0.2s ease-out;
 }
 
@@ -18,16 +18,19 @@
   font-size: 14px;
 }
 
+/* The showdown window: the theme's frame, in red (spec 050, 2.8). */
+.showdownFrame {
+  max-width: 96%;
+  max-height: calc(96% - var(--frame-room));
+  font-size: clamp(12px, 2.4cqmin, 30px);
+}
+
 .showdown {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.6em;
   padding: 0.8em 1.6em;
-  border: 3px solid var(--danger);
-  border-radius: 0.8em;
-  background: var(--panel);
-  font-size: clamp(12px, 2.4cqmin, 30px);
 }
 
 .showdownSlot {

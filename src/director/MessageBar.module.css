@@ -84,10 +84,13 @@
 
 .error button {
   margin-left: auto;
+  padding: 0 4px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: inherit;
   font-size: 1.2em;
+  --button-press: 0px;
 }
 
 /* Director-only information that stays until closed (spec 007, 2.7). */
@@ -111,8 +114,11 @@
   position: absolute;
   top: 4px;
   right: 6px;
+  padding: 0 4px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: #a7f3d0;
   font-size: 1.2em;
+  --button-press: 0px;
 }

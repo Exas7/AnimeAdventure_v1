@@ -5,14 +5,20 @@ export type StartMenuId =
   | 'newGame'
   | 'episodes'
   | 'maps'
-  | 'loadFile';
+  | 'loadFile'
+  | 'themes';
 
-/** One button of the start page menu, with the hint shown on hover (spec 024). */
+/**
+ * One button of the start page menu, with the hint shown on hover (spec 024)
+ * and its dragon ball: the number of stars, or null for the dragon radar of
+ * «Riprendi la partita» (spec 050, 2.4).
+ */
 export interface StartMenuItem {
   id: StartMenuId;
   label: string;
   hint: string;
   primary: boolean;
+  stars: number | null;
 }
 
 const ITEMS: Omit<StartMenuItem, 'primary'>[] = [
@@ -20,32 +26,44 @@ const ITEMS: Omit<StartMenuItem, 'primary'>[] = [
     id: 'resume',
     label: 'Riprendi la partita',
     hint: "Torna alla partita salvata in automatico, dal punto in cui l'hai lasciata.",
+    stars: null,
   },
   {
     id: 'newGame',
     label: 'Nuova partita',
     hint: 'Scegli mappa o puntata, giocatori e starter, e comincia una partita nuova.',
+    stars: 1,
   },
   {
     id: 'episodes',
     label: 'Puntate',
     hint: 'Prepara le puntate: personaggi nelle caselle, negozi e starter proposti. Qui ci sono anche i negozianti speciali e i poteri.',
+    stars: 2,
   },
   {
     id: 'maps',
     label: 'Editor delle mappe',
     hint: 'Disegna le mappe: sfondo, caselle e percorsi.',
+    stars: 3,
   },
   {
     id: 'loadFile',
     label: 'Carica partita da file',
     hint: 'Riapre una partita esportata su file (.json), anche da un altro PC.',
+    stars: 4,
+  },
+  {
+    id: 'themes',
+    label: 'Temi',
+    hint: "Scegli i colori dell'app tra cinque temi di Dragon Ball. Cornice e simbolo si cambiano da Impostazioni avanzate.",
+    stars: 5,
   },
 ];
 
 /**
  * The start page menu, top to bottom. "Riprendi la partita" only with a saved
- * game, and then it is the main button; otherwise "Nuova partita" is.
+ * game, and then it is the main button; otherwise "Nuova partita" is. The
+ * others always carry the balls from one to five stars (spec 050, 2.4).
  */
 export function startMenu(hasSavedGame: boolean): StartMenuItem[] {
   const main: StartMenuId = hasSavedGame ? 'resume' : 'newGame';

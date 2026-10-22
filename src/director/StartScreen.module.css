@@ -1,18 +1,14 @@
+/* The menu on the left, the theme's picture on the right (spec 050, 2.7). */
 .page {
   position: relative;
   isolation: isolate;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
   min-height: 100%;
-  padding: 40px 24px;
+  padding: 40px 24px 40px clamp(24px, 9vw, 160px);
   overflow: auto;
   background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse at 50% 18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
-    radial-gradient(ellipse at 50% 115%, color-mix(in srgb, var(--p2) 24%, transparent), transparent 60%);
+  background-image: var(--start-glow);
 }
 
 /* The channel's image (assets/layout/pagina-iniziale), darkened so the menu stays readable. */
@@ -34,23 +30,69 @@
   );
 }
 
+/* The theme's picture, its subject on the right, past the menu. */
+.art {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-position: right center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Shenron on an almost black sky: "screen" lets the theme's colour through the sky. */
+.shenron {
+  mix-blend-mode: screen;
+}
+
+/* The sea under the menu takes the theme's colour. */
+.kameHouse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--bg) 80%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 55%, transparent) 40%,
+    transparent 62%
+  );
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  width: min(460px, 100%);
+}
+
 .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   text-align: center;
 }
 
+/* The title in the colours of the theme, with the comic outline. */
 .title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-  text-shadow: 0.05em 0.05em 0 #000;
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  background: linear-gradient(180deg, var(--title-top) 25%, var(--title-bottom) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--title-outline);
+  filter: drop-shadow(0.05em 0.05em 0 var(--ink));
 }
 
 .subtitle {
-  margin: 6px 0 0;
+  margin: 0;
   font-family: var(--font-display);
   font-size: 1.5rem;
   letter-spacing: 0.3em;
@@ -61,57 +103,123 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(320px, 100%);
+  width: min(330px, 100%);
 }
 
 .item {
   position: relative;
 }
 
-/* All the same size, the saved game's two lines included (spec 024, 2.1),
-   in the font of the starter cards (spec 024, change of 20 October). */
+/* «Riprendi la partita» stands apart from the five balls (spec 050, 2.4). */
+.resume {
+  margin-bottom: 8px;
+}
+
+/*
+ * All the same size, the saved game's two lines included (spec 024, 2.1), in
+ * the font of the starter cards; a pill with the frame's band around it and
+ * the ball overlapping on the left (spec 050, 2.4).
+ */
 .button {
+  --button-press: 4px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   width: 100%;
-  height: 62px;
-  padding: 8px 20px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--panel-raised) 92%, transparent);
+  height: 56px;
+  padding: 0 18px 0 56px;
+  border: 4px solid transparent;
+  border-radius: 30px;
+  background:
+    linear-gradient(var(--panel-raised-hi), var(--panel-raised)) padding-box,
+    linear-gradient(180deg, var(--frame-light), var(--frame-mid) 45%, var(--frame-dark)) border-box;
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 5px 0 2px var(--ink);
   color: var(--text);
   font-family: var(--font-card);
-  font-size: 1.45em;
+  font-size: 1.4em;
   letter-spacing: 0.05em;
-  transition:
-    border-color 0.15s,
-    background-color 0.15s;
+  line-height: 1;
 }
 
-.button:hover {
-  border-color: var(--accent);
-  background: var(--panel-raised);
+.button:active:not(:disabled) {
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 1px 0 2px var(--ink);
 }
 
-.button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+:global(:root[data-frame='aura']) .button:hover {
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 5px 0 2px var(--ink),
+    0 0 16px 2px var(--aura);
 }
 
 .primary {
-  border-color: var(--accent);
-  color: var(--accent);
+  background:
+    linear-gradient(var(--accent-hi), var(--accent) 60%, var(--accent-lo)) padding-box,
+    linear-gradient(180deg, #ffffff, var(--frame-light) 40%, var(--frame-dark)) border-box;
+  color: var(--on-accent);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.resume .button {
+  height: 66px;
+  font-size: 1.5em;
 }
 
 /* The saved game's players and turn stay in the plain font, small and readable. */
 .button small {
+  margin-top: 3px;
   color: var(--muted);
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  font-size: 0.55em;
+  font-size: 0.5em;
   letter-spacing: 0;
+  text-shadow: none;
+}
+
+.primary small {
+  color: var(--on-accent);
+  opacity: 0.85;
+}
+
+/* The ball, or the radar, overlapping the left end; it turns a little on hover. */
+.icon {
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  width: 60px;
+  height: 60px;
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.6));
+  transform: translateY(-50%);
+  transition: transform 0.25s;
+}
+
+.resume .icon {
+  left: -16px;
+  width: 72px;
+  height: 72px;
+}
+
+.button:hover .icon {
+  transform: translateY(-50%) rotate(-18deg) scale(1.06);
+}
+
+.blip {
+  animation: blip 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes blip {
+  from {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* The hint: beside the button on mouse hover or keyboard focus, gone when the mouse leaves. */
@@ -122,13 +230,15 @@
   z-index: 1;
   width: 280px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--frame-mid);
   border-radius: 8px;
   background: var(--panel);
   color: var(--text);
   font-size: 0.9em;
   line-height: 1.4;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 6px 20px rgb(0 0 0 / 0.35);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -145,7 +255,7 @@
   top: 50%;
   right: 100%;
   border: 7px solid transparent;
-  border-right-color: var(--border);
+  border-right-color: var(--frame-mid);
   transform: translateY(-50%);
 }
 
@@ -170,7 +280,7 @@
     bottom: 100%;
     left: 50%;
     border-right-color: transparent;
-    border-bottom-color: var(--border);
+    border-bottom-color: var(--frame-mid);
     transform: translateX(-50%);
   }
 
@@ -180,20 +290,14 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .button,
-  .hint,
-  .advanced {
-    transition: none;
-  }
-}
-
 /* Smaller than the menu and in the plain font: what is behind it is on trial (spec 042, D-068). */
 .advanced {
+  --button-press: 0px;
   padding: 6px 14px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
+  box-shadow: none;
   color: var(--muted);
   font-size: 0.9em;
   transition:
@@ -206,7 +310,14 @@
   color: var(--text);
 }
 
-.advanced:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+@media (prefers-reduced-motion: reduce) {
+  .hint,
+  .advanced,
+  .icon {
+    transition: none;
+  }
+
+  .blip {
+    animation: none;
+  }
 }

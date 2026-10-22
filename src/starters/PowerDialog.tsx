@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Frame, FrameTitle } from '../theme/Frame';
 import { EMPTY_READY_POWER, ReadyPowerForm, type ReadyPowerDraft } from './ReadyPowerForm';
 import styles from './PowerDialog.module.css';
 
@@ -21,8 +22,8 @@ export function PowerDialog({ onSave, onClose }: PowerDialogProps) {
 
   return (
     <div className={styles.backdrop}>
-      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Nuovo potere">
-        <h2 className={styles.title}>Nuovo potere</h2>
+      <Frame className={styles.dialog} contentClassName={styles.content} role="dialog" aria-modal="true" aria-label="Nuovo potere">
+        <FrameTitle className={styles.title}>Nuovo potere</FrameTitle>
         <p className={styles.note}>Entra nella lista dei poteri e va in questa proposta.</p>
         <ReadyPowerForm
           initial={EMPTY_READY_POWER}
@@ -30,7 +31,7 @@ export function PowerDialog({ onSave, onClose }: PowerDialogProps) {
           onSave={onSave}
           onCancel={onClose}
         />
-      </div>
+      </Frame>
     </div>
   );
 }

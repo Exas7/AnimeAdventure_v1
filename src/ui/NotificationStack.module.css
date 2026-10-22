@@ -17,10 +17,14 @@
   align-items: flex-start;
   gap: 10px;
   padding: 10px 14px;
-  border-left: 5px solid var(--accent);
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.92);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: 3px solid transparent;
+  border-radius: 10px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--panel) 94%, transparent), color-mix(in srgb, var(--panel) 94%, transparent)) padding-box,
+    linear-gradient(145deg, var(--frame-light), var(--frame-mid) 45%, var(--frame-dark)) border-box;
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 6px 18px rgb(0 0 0 / 0.4);
   font-size: 1.05em;
   font-weight: 600;
   animation: enter 0.25s ease-out;
@@ -28,11 +32,14 @@
 
 .close {
   margin-left: auto;
+  padding: 0 4px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: var(--muted);
   font-size: 1.2em;
   line-height: 1;
+  --button-press: 0px;
 }
 
 @keyframes enter {

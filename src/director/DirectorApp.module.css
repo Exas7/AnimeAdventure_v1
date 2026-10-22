@@ -117,10 +117,6 @@
 
 .side button,
 .boardArea button {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
   padding: 4px 10px;
 }
 

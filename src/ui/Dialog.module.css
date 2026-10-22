@@ -6,27 +6,22 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgb(2 6 23 / 0.7);
+  background: var(--backdrop);
 }
 
+/* The window's size; the frame and the panel come from the theme (spec 050, 2.2). */
 .dialog {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   width: min(860px, 100%);
-  max-height: calc(100vh - 48px);
-  padding: 16px;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg);
+  max-height: calc(100vh - 48px - var(--frame-room));
 }
 
 .narrow {
   width: min(520px, 100%);
 }
 
-.title {
-  margin: 0;
-  font-size: 1.2em;
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
 }

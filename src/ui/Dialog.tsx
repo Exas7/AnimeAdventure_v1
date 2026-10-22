@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { Frame, FrameTitle } from '../theme/Frame';
 import styles from './Dialog.module.css';
 
 interface DialogProps {
@@ -23,15 +24,16 @@ export function Dialog({ title, narrow, onClose, children }: DialogProps) {
 
   return (
     <div className={styles.backdrop}>
-      <div
+      <Frame
         className={narrow ? `${styles.dialog} ${styles.narrow}` : styles.dialog}
+        contentClassName={styles.content}
         role="dialog"
         aria-modal="true"
         aria-label={title}
       >
-        <h2 className={styles.title}>{title}</h2>
+        <FrameTitle>{title}</FrameTitle>
         {children}
-      </div>
+      </Frame>
     </div>
   );
 }

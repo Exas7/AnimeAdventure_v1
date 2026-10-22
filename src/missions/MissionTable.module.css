@@ -13,16 +13,13 @@
 
 .filters button {
   padding: 3px 10px;
-  border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--panel-raised);
-  color: var(--text);
   font-size: 0.85em;
 }
 
 .filters .activeFilter {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--button-chosen);
+  box-shadow: var(--button-shadow), inset 0 0 0 1px var(--accent-hi);
   font-weight: 700;
 }
 
@@ -119,10 +116,12 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--panel-raised);
+  box-shadow: none;
   color: var(--text);
   font: inherit;
   font-size: 0.9em;
   text-align: left;
+  --button-press: 0px;
 }
 
 .card:not(:disabled):hover {

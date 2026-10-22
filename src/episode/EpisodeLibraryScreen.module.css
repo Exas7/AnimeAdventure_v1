@@ -24,14 +24,11 @@
 
 .page button {
   padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .page .primary {
-  border-color: var(--accent);
+  background: var(--button-primary);
+  color: var(--on-accent);
   font-size: 1.05em;
   font-weight: 700;
 }
@@ -77,8 +74,12 @@
   align-items: center;
   gap: 8px;
   margin-bottom: -1px;
+  border: 1px solid var(--border);
   border-bottom-color: transparent;
   border-radius: 8px 8px 0 0;
+  background: var(--panel-raised);
+  box-shadow: none;
+  --button-press: 0px;
 }
 
 .tabs .activeTab {

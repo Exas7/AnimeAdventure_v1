@@ -11,7 +11,8 @@
   align-items: center;
   gap: 8px 16px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 5px solid;
+  border-image: linear-gradient(90deg, var(--frame-dark), var(--frame-mid), var(--frame-light), var(--frame-mid), var(--frame-dark)) 1;
   background: var(--panel);
 }
 
@@ -19,9 +20,10 @@
 .fileButton,
 .panel button {
   padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--button-bg);
+  box-shadow: var(--button-shadow);
   color: var(--text);
   font-size: 0.95em;
   cursor: pointer;
@@ -40,9 +42,8 @@
 }
 
 .toolbar .active {
-  border-color: #facc15;
-  background: #facc15;
-  color: #000000;
+  background: var(--button-primary);
+  color: var(--on-accent);
   font-weight: 700;
 }
 
@@ -55,7 +56,8 @@
 }
 
 .toolbar .primary {
-  border-color: var(--accent);
+  background: var(--button-primary);
+  color: var(--on-accent);
   font-weight: 700;
 }
 

@@ -1,0 +1,78 @@
+.note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: 30px 16px;
+  padding: 24px 6px 10px;
+}
+
+/* Each card carries its theme, so the colours inside are its own; isolated, so the aura's flames show. */
+.card {
+  --chest-size: 30px;
+  --medal-size: 44px;
+  --back-size: 140px;
+  isolation: isolate;
+  display: flex;
+  cursor: pointer;
+}
+
+.card > * {
+  flex: 1;
+}
+
+.current > * {
+  outline: 3px dashed var(--text);
+  outline-offset: 7px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 12px;
+}
+
+.name {
+  font-size: 1.15em;
+}
+
+.description {
+  flex: 1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.swatches {
+  display: flex;
+  gap: 3px;
+}
+
+.swatches i {
+  flex: 1;
+  height: 18px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+.choose,
+.inUse {
+  padding: 4px 8px;
+  font-size: 0.85em;
+}
+
+.inUse {
+  background: var(--button-primary);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+}

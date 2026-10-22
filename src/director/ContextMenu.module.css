@@ -1,14 +1,13 @@
 .menu {
   position: fixed;
   z-index: 10;
+  min-width: 240px;
+}
+
+.items {
   display: flex;
   flex-direction: column;
-  min-width: 240px;
   padding: 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-raised);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .title {
@@ -23,10 +22,12 @@
   border: none;
   border-radius: 4px;
   background: transparent;
+  box-shadow: none;
   color: var(--text);
   text-align: left;
+  --button-press: 0px;
 }
 
 .menu button:hover {
-  background: var(--panel);
+  background: var(--panel-raised);
 }

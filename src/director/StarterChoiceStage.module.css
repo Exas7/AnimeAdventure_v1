@@ -10,16 +10,13 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 5px solid;
+  border-image: linear-gradient(90deg, var(--frame-dark), var(--frame-mid), var(--frame-light), var(--frame-mid), var(--frame-dark)) 1;
   background: var(--panel);
 }
 
 .bar button {
   padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .bar button:disabled {
@@ -28,7 +25,8 @@
 }
 
 .bar .primary {
-  border-color: var(--accent);
+  background: var(--button-primary);
+  color: var(--on-accent);
   font-weight: 700;
 }
 

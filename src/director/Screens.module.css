@@ -37,16 +37,18 @@
   align-items: center;
   gap: 4px;
   padding: 12px 22px;
-  border: 1px solid var(--border);
+  border: 2px solid var(--ink);
   border-radius: 10px;
-  background: var(--panel-raised);
+  background: var(--button-bg);
+  box-shadow: var(--button-shadow);
   color: var(--text);
   font-size: 1.1em;
   cursor: pointer;
 }
 
 .choices .primary {
-  border-color: var(--accent);
+  background: var(--button-primary);
+  color: var(--on-accent);
   font-weight: 700;
 }
 
@@ -101,10 +103,6 @@
 .player > button {
   align-self: flex-start;
   padding: 5px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .subtitle {
@@ -148,16 +146,12 @@
 
 .mapButtons button {
   padding: 6px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-raised);
-  color: var(--text);
   cursor: pointer;
 }
 
 .mapButtons .chosen {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--button-chosen);
+  box-shadow: var(--button-shadow), inset 0 0 0 1px var(--accent-hi);
   font-weight: 700;
 }
 
@@ -223,14 +217,9 @@
 
 .mapActions button {
   padding: 5px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .mapActions .danger {
-  border-color: var(--danger);
-  background: var(--danger);
+  background: var(--button-danger);
   color: #ffffff;
 }

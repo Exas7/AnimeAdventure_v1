@@ -1,0 +1,53 @@
+/*
+ * The symbol of the gi (spec 050, 2.3): its size comes from --symbol-size.
+ * A smaller preview sets --head-size, --chest-size, --medal-size, --back-size.
+ */
+.badge {
+  --symbol-size: 40px;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: var(--symbol-size);
+  height: var(--symbol-size);
+  border: calc(var(--symbol-size) * 0.085) solid #111111;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #111111;
+  box-shadow:
+    0 0 0 calc(var(--symbol-size) * 0.05) var(--frame-light),
+    0 4px 10px rgb(0 0 0 / 0.45);
+}
+
+.drawing {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.head {
+  --symbol-size: var(--head-size, 64px);
+}
+
+.chest {
+  --symbol-size: var(--chest-size, 40px);
+}
+
+.medal {
+  --symbol-size: var(--medal-size, 60px);
+}
+
+.swatch {
+  --symbol-size: 34px;
+}
+
+/* On the back of the window: big and faded, in the colour of the text. */
+.back {
+  --symbol-size: var(--back-size, 230px);
+  border-color: var(--text);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  opacity: 0.07;
+  pointer-events: none;
+}

@@ -1,4 +1,5 @@
 import { cellNumber, type CellContent, type GameContext, type GameState } from '../engine';
+import { Frame, FrameTitle } from '../theme/Frame';
 import { CellContentForm } from '../ui/CellContentForm';
 import { ShopScreen, type ShopActions } from '../ui/ShopScreen';
 import styles from './CellEditor.module.css';
@@ -24,12 +25,17 @@ export function CellEditor({ context, state, nodeId, onSave, onClose, shopAction
   const initial = state.cells[nodeId] ?? {};
 
   return (
-    <div className={styles.editor} role="dialog" aria-label={`Modifica casella ${cellNumber(nodeId)}`}>
+    <Frame
+      className={styles.editor}
+      contentClassName={styles.content}
+      role="dialog"
+      aria-label={`Modifica casella ${cellNumber(nodeId)}`}
+    >
       <header className={styles.header}>
-        <h2>
+        <FrameTitle>
           Casella {cellNumber(nodeId)}
           {isShop && <span className={styles.badge}>negozio</span>}
-        </h2>
+        </FrameTitle>
         <span className={styles.private}>Visibile solo in regia</span>
       </header>
 
@@ -59,6 +65,6 @@ export function CellEditor({ context, state, nodeId, onSave, onClose, shopAction
           />
         </section>
       )}
-    </div>
+    </Frame>
   );
 }

@@ -61,10 +61,6 @@
 
 .form button {
   padding: 4px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .form button:disabled {
@@ -76,6 +72,8 @@
   padding: 0 2px;
   border: none;
   background: transparent;
+  box-shadow: none;
+  --button-press: 0px;
 }
 
 .buttons {
@@ -85,6 +83,6 @@
 }
 
 .form .primary {
-  border-color: #a855f7;
+  box-shadow: var(--button-shadow), inset 0 0 0 2px #a855f7;
   font-weight: 700;
 }

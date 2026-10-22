@@ -1,20 +1,19 @@
 /* Director-only panel over the board (edit mode): never sent to the stream. */
 .editor {
+  --frame-inner: #a855f7;
   position: absolute;
   top: 12px;
   right: 12px;
   bottom: 12px;
   z-index: 4;
+  width: min(560px, 90%);
+}
+
+.content {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: min(560px, 90%);
   padding: 14px 16px;
-  overflow-y: auto;
-  border: 2px solid #a855f7;
-  border-radius: 12px;
-  background: var(--panel);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
 }
 
 .header {
@@ -25,11 +24,7 @@
 }
 
 .header h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 .badge {
@@ -47,10 +42,6 @@
 
 .editor button {
   padding: 4px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
-  color: var(--text);
 }
 
 .editor button:disabled {

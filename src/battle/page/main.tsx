@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ThemeProvider } from '../../theme/ThemeProvider';
 import { BattlePage } from './BattlePage';
 import '../../index.css';
 
@@ -10,6 +11,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <BattlePage />
+    <ThemeProvider>
+      <BattlePage />
+    </ThemeProvider>
   </StrictMode>,
 );

@@ -19,8 +19,8 @@ punti e trattini bassi non contano.
 - Un'immagine nuova compare al prossimo avvio col doppio clic su
   `Avvia Anime Adventure.bat`.
 
-## Restano sul tuo computer
+## Da dove vengono
 
-Git non salva le immagini di questa cartella e la versione pubblica non le
-contiene: sono immagini prese dal web o generate, con dei diritti. Tienine
-una copia anche fuori dalla cartella del gioco.
+Le immagini sono prese dal web o generate e appartengono ai loro autori
+(crediti nel README). Sono nella versione pubblica e nel sito (spec 049,
+D-076).

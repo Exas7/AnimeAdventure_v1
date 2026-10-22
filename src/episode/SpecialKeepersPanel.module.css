@@ -39,9 +39,10 @@
 .form button,
 .fileButton {
   padding: 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-raised);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--button-bg);
+  box-shadow: var(--button-shadow);
   color: var(--text);
   cursor: pointer;
 }
@@ -56,7 +57,8 @@
 }
 
 .primary {
-  border-color: var(--accent) !important;
+  background: var(--button-primary) !important;
+  color: var(--on-accent) !important;
 }
 
 .who {

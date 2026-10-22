@@ -6,23 +6,23 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgb(2 6 23 / 0.7);
+  background: var(--backdrop);
 }
 
 .dialog {
+  width: min(640px, 100%);
+  max-height: calc(100vh - 48px - var(--frame-room));
+}
+
+.content {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: min(640px, 100%);
   padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--bg);
 }
 
 .title {
-  margin: 0;
-  font-size: 1.2em;
+  font-size: 1.3em;
 }
 
 .note {

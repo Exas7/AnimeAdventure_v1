@@ -54,12 +54,14 @@
   border: none;
   border-radius: 0.7em;
   background: #ffffff;
+  box-shadow: none;
   color: #000000;
   font: inherit;
   font-size: 1.35em;
   font-weight: 600;
   line-height: 1.3;
   text-align: left;
+  --button-press: 0px;
 }
 
 .scene .balloon::before {

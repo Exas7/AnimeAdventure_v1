@@ -7,7 +7,7 @@ import {
   startMenu,
 } from './startMenu';
 
-describe('start page menu (spec 024, criterion 2; spec 042, criterion 1)', () => {
+describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 050, criterion 3)', () => {
   it('with a saved game: every button in order, "Riprendi la partita" first and main', () => {
     const menu = startMenu(true);
     expect(menu.map((item) => item.label)).toEqual([
@@ -16,6 +16,7 @@ describe('start page menu (spec 024, criterion 2; spec 042, criterion 1)', () =>
       'Puntate',
       'Editor delle mappe',
       'Carica partita da file',
+      'Temi',
     ]);
     expect(menu.filter((item) => item.primary).map((item) => item.id)).toEqual(['resume']);
   });
@@ -24,6 +25,11 @@ describe('start page menu (spec 024, criterion 2; spec 042, criterion 1)', () =>
     const menu = startMenu(false);
     expect(menu.some((item) => item.id === 'resume')).toBe(false);
     expect(menu.filter((item) => item.primary).map((item) => item.id)).toEqual(['newGame']);
+  });
+
+  it('"Riprendi la partita" has the dragon radar, the others the balls from one to five stars, in order', () => {
+    expect(startMenu(true).map((item) => item.stars)).toEqual([null, 1, 2, 3, 4, 5]);
+    expect(startMenu(false).map((item) => item.stars)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('every button has its own hint', () => {

@@ -6,6 +6,7 @@ import { TeamColumn } from '../battle/page/TeamColumn';
 import type { BattleView, SideNames } from '../battle/playback';
 import { usePlayback } from '../battle/usePlayback';
 import type { Character } from '../engine';
+import { Frame, FrameTitle } from '../theme/Frame';
 import pageStyles from '../battle/page/BattlePage.module.css';
 import styles from './FightDialog.module.css';
 
@@ -72,8 +73,8 @@ export function FightDialog(props: FightDialogProps) {
 
   return (
     <div className={styles.backdrop}>
-      <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={title}>
-        <h2 className={styles.title}>{title}</h2>
+      <Frame className={styles.dialog} contentClassName={styles.content} role="dialog" aria-modal="true" aria-label={title}>
+        <FrameTitle className={styles.title}>{title}</FrameTitle>
         {!record ? (
           <>
             <p className={styles.note}>
@@ -127,7 +128,7 @@ export function FightDialog(props: FightDialogProps) {
             </div>
           </>
         )}
-      </div>
+      </Frame>
     </div>
   );
 }

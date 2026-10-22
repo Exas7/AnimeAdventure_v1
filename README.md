@@ -13,9 +13,18 @@ Il gioco ha due finestre:
 - lo **stream**, la finestra da mostrare agli spettatori: la catturi con
   OBS oppure la condividi su Discord.
 
+**Gioca online:** https://exas7.github.io/AnimeAdventure_v1/ (meglio con
+Chrome): si apre la regia; per lo stream premi «Apri stream». Le partite
+restano salvate nel tuo browser.
+
 > Progetto di fan, non ufficiale e senza scopo di lucro. Dragon Ball e i
-> suoi personaggi appartengono ai rispettivi proprietari. Il gioco non
-> contiene immagini ufficiali.
+> suoi personaggi appartengono ai rispettivi proprietari. Le immagini
+> degli oggetti del negozio vengono dal web o sono generate e appartengono
+> ai loro autori: Senzu, render di Forever-DB (DeviantArt); Camera
+> Gravitazionale, navicella da Comic Vine; Vestiti pesanti, generati con
+> Ideogram; Stanza dello Spirito e del Tempo, Nuvola Speedy e abitante di
+> Yardrat (Trasmissione Istantanea), immagini dal web. Gli sfondi della
+> pagina iniziale, Shenron e la Kame House, sono generati con Gemini.
 
 ## Cosa serve
 

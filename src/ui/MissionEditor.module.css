@@ -72,6 +72,8 @@
   padding: 0 2px !important;
   border: none !important;
   background: transparent !important;
+  box-shadow: none !important;
+  --button-press: 0px;
 }
 
 .reward {

@@ -3,20 +3,23 @@
   display: flex;
   flex-direction: column;
   gap: 0.6em;
-  max-width: 96%;
-  max-height: 96%;
   padding: 0.9em 1.2em;
   overflow: auto;
-  border: 3px solid #10b981;
-  border-radius: 0.8em;
-  background: var(--panel);
+}
+
+/* Over the board: the theme's frame, its inner line in the green of the shops (spec 050, 2.8). */
+.frame {
+  --frame-inner: #10b981;
+  max-width: 96%;
+  max-height: calc(96% - var(--frame-room));
   font-size: clamp(12px, 2.3cqmin, 26px);
 }
 
 /* Director side panel: fixed small size, one column. */
 .compact {
-  max-width: 100%;
-  max-height: none;
+  border: 2px solid #10b981;
+  border-radius: 10px;
+  background: var(--panel);
   font-size: 14px;
 }
 
@@ -122,10 +125,6 @@
 .list button,
 .actions button {
   padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel);
-  color: var(--text);
   font-size: 14px;
 }
 

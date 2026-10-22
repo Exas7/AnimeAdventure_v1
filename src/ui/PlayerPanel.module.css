@@ -1,8 +1,9 @@
 .panel {
   padding: 10px 12px;
-  border: 2px solid var(--border);
+  border: 3px solid var(--border);
   border-radius: 10px;
   background: var(--panel);
+  box-shadow: 0 0 0 2px var(--ink);
 }
 
 .p1 {
@@ -15,12 +16,16 @@
 
 .current.p1 {
   border-color: var(--p1);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--p1) 35%, transparent);
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 14px 2px color-mix(in srgb, var(--p1) 45%, transparent);
 }
 
 .current.p2 {
   border-color: var(--p2);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--p2) 35%, transparent);
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 14px 2px color-mix(in srgb, var(--p2) 45%, transparent);
 }
 
 .header {
@@ -170,11 +175,13 @@
   width: 22px;
   height: 22px;
   padding: 0;
-  border: none;
+  border: 2px solid var(--ink);
   border-radius: 50%;
   background: var(--danger);
+  box-shadow: none;
   color: #ffffff;
   line-height: 1;
+  --button-press: 0px;
 }
 
 .extras {
@@ -262,8 +269,10 @@
   padding: 0 2px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: var(--text);
   line-height: 1;
+  --button-press: 0px;
 }
 
 /* "Usa" on a training item (spec 041). */
@@ -332,9 +341,5 @@
 
 .missionActions button {
   padding: 2px 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--panel);
-  color: var(--text);
   font-size: 0.85em;
 }

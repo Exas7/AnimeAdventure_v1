@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { shopListing, type GameContext, type GameState } from '../engine';
+import { Frame } from '../theme/Frame';
 import { NumberField } from './NumberField';
 import { ownImage } from './characterImages';
 import { itemImage } from './itemImages';
@@ -37,8 +38,8 @@ export function ShopScreen(props: ShopScreenProps) {
     context.catalog.find((character) => character.id === characterId)?.name ?? characterId;
   const keeper = listing.shopkeeperId ? nameOf(listing.shopkeeperId) : null;
 
-  return (
-    <div className={`${styles.shop} ${compact ? styles.compact : ''}`}>
+  const body = (
+    <>
       <header className={styles.header}>
         {keeper && (
           <div className={styles.keeper}>
@@ -117,7 +118,15 @@ export function ShopScreen(props: ShopScreenProps) {
       </div>
 
       {children && <div className={styles.actions}>{children}</div>}
-    </div>
+    </>
+  );
+  // Over the board, the window of the theme (spec 050, 2.8); in the director's side panel, a plain box.
+  return compact ? (
+    <div className={`${styles.shop} ${styles.compact}`}>{body}</div>
+  ) : (
+    <Frame className={styles.frame} contentClassName={styles.shop}>
+      {body}
+    </Frame>
   );
 }
 

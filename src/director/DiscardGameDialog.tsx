@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Frame, FrameTitle } from '../theme/Frame';
 import styles from './DiscardGameDialog.module.css';
 
 interface DiscardGameDialogProps {
@@ -23,14 +24,16 @@ export function DiscardGameDialog({ onCancel, onConfirm }: DiscardGameDialogProp
 
   return (
     <div className={styles.backdrop} onClick={onCancel}>
-      <div
+      <Frame
+        danger
         className={styles.dialog}
+        contentClassName={styles.content}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="discard-title"
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 id="discard-title">Sicuro di voler eliminare la partita?</h2>
+        <FrameTitle id="discard-title">Sicuro di voler eliminare la partita?</FrameTitle>
         <p>
           La partita e il suo salvataggio automatico vengono cancellati e non si possono
           recuperare. Per tenerla, chiudi questo messaggio e usa prima "Salva su file".
@@ -43,7 +46,7 @@ export function DiscardGameDialog({ onCancel, onConfirm }: DiscardGameDialogProp
             Torna al menu e cancella la partita
           </button>
         </div>
-      </div>
+      </Frame>
     </div>
   );
 }

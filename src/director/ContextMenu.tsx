@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Frame } from '../theme/Frame';
 import type { ScreenPoint } from '../ui/Board';
 import styles from './ContextMenu.module.css';
 
@@ -42,9 +43,11 @@ export function ContextMenu({ menu, onClose }: ContextMenuProps) {
   }, [onClose]);
 
   return (
-    <div
+    <Frame
+      thin
       ref={ref}
       className={styles.menu}
+      contentClassName={styles.items}
       style={{ left: menu.at.x, top: menu.at.y }}
       role="menu"
     >
@@ -61,6 +64,6 @@ export function ContextMenu({ menu, onClose }: ContextMenuProps) {
           {item.label}
         </button>
       ))}
-    </div>
+    </Frame>
   );
 }

@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import { PLAYER_IDS, TEAM_SIZE, type Character, type GameState } from '../engine';
+import { Frame } from '../theme/Frame';
 import { ownImage } from './characterImages';
 import { Placeholder } from './Placeholder';
 import styles from './Overlay.module.css';
@@ -18,7 +19,7 @@ export function ShowdownScreen({ state, catalog, children }: ShowdownScreenProps
 
   return (
     <div className={styles.backdrop}>
-      <div className={styles.showdown}>
+      <Frame danger className={styles.showdownFrame} contentClassName={styles.showdown}>
         <h2 className={styles.showdownTitle}>Showdown</h2>
         <div className={styles.teams}>
           {PLAYER_IDS.map((playerId, index) => (
@@ -43,7 +44,7 @@ export function ShowdownScreen({ state, catalog, children }: ShowdownScreenProps
           ))}
         </div>
         {children && <div className={styles.actions}>{children}</div>}
-      </div>
+      </Frame>
     </div>
   );
 }

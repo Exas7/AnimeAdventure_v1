@@ -39,8 +39,11 @@
   position: absolute;
   top: 6px;
   right: 6px;
+  padding: 0 6px;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: var(--danger);
   font-size: 1.3em;
+  --button-press: 0px;
 }

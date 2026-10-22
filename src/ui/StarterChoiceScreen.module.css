@@ -10,9 +10,8 @@
   padding: 2cqh 3cqw 2.4cqh;
   overflow: hidden;
   background:
-    radial-gradient(60% 50% at 50% 38%, #1f3a66 0%, transparent 70%),
-    radial-gradient(40% 40% at 12% 80%, #2a1d4d 0%, transparent 70%),
-    linear-gradient(180deg, #101a33 0%, #0a0f1f 100%);
+    var(--start-glow),
+    linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
   color: #ffffff;
 }
 
@@ -64,11 +63,11 @@
   padding: 0;
   border: none;
   background: transparent;
+  box-shadow: none;
   color: inherit;
   font: inherit;
-  transition:
-    opacity 0.2s,
-    filter 0.2s;
+  transition: opacity 0.2s, filter 0.2s;
+  --button-press: 0px;
 }
 
 .card:nth-child(1) {

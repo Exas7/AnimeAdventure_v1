@@ -15,27 +15,188 @@
   src: url('./fonts/PermanentMarker.woff2') format('woff2');
 }
 
+/* The four kanji of the gi symbols, and only them (spec 050, D-079). */
+@font-face {
+  font-family: 'Potta One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/PottaOne-kanji.woff2') format('woff2');
+  unicode-range: U+4E80, U+609F, U+795E, U+9F8D;
+}
+
 :root {
   /* Spec 024: A for the starter cards, B for team names, C for titles and coins. */
   --font-card: 'Bangers', Impact, sans-serif;
   --font-team: 'Permanent Marker', 'Comic Sans MS', cursive;
   --font-display: 'Bangers', Impact, sans-serif;
+  --font-kanji: 'Potta One', 'Yu Gothic', 'MS Gothic', serif;
 
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --panel-raised: #273449;
-  --border: #334155;
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --accent: #f59e0b;
+  /* The same in every theme: the players' colours, danger and warnings (spec 050, 2.1). */
   --p1: #facc15;
   --p2: #3b82f6;
   --danger: #ef4444;
   --warning: #f59e0b;
+  /* The black outline of the comics. */
+  --ink: #000000;
 
+  color-scheme: dark;
+  accent-color: var(--accent);
+  scrollbar-color: var(--border) var(--bg);
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
+}
+
+/*
+ * The five themes (spec 050, appendix A). The page carries data-theme; a
+ * preview (the cards of «Temi») carries it too, and its colours apply inside.
+ * Without a choice, theme 1.
+ */
+:root,
+[data-theme='goku'] {
+  --bg: #081530;
+  --panel: #0f2148;
+  --panel-raised: #17306a;
+  --panel-raised-hi: #22408a;
+  --border: #2c4c8f;
+  --text: #eef3ff;
+  --muted: #a3b6de;
+  --accent: #ff7b1c;
+  --accent-hi: #ffb067;
+  --accent-lo: #c24d00;
+  --on-accent: #2a0f00;
+  --accent-2: #2257e6;
+  --frame-light: #ffc58f;
+  --frame-mid: #ff7b1c;
+  --frame-dark: #a84000;
+  --frame-inner: #2257e6;
+  --aura: #8fd0ff;
+  --title-top: #ffe36b;
+  --title-bottom: #ff7b1c;
+  --title-outline: #6b1900;
+  --start-glow:
+    radial-gradient(ellipse at 28% 12%, rgb(255 123 28 / 0.28), transparent 55%),
+    radial-gradient(ellipse at 60% 115%, rgb(34 87 230 / 0.55), transparent 60%);
+}
+
+[data-theme='sfera'] {
+  --bg: #170a04;
+  --panel: #25120a;
+  --panel-raised: #3a1c0d;
+  --panel-raised-hi: #552a12;
+  --border: #7a3d15;
+  --text: #fff4e2;
+  --muted: #e0b98f;
+  --accent: #ffb21e;
+  --accent-hi: #ffdc73;
+  --accent-lo: #d8711a;
+  --on-accent: #3a1300;
+  --accent-2: #d7262b;
+  --frame-light: #ffe28f;
+  --frame-mid: #f7941d;
+  --frame-dark: #b33a0c;
+  --frame-inner: #d7262b;
+  --aura: #ffd24d;
+  --title-top: #fff4b0;
+  --title-bottom: #ff9a1a;
+  --title-outline: #7d0d0d;
+  --start-glow:
+    radial-gradient(circle at 30% 28%, rgb(255 178 30 / 0.3), transparent 50%),
+    radial-gradient(ellipse at 70% 120%, rgb(215 38 43 / 0.4), transparent 60%);
+}
+
+[data-theme='aura'] {
+  --bg: #050a17;
+  --panel: #0b1630;
+  --panel-raised: #12234a;
+  --panel-raised-hi: #1b3366;
+  --border: #2a4777;
+  --text: #ecf7ff;
+  --muted: #9bbbdc;
+  --accent: #ff8a2a;
+  --accent-hi: #ffbb7a;
+  --accent-lo: #c25200;
+  --on-accent: #2a1000;
+  --accent-2: #7fd8ff;
+  --frame-light: #ffffff;
+  --frame-mid: #8fdcff;
+  --frame-dark: #2d78b8;
+  --frame-inner: #ff8a2a;
+  --aura: #8fe0ff;
+  --title-top: #ffe36b;
+  --title-bottom: #ff8a2a;
+  --title-outline: #4a1300;
+  --start-glow:
+    radial-gradient(ellipse at 40% 105%, rgb(127 216 255 / 0.38), transparent 60%),
+    radial-gradient(ellipse at 25% 0%, rgb(127 216 255 / 0.14), transparent 50%);
+}
+
+[data-theme='shenron'] {
+  --bg: #03110b;
+  --panel: #092117;
+  --panel-raised: #0f3222;
+  --panel-raised-hi: #164630;
+  --border: #1f5c3c;
+  --text: #edfff4;
+  --muted: #9fcdb2;
+  --accent: #f2a541;
+  --accent-hi: #ffd58f;
+  --accent-lo: #b56910;
+  --on-accent: #2b1600;
+  --accent-2: #2fbf5b;
+  --frame-light: #8ef5a6;
+  --frame-mid: #25a84a;
+  --frame-dark: #0b5424;
+  --frame-inner: #f2a541;
+  --aura: #ffd54a;
+  --title-top: #fff0a8;
+  --title-bottom: #f29a2e;
+  --title-outline: #0b3d1f;
+  --start-glow:
+    radial-gradient(ellipse at 70% 25%, rgb(255 213 74 / 0.16), transparent 50%),
+    radial-gradient(ellipse at 30% 110%, rgb(47 191 91 / 0.35), transparent 60%);
+}
+
+[data-theme='kame'] {
+  --bg: #04243b;
+  --panel: #093453;
+  --panel-raised: #0e476f;
+  --panel-raised-hi: #155c8e;
+  --border: #2b79ad;
+  --text: #f3fbff;
+  --muted: #a9d0e8;
+  --accent: #e8403a;
+  --accent-hi: #ff8a80;
+  --accent-lo: #9e1714;
+  --on-accent: #ffffff;
+  --accent-2: #f3dca2;
+  --frame-light: #ff9a90;
+  --frame-mid: #e53935;
+  --frame-dark: #8f1411;
+  --frame-inner: #fff3e0;
+  --aura: #8fe9ff;
+  --title-top: #fff6c2;
+  --title-bottom: #ffa21a;
+  --title-outline: #7d0d0d;
+  --start-glow:
+    radial-gradient(ellipse at 50% 0%, rgb(143 233 255 / 0.22), transparent 55%),
+    radial-gradient(ellipse at 50% 120%, rgb(243 220 162 / 0.3), transparent 55%);
+}
+
+/* Made of the colours above, so worked out again wherever a theme is set. */
+:root,
+[data-theme] {
+  color: var(--text);
+  --backdrop: color-mix(in srgb, var(--bg) 78%, transparent);
+  --button-bg: linear-gradient(var(--panel-raised-hi), var(--panel-raised));
+  --button-shadow: 0 3px 0 var(--ink), inset 0 1px 0 rgb(255 255 255 / 0.18);
+  --button-primary: linear-gradient(var(--accent-hi), var(--accent) 55%, var(--accent-lo));
+  --button-danger: linear-gradient(#ff7b7b, #dc2626 55%, #8f1414);
+  --button-chosen: linear-gradient(
+    color-mix(in srgb, var(--accent) 42%, var(--panel-raised-hi)),
+    color-mix(in srgb, var(--accent) 24%, var(--panel-raised))
+  );
 }
 
 *,
@@ -58,6 +219,51 @@ textarea {
   font: inherit;
 }
 
-button {
+/*
+ * Every button of the app, in relief with the comic outline (spec 050, 2.8).
+ * Inside :where(), so the components' own styles win where they set
+ * something: a plain button (a «×», a menu entry) sets box-shadow: none and
+ * --button-press: 0px. The main ones use var(--button-primary), the
+ * dangerous ones var(--button-danger), the chosen ones var(--button-chosen).
+ */
+:where(button) {
+  --button-press: 3px;
+  padding: 6px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--button-bg);
+  color: var(--text);
+  box-shadow: var(--button-shadow);
   cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s,
+    filter 0.15s;
+}
+
+:where(button:hover:not(:disabled)) {
+  filter: brightness(1.12);
+}
+
+:where(button:active:not(:disabled)) {
+  box-shadow:
+    0 0 0 var(--ink),
+    inset 0 1px 0 rgb(255 255 255 / 0.1);
+  transform: translateY(var(--button-press));
+}
+
+:where(button:disabled) {
+  cursor: default;
+  opacity: 0.45;
+}
+
+:where(button:focus-visible) {
+  outline: 2px solid var(--accent-hi);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(button) {
+    transition: none;
+  }
 }
