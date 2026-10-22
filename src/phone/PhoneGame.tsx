@@ -12,6 +12,7 @@ import {
   LASTING_MISSIONS,
   nextLineIndex,
   rechargesStarter,
+  stepBackCell,
   trainingRule,
   travelRule,
   type Game,
@@ -43,8 +44,19 @@ interface PhoneGameProps {
   onGameOver(next: 'menu' | 'newGame'): void;
 }
 
-/** Messages of the referee disappear after this time. */
-const MESSAGE_MS = 4000;
+/** An alert disappears after this time (spec 055, 2.2). */
+const MESSAGE_MS = 2000;
+
+/**
+ * An alert of the phone, in the strip at the bottom of the map (spec 055,
+ * 2.2): a refusal of the referee or a notification of the game.
+ */
+interface Notice {
+  text: string;
+  kind: 'refusal' | 'news';
+  /** A new alert restarts the time, also with the same text. */
+  id: number;
+}
 
 /** The target of a highlighted cell, in board units (1600 wide): about a fingertip on a phone. */
 const TAP_RADIUS = 60;
@@ -64,7 +76,13 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   const current = state.currentPlayer;
   const name = (player: PlayerId) => state.players[player].name;
   const overlay = session.overlay;
-  const [message, setMessage] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const noticeCount = useRef(0);
+  // One alert at a time: the new one takes the place of the old one.
+  const setMessage = (text: string, kind: Notice['kind'] = 'refusal') => {
+    noticeCount.current += 1;
+    setNotice({ text, kind, id: noticeCount.current });
+  };
   const [fight, setFight] = useState<PhoneFightSetup | null>(null);
   const [training, setTraining] = useState<string | null>(null);
   const [travel, setTravel] = useState<TravelChoice | null>(null);
@@ -89,12 +107,26 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   gameRef.current = game;
 
   useEffect(() => {
-    if (!message) {
+    if (!notice) {
       return undefined;
     }
-    const timer = window.setTimeout(() => setMessage(null), MESSAGE_MS);
+    const timer = window.setTimeout(() => setNotice(null), MESSAGE_MS);
     return () => window.clearTimeout(timer);
-  }, [message]);
+  }, [notice]);
+
+  // The newest notification of the game (purchases, powers, missions) goes in
+  // the strip; none in the AI's turn, which has its summary (spec 055, 2.2).
+  const notifications = state.notifications;
+  const seenNotifications = useRef(notifications.map((notification) => notification.id));
+  useEffect(() => {
+    const fresh = notifications.filter((notification) => !seenNotifications.current.includes(notification.id));
+    seenNotifications.current = notifications.map((notification) => notification.id);
+    const newest = fresh[fresh.length - 1];
+    if (newest && !aiTurn) {
+      setMessage(newest.text, 'news');
+    }
+    // setMessage only stores the alert.
+  }, [notifications, aiTurn]);
 
   // An end of turn left a showdown due when the page closed: it opens again (spec 052, 2.9).
   const { setOverlay } = session;
@@ -115,8 +147,12 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
         break;
       }
       latest = next;
-      if (reward.type === 'completeMission') {
-        setMessage(`Missione completata: premio a ${name(reward.player)}`);
+      // Its notification is the alert; in the AI's turn it goes in the summary (spec 055, 2.2).
+      const done = currentState(next);
+      const news = done.notifications[done.notifications.length - 1];
+      if (ai && done.currentPlayer === ai.player && news) {
+        const prefix = `${name(ai.player)} · `;
+        aiLog.current.push(news.text.startsWith(prefix) ? news.text.slice(prefix.length) : news.text);
       }
     }
   };
@@ -147,14 +183,20 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
     }
   };
 
-  /** An action of the AI: silent when the referee refuses it, which ends its turn. */
-  const aiAttempt = (action: GameAction): Game | null => {
+  /**
+   * An action of the AI: silent when the referee refuses it, which ends its
+   * turn. Its line goes in the summary before the rewards it made due.
+   */
+  const aiAttempt = (action: GameAction, text?: string): Game | null => {
     if (blockReason(gameRef.current, action)) {
       return null;
     }
     const next = session.perform(action, { alreadyShown: ['actionsLeft'] });
     if (next) {
       gameRef.current = next;
+      if (text) {
+        aiLog.current.push(text);
+      }
       giveRewards(next);
     }
     return next;
@@ -214,17 +256,14 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
         if (step.resolves) {
           memory.resolved.add(step.resolves);
         }
-        if (aiAttempt(step.action)) {
-          aiLog.current.push(step.text);
-        } else {
+        if (!aiAttempt(step.action, step.text)) {
           endAiTurn();
           return;
         }
         break;
       case 'interact':
-        if (aiAttempt({ type: 'interact', nodeId: step.nodeId })) {
+        if (aiAttempt({ type: 'interact', nodeId: step.nodeId }, step.text)) {
           setOverlay({ kind: 'challenge', nodeId: step.nodeId, line: 0 });
-          aiLog.current.push(step.text);
         } else {
           endAiTurn();
           return;
@@ -296,7 +335,10 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
       }
       return;
     }
-    if (moveTargets(game, state).has(nodeId)) {
+    if (nodeId === stepBackCell(game)) {
+      // Back where the last move started: that move is undone (D-087).
+      session.undo();
+    } else if (moveTargets(game, state).has(nodeId)) {
       attempt({ type: 'move', to: nodeId });
     } else {
       setMessage('La pedina va solo sulle caselle evidenziate');
@@ -527,7 +569,8 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
 
   const stageOverlay: Overlay | null = overlay;
   return (
-    <div className={styles.game}>
+    // The first touch anywhere closes the alert (spec 055, 2.2).
+    <div className={styles.game} onPointerDownCapture={() => setNotice(null)}>
       <div className={styles.board}>
         <Stage
           map={game.map}
@@ -542,7 +585,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
           onPawnDrop={aiTurn ? undefined : handlePawnDrop}
           highlighted={targets ? new Set(targets) : undefined}
           tapRadius={TAP_RADIUS}
-          onCloseNotification={session.closeNotification}
+          hideNotifications
           challengeControls={aiTurn ? () => <span>Turno dell'IA</span> : challengeControls}
           showdownControls={<button onClick={() => setFight({ kind: 'showdown' })}>Combatti</button>}
           shopActions={
@@ -554,6 +597,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
                 })
           }
           shopControls={aiTurn ? undefined : <button onClick={closeOverlay}>Chiudi</button>}
+          stackedShop
         />
         {aiTurn && ai && (
           <div className={styles.aiBanner} role="status">
@@ -569,9 +613,12 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
             <button onClick={() => setTravel(null)}>Annulla</button>
           </div>
         )}
-        {message && (
-          <div className={styles.message} role="alert" onClick={() => setMessage(null)}>
-            {message}
+        {notice && (
+          <div
+            className={`${styles.message} ${styles[notice.kind]} ${traveling ? styles.raised : ''}`}
+            role="alert"
+          >
+            {notice.text}
           </div>
         )}
       </div>

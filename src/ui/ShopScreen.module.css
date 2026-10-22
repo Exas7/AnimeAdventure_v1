@@ -27,6 +27,16 @@
   grid-template-columns: 1fr;
 }
 
+/* The phone (spec 057, 2.1): characters, then items, as wide as the window;
+   a row too long wraps instead of sticking out, so it scrolls only up and down. */
+.stacked .columns {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stacked .list li {
+  flex-wrap: wrap;
+}
+
 .header {
   display: flex;
   align-items: center;

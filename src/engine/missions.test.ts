@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { act, createGame, currentState, lastWarnings, undo } from './game';
 import { parseGame, serializeGame } from './save';
 import {
+  activeMissionParts,
   activeMissionText,
   missionsOf,
   cellMission,
@@ -216,6 +217,27 @@ describe('missions in progress and their conditions (spec 026, 2.4)', () => {
       { id: 2, nodeId: 'c3', text: 'Personaggio C: batti Personaggio B' },
     ]);
     expect(missionsOf(state, 'p2', testCatalog).map((mission) => mission.id)).toEqual([1]);
+  });
+
+  it('who gave a mission and what it asks, apart for the phone (spec 058, criterion 1)', () => {
+    let game = withMission('c3', { type: 'wait', turns: 2, reward: {} });
+    game = play(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' }, { type: 'endTurn' }, { type: 'endTurn' });
+    const state = currentState(game);
+    const [active] = state.activeMissions ?? [];
+    expect(active && activeMissionParts(active, state, testCatalog)).toEqual({
+      giver: 'Personaggio C',
+      task: 'attendi 2 turni (ne manca 1)',
+    });
+    expect(active && activeMissionText(active, state, testCatalog)).toBe(
+      'Personaggio C: attendi 2 turni (ne manca 1)',
+    );
+
+    const removed = act(game, { type: 'setCellContent', nodeId: 'c3', content: { characterId: 'char-c' } });
+    const after = currentState(removed);
+    expect(active && activeMissionParts(active, after, testCatalog)).toEqual({
+      giver: 'Personaggio C',
+      task: 'missione tolta dalla casella',
+    });
   });
 
   it('accepting the same mission twice gives a warning', () => {

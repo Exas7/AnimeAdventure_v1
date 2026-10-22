@@ -11,6 +11,7 @@ import {
   itemPrice,
   lastWarnings,
   missionsDone,
+  stepBackCell,
   TEAM_SIZE,
   turnRuleWarnings,
   type Game,
@@ -26,10 +27,12 @@ import {
 
 /**
  * The cells the current player's pawn reaches with one tap (spec 052, 2.5):
- * next to it along paths open for them, while actions are left.
+ * next to it along paths open for them, while actions are left; and the
+ * cell its last move started from, where going back undoes that move (D-087).
  */
 export function moveTargets(game: Game, state: GameState): Set<string> {
-  const targets = new Set<string>();
+  const back = stepBackCell(game);
+  const targets = new Set<string>(back ? [back] : []);
   if (state.actions.used >= state.actions.available) {
     return targets;
   }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { checkMap } from '../editor/mapEdit';
 import { serializeMap } from '../editor/mapFile';
+import type { GameMap } from '../engine';
 import { testItems, testMap } from '../engine';
 import { tierRank } from '../episode/fill';
 import { randomEpisode } from '../episode/stepRandomize';
@@ -238,7 +239,89 @@ describe('the maps that come with the app (spec 030, criterion 6)', () => {
       expect(ax === -bx && ay === -by, map.name).toBe(true);
     }
   });
+
+  it('no paths for their own sake: no detour, every short loop visits a cell (spec 056, criterion 2)', async () => {
+    for (const { map } of (await listIncludedMaps()).maps) {
+      const near = neighbours(map);
+      const passage = (id: string) => map.nodes.find((node) => node.id === id)?.type === 'empty';
+      // A passage with two paths that joins two cells already joined to each other.
+      const detours = map.nodes
+        .filter((node) => node.type === 'empty' && near(node.id).length === 2)
+        .filter((node) => {
+          const [a, b] = near(node.id) as [string, string];
+          return near(a).includes(b);
+        })
+        .map((node) => node.id);
+      expect(detours, map.name).toEqual([]);
+      // Loops of 3 or 4 cells made of passages only: a-b-c and a-b-d-c.
+      const emptyLoops: string[] = [];
+      for (const a of map.nodes.map((node) => node.id)) {
+        for (const [index, b] of near(a).entries()) {
+          for (const c of near(a).slice(index + 1)) {
+            const loops = near(b).includes(c) ? [[a, b, c]] : [];
+            loops.push(...near(b).filter((d) => d !== a && near(c).includes(d)).map((d) => [a, b, d, c]));
+            emptyLoops.push(...loops.filter((loop) => loop.every(passage)).map((loop) => loop.join('-')));
+          }
+        }
+      }
+      expect(emptyLoops, map.name).toEqual([]);
+    }
+  });
+
+  it('the characters spread over the map, alike on both sides (spec 056, criteria 3 and 4)', async () => {
+    for (const { map } of (await listIncludedMaps()).maps) {
+      const size = boardSize(map);
+      const place = (node: { x: number; y: number }) => ({ x: node.x * size.width, y: node.y * size.height });
+      const characters = map.nodes.filter((node) => node.type === 'character');
+      const far = map.nodes
+        .filter((node) => Math.min(...characters.map((other) => distance(place(node), place(other)))) > 200)
+        .map((node) => node.id);
+      expect(far, map.name).toEqual([]);
+      const [a, b] = map.nodes.filter((node) => node.type === 'start');
+      if (!a || !b) {
+        throw new Error(`${map.name}: two starts expected`);
+      }
+      const nearA = characters.filter((node) => distance(place(node), place(a)) < distance(place(node), place(b)));
+      expect(Math.abs(2 * nearA.length - characters.length), map.name).toBeLessThanOrEqual(3);
+      const fromA = stepsFrom(map, a.id);
+      const fromB = stepsFrom(map, b.id);
+      const closerA = characters.filter((node) => (fromA.get(node.id) ?? 0) < (fromB.get(node.id) ?? 0)).length;
+      const closerB = characters.filter((node) => (fromB.get(node.id) ?? 0) < (fromA.get(node.id) ?? 0)).length;
+      expect(Math.abs(closerA - closerB), map.name).toBeLessThanOrEqual(2);
+    }
+  });
 });
+
+/** The cells joined to each one by a path, grey roads included. */
+function neighbours(map: GameMap): (id: string) => string[] {
+  const near = new Map<string, string[]>(map.nodes.map((node) => [node.id, []]));
+  for (const edge of map.edges) {
+    near.get(edge.from)?.push(edge.to);
+    near.get(edge.to)?.push(edge.from);
+  }
+  return (id) => near.get(id) ?? [];
+}
+
+/** How many paths away each cell is from the given one. */
+function stepsFrom(map: GameMap, start: string): Map<string, number> {
+  const near = neighbours(map);
+  const steps = new Map([[start, 0]]);
+  const queue = [start];
+  while (queue.length > 0) {
+    const current = queue.shift() as string;
+    for (const next of near(current)) {
+      if (!steps.has(next)) {
+        steps.set(next, (steps.get(current) ?? 0) + 1);
+        queue.push(next);
+      }
+    }
+  }
+  return steps;
+}
+
+function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
 
 /** Repeatable "random" numbers (mulberry32): the same seed, the same episodes. */
 function seeded(seed: number): () => number {

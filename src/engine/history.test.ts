@@ -7,6 +7,7 @@ import {
   dismissNotification,
   dismissRedoNotification,
   redo,
+  stepBackCell,
   undo,
   undoKeepingRedo,
   type Timeline,
@@ -163,5 +164,23 @@ describe('"Ripeti" (spec 021, criterion 3)', () => {
     const [first] = notified;
     const cleaned = dismissRedoNotification(undone.redo, first?.id ?? -1);
     expect(cleaned.flatMap((entry) => entry.state.notifications)).not.toContainEqual(first);
+  });
+});
+
+describe('going back where the last move started (D-087)', () => {
+  it('is the cell the last move of the turn started from, back to the start', () => {
+    const start = createGame(setupWithPowers);
+    expect(stepBackCell(start)).toBeNull();
+    const once = act(start, { type: 'move', to: 'n1' });
+    expect(stepBackCell(once)).toBe('s1');
+    const twice = act(once, { type: 'move', to: 'sh1' });
+    expect(stepBackCell(twice)).toBe('n1');
+    expect(stepBackCell(undo(twice))).toBe('s1');
+  });
+
+  it('is gone once something else happened after the move, or the turn ended', () => {
+    const moved = act(createGame(setupWithPowers), { type: 'move', to: 'n1' });
+    expect(stepBackCell(act(moved, { type: 'setCoins', player: 'p1', coins: 5 }))).toBeNull();
+    expect(stepBackCell(act(moved, { type: 'endTurn' }))).toBeNull();
   });
 });

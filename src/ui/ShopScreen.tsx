@@ -22,6 +22,8 @@ interface ShopScreenProps {
   actions?: ShopActions;
   /** Small, single-column version for the director's side panels. */
   compact?: boolean;
+  /** One column over the board, for the phone (spec 057, 2.1). */
+  stacked?: boolean;
   /** Extra buttons at the bottom, such as "Chiudi". */
   children?: ReactNode;
 }
@@ -31,7 +33,7 @@ interface ShopScreenProps {
  * already bought entries are grey, but stay buyable (D-015).
  */
 export function ShopScreen(props: ShopScreenProps) {
-  const { context, state, shopNodeId, actions, compact, children } = props;
+  const { context, state, shopNodeId, actions, compact, stacked, children } = props;
   const viewer = state.currentPlayer;
   const listing = shopListing(state, context, shopNodeId, viewer);
   const nameOf = (characterId: string) =>
@@ -124,7 +126,10 @@ export function ShopScreen(props: ShopScreenProps) {
   return compact ? (
     <div className={`${styles.shop} ${styles.compact}`}>{body}</div>
   ) : (
-    <Frame className={styles.frame} contentClassName={styles.shop}>
+    <Frame
+      className={stacked ? `${styles.frame} ${styles.stacked}` : styles.frame}
+      contentClassName={styles.shop}
+    >
       {body}
     </Frame>
   );

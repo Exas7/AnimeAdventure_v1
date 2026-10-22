@@ -138,12 +138,31 @@ export function activeMissionText(
   state: GameState,
   catalog: Character[],
 ): string {
+  const { giver, task } = activeMissionParts(active, state, catalog);
+  return `${giver}: ${task}`;
+}
+
+/**
+ * Who gave a mission in progress and what it asks, apart: "Bulma" and
+ * "attendi 3 turni (ne mancano 2)". The phone shows the name only and the
+ * task on a tap (spec 058).
+ */
+export function activeMissionParts(
+  active: ActiveMission,
+  state: GameState,
+  catalog: Character[],
+): { giver: string; task: string } {
   const name = nameIn(catalog);
   const giverId = state.cells[active.nodeId]?.characterId;
   const giver = giverId ? name(giverId) : 'Missione';
+  return { giver, task: missionTask(active, state, catalog, giver) };
+}
+
+function missionTask(active: ActiveMission, state: GameState, catalog: Character[], giver: string): string {
+  const name = nameIn(catalog);
   const mission = cellMission(state.cells[active.nodeId]);
   if (!mission) {
-    return `${giver}: missione tolta dalla casella`;
+    return 'missione tolta dalla casella';
   }
   const target = mission.targetId ? name(mission.targetId) : '?';
   const turns = mission.turns ?? 0;
@@ -151,26 +170,26 @@ export function activeMissionText(
     case 'goTo':
       if (mission.returnToGiver) {
         return active.reachedTarget
-          ? `${giver}: sei stato da ${target}, ora torna da ${giver}`
-          : `${giver}: vai da ${target}, poi torna`;
+          ? `sei stato da ${target}, ora torna da ${giver}`
+          : `vai da ${target}, poi torna`;
       }
-      return `${giver}: vai da ${target}`;
+      return `vai da ${target}`;
     case 'defeat':
-      return `${giver}: batti ${target}`;
+      return `batti ${target}`;
     case 'bring':
-      return `${giver}: porta ${target} in squadra`;
+      return `porta ${target} in squadra`;
     case 'wait': {
       const left = Math.max(0, turns - (state.players[active.player].turnsPlayed - active.turnsPlayedAtStart));
-      return `${giver}: attendi ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
+      return `attendi ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
     }
     case 'skipTurns': {
       const left = active.turnsToSkipLeft ?? 0;
-      return `${giver}: salta ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
+      return `salta ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
     }
     case 'fight':
     case 'quiz':
     case 'other':
-      return `${giver}: ${missionLabel(mission, catalog).toLowerCase()}`;
+      return missionLabel(mission, catalog).toLowerCase();
   }
 }
 

@@ -1,12 +1,12 @@
+import { useState } from 'react';
 import {
-  missionsOf,
+  activeMissionParts,
   rechargesStarter,
   TEAM_SIZE,
   trainingRule,
   travelRule,
   type Character,
   type ItemDefinition,
-  type PanelMission,
   type PlayerId,
   type PlayerState,
 } from '../engine';
@@ -60,7 +60,9 @@ export function PhonePanel(props: PhonePanelProps) {
         player={state.players[current]}
         catalog={catalog}
         items={items}
-        missions={missionsOf(state, current, catalog)}
+        missions={(state.activeMissions ?? [])
+          .filter((active) => active.player === current)
+          .map((active) => ({ id: active.id, ...activeMissionParts(active, state, catalog) }))}
         onUsePower={props.onUsePower}
         onUseItem={props.onUseItem}
         onAbandonMission={props.onAbandonMission}
@@ -81,6 +83,13 @@ export function PhonePanel(props: PhonePanelProps) {
   );
 }
 
+/** A mission in progress: the name of who gave it, the task on a tap (spec 058). */
+interface PhoneMission {
+  id: number;
+  giver: string;
+  task: string;
+}
+
 interface PlayerBoxProps {
   playerId: PlayerId;
   player: PlayerState;
@@ -88,7 +97,7 @@ interface PlayerBoxProps {
   items: ItemDefinition[];
   /** The opponent: name, coins and team only. */
   short?: boolean;
-  missions?: PanelMission[];
+  missions?: PhoneMission[];
   onUsePower?(powerId: string): void;
   onUseItem?(itemId: string): void;
   onAbandonMission?(missionId: number): void;
@@ -105,6 +114,8 @@ function PlayerBox(props: PlayerBoxProps) {
   };
   const manualPowers = player.powers.filter((power) => power.usesLeft !== null);
   const slots = Array.from({ length: TEAM_SIZE }, (_, index) => player.team[index]);
+  // The mission whose task is open: one at a time, not a game action (spec 058).
+  const [openMission, setOpenMission] = useState<number | null>(null);
 
   return (
     <section className={`${styles.player} ${styles[playerId] ?? ''} ${short ? styles.short : ''}`}>
@@ -161,14 +172,27 @@ function PlayerBox(props: PlayerBoxProps) {
               </div>
             );
           })}
-          {(props.missions ?? []).map((mission) => (
-            <div key={mission.id} className={styles.row}>
-              <span className={styles.label}>{mission.text}</span>
-              <button disabled={props.locked} onClick={() => props.onAbandonMission?.(mission.id)}>
-                Abbandona
-              </button>
-            </div>
-          ))}
+          {(props.missions ?? []).map((mission) => {
+            const open = openMission === mission.id;
+            return (
+              <div key={mission.id}>
+                <div className={styles.row}>
+                  <button
+                    className={styles.giver}
+                    aria-expanded={open}
+                    title="Mostra la missione"
+                    onClick={() => setOpenMission(open ? null : mission.id)}
+                  >
+                    {open ? '▾' : '▸'} {mission.giver}
+                  </button>
+                  <button disabled={props.locked} onClick={() => props.onAbandonMission?.(mission.id)}>
+                    Abbandona
+                  </button>
+                </div>
+                {open && <p className={styles.task}>{mission.task}</p>}
+              </div>
+            );
+          })}
         </>
       )}
     </section>

@@ -29,8 +29,13 @@ describe('where the pawn goes with a tap (spec 052, criterion 2)', () => {
   });
 
   it('none once the actions of the turn are used', () => {
-    const game = play(start(), { type: 'move', to: 'n1' }, { type: 'move', to: 'c1' });
+    const game = play(start(), { type: 'move', to: 'n1' }, { type: 'interact', nodeId: 'c1' });
     expect(moveTargets(game, currentState(game)).size).toBe(0);
+  });
+
+  it('the cell the last move started from, even with the actions used (D-087)', () => {
+    const game = play(start(), { type: 'move', to: 'n1' }, { type: 'move', to: 'c1' });
+    expect([...moveTargets(game, currentState(game))]).toEqual(['n1']);
   });
 });
 

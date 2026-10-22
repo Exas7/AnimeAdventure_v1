@@ -138,3 +138,23 @@
   color: var(--on-accent);
   font-weight: 700;
 }
+
+/* A mission in progress (spec 058): the giver's name only, the task opens below on a tap. */
+.row .giver {
+  --button-press: 0px;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  font-weight: 600;
+  text-align: left;
+}
+
+.task {
+  margin: 0;
+  padding: 0 0 2px 14px;
+  color: var(--muted);
+}

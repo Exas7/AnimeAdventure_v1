@@ -44,10 +44,14 @@ interface StageProps {
   /** The phone (spec 052, 2.5): highlighted cells are large targets for a finger. */
   tapRadius?: number;
   onCloseNotification?: (notificationId: number) => void;
+  /** The phone (spec 055, 2.2): notifications go in its own strip, not in boxes over the map. */
+  hideNotifications?: boolean;
   challengeControls?: (nodeId: string, character: Character | undefined) => ReactNode;
   showdownControls?: ReactNode;
   shopActions?: (shopNodeId: string) => ShopActions;
   shopControls?: ReactNode;
+  /** The phone (spec 057, 2.1): the shop in one column, scrolled only up and down. */
+  stackedShop?: boolean;
 }
 
 /** The board with what goes on top of it: challenge, showdown and notifications. */
@@ -104,6 +108,7 @@ export function Stage(props: StageProps) {
             state={state}
             shopNodeId={overlay.nodeId}
             actions={props.shopActions?.(overlay.nodeId)}
+            stacked={props.stackedShop}
           >
             {props.shopControls}
           </ShopScreen>
@@ -114,7 +119,9 @@ export function Stage(props: StageProps) {
           {props.showdownControls}
         </ShowdownScreen>
       )}
-      <NotificationStack notifications={state.notifications} onClose={props.onCloseNotification} />
+      {!props.hideNotifications && (
+        <NotificationStack notifications={state.notifications} onClose={props.onCloseNotification} />
+      )}
     </div>
   );
 }

@@ -63,11 +63,13 @@ const ITEMS: Omit<StartMenuItem, 'primary'>[] = [
 /**
  * The start page menu, top to bottom. "Riprendi la partita" only with a saved
  * game, and then it is the main button; otherwise "Nuova partita" is. The
- * others always carry the balls from one to five stars (spec 050, 2.4). On
- * the phone there is no "Carica partita da file" (spec 052, 2.2).
+ * others carry the balls from one star up, in order (spec 050, 2.4). On
+ * the phone there is no "Carica partita da file" (spec 052, 2.2), so the
+ * balls go from one to four, with no gap (spec 057, 2.2).
  */
 export function startMenu(hasSavedGame: boolean, phone = false): StartMenuItem[] {
   const main: StartMenuId = hasSavedGame ? 'resume' : 'newGame';
+  let stars = 0;
   return ITEMS.filter(
     (item) =>
       (hasSavedGame || item.id !== 'resume') &&
@@ -76,6 +78,7 @@ export function startMenu(hasSavedGame: boolean, phone = false): StartMenuItem[]
   ).map((item) => ({
     ...item,
     primary: item.id === main,
+    stars: item.stars === null ? null : ++stars,
   }));
 }
 

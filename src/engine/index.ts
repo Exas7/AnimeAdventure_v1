@@ -13,6 +13,7 @@ export {
   dismissRedoNotification,
   lastWarnings,
   redo,
+  stepBackCell,
   undo,
   undoKeepingRedo,
   type Timeline,
@@ -20,6 +21,7 @@ export {
 export { gameLog, type LogEntry } from './log';
 export { cleanLines, nextLineIndex, upgradeCellTexts } from './lines';
 export {
+  activeMissionParts,
   activeMissionText,
   cellMission,
   defaultMission,

@@ -108,8 +108,8 @@ pacchetti npm senza chiederlo.
    casella personaggio in fondo a un vicolo cieco.
 7. Mappe base: niente caselle speciali; circa 100 caselle, 40 caselle
    personaggio, 6-8 strade grigie, divise in modo simile tra i due lati.
-8. Caselle e percorsi sulla terra: il mare o la lava si attraversano solo
-   per unire le isole, meglio dove lo sfondo disegna un ponte.
+8. Caselle e percorsi possono passare anche sopra il mare e la lava (in
+   Dragon Ball si vola).
 9. **Caselle lontane dal bordo**: il tabellone finisce al bordo dello
    sfondo, e la pedina sta in piedi sopra la casella. Una casella
    personaggio vuole circa il 3,5% della larghezza ai lati e l'8,5%
@@ -119,6 +119,14 @@ pacchetti npm senza chiederlo.
     unità (la mappa è larga 1600), e un percorso passa ad almeno 10
     unità da ogni casella che non collega. I conti esatti sono
     `touchingCells` e `pathsOverCells` in `src/ui/boardModel.ts`.
+11. **Mappe base: personaggi sparsi, niente giri inutili.** Ogni casella
+    sta entro 200 unità da una casella personaggio; le caselle personaggio
+    sono circa tante nelle due metà della mappa (scarto di 3 in linea
+    d'aria, di 2 contando i passi dalle partenze); nessun pallino con due
+    soli percorsi unisce due caselle già collegate, e ogni giro di 3 o 4
+    caselle passa da una casella personaggio, un negozio o una partenza.
+    Non le segnala `checkMap`: le controllano i test di
+    `src/included/included.test.ts`.
 
 Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
 «the three default maps» in `src/included/included.test.ts`, poi `npm test`.

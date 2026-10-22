@@ -11,6 +11,7 @@ import {
   isRepeatInteraction,
   PLAYER_IDS,
   SaveFileError,
+  stepBackCell,
   turnRuleWarnings,
   testItems,
   trainingRule,
@@ -853,6 +854,11 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
           setTravel(null),
         );
       }
+      return;
+    }
+    if (playerId === state.currentPlayer && nodeId === stepBackCell(game)) {
+      // Back where the last move started: that move is undone, with no warning (D-087).
+      undo();
       return;
     }
     const action = pawnDropAction(state, playerId, nodeId);

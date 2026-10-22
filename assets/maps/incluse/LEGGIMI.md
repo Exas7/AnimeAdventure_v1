@@ -7,7 +7,10 @@ browser (spec 033).
 
 Oggi sono le tre mappe di default (spec 036, D-056): Pianeta Nameck,
 Pianeta dei Kaioshin e Inferi, fatte con le regole delle mappe (D-051) e
-con le partenze in due angoli opposti.
+con le partenze in due angoli opposti. La spec 056 (D-088) le ha
+sistemate: coprono tutta la terra e spargono i personaggi in modo simile
+nelle due metà, senza percorsi fini a se stessi; percorsi e caselle
+possono passare sopra l'acqua e la lava.
 
 Per aggiungerne una:
 

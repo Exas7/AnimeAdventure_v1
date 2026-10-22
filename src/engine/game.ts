@@ -116,6 +116,26 @@ export function undo(game: Game): Game {
 }
 
 /**
+ * The cell the current player's pawn goes back to for free (D-087): where
+ * its last move started, when that move is the last action of the turn.
+ * Going back there undoes the move instead of making a new one. Null when
+ * something else came after the move, or there is no move to go back on.
+ */
+export function stepBackCell(game: Game): string | null {
+  const last = game.history[game.history.length - 1];
+  const before = game.history[game.history.length - 2];
+  if (!last || !before || last.action.type !== 'move') {
+    return null;
+  }
+  const { turn, currentPlayer, players } = last.state;
+  if (last.turn !== turn || last.player !== currentPlayer) {
+    return null;
+  }
+  const from = before.state.players[currentPlayer].position;
+  return from === players[currentPlayer].position ? null : from;
+}
+
+/**
  * A game with what "Ripeti" can bring back (spec 021): the history entries
  * taken away by undo, the last one undone at the end. It lives in the
  * director session only, never in the game nor in its saves.
