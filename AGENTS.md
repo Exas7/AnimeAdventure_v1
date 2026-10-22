@@ -39,6 +39,7 @@ Due finestre dello stesso Chrome: la **regia** (`/`) e lo **stream**
 | `src/included/` | i dati che vengono con l'app |
 | `assets/maps/*.jpg` | gli **sfondi**: immagini, scelte dal menu «Sfondi…» dell'editor |
 | `assets/maps/incluse/*.json` | le **mappe base**: sfondo più caselle e percorsi |
+| `assets/characters/` | le **immagini dei personaggi**, col nome del personaggio: la figura intera qui, il volto in `volti/`; fonti in `CREDITI.md` |
 | `docs/*.csv` | le liste: personaggi, missioni, domande |
 | `docs/*.xlsx` | le stesse liste in Excel, per modificarle a mano |
 

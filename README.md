@@ -24,7 +24,13 @@ restano salvate nel tuo browser.
 > Gravitazionale, navicella da Comic Vine; Vestiti pesanti, generati con
 > Ideogram; Stanza dello Spirito e del Tempo, Nuvola Speedy e abitante di
 > Yardrat (Trasmissione Istantanea), immagini dal web. Gli sfondi della
-> pagina iniziale, Shenron e la Kame House, sono generati con Gemini.
+> pagina iniziale, Shenron e la Kame House, sono generati con Gemini. Le
+> immagini dei personaggi sono illustrazioni ufficiali di Dragon Ball:
+> Sparking! ZERO, Dragon Ball Legends e Budokai Tenkaichi 3 (Bandai
+> Namco) e ritagli di fan su DeviantArt di illustrazioni ufficiali
+> (Maxiuchiha22, SuperDabura, Ltxalex, PrinceofDBZGames, MonkeyOfLife,
+> Rabazza), con un contorno aggiunto; i crediti di ognuna sono in
+> `assets/characters/CREDITI.md`.
 
 ## Cosa serve
 

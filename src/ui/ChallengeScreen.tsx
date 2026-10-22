@@ -51,6 +51,7 @@ export function ChallengeScreen(props: ChallengeScreenProps) {
             characterId={character?.id}
             imageData={character?.imageData}
             size="fill"
+            figure
           />
         </div>
         <div className={styles.speech}>

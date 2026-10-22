@@ -80,7 +80,7 @@ export function BattleScreen({ view }: BattleScreenProps) {
                 key={`${side}-${shown}`}
                 className={[styles.fighter, styles[side], motionOf(event, side)].join(' ')}
               >
-                <Placeholder name={fighter.name} characterId={fighter.id} size="fill" />
+                <Placeholder name={fighter.name} characterId={fighter.id} size="fill" figure />
               </div>
             );
           })}

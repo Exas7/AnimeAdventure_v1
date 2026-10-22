@@ -1,4 +1,4 @@
-import { characterImage } from './characterImages';
+import { characterFace, characterImage } from './characterImages';
 import styles from './Placeholder.module.css';
 
 interface PlaceholderProps {
@@ -9,14 +9,16 @@ interface PlaceholderProps {
   imageData?: string;
   /** 'fill' takes the size of the surrounding box and shows the whole image. */
   size?: 'small' | 'fill';
+  /** Tall frames show the whole figure; the others the face, when there is one (spec 051, D-081). */
+  figure?: boolean;
 }
 
 /**
  * A character: its image when there is one, otherwise the stand-in with a
  * white background and the name in black (spec 002, spec 013).
  */
-export function Placeholder({ name, characterId, imageData, size = 'small' }: PlaceholderProps) {
-  const image = imageData ?? characterImage(characterId);
+export function Placeholder({ name, characterId, imageData, size = 'small', figure = false }: PlaceholderProps) {
+  const image = imageData ?? (figure ? characterImage(characterId) : characterFace(characterId));
   if (image) {
     return (
       <div className={`${styles.picture} ${styles[size] ?? ''}`} title={name}>

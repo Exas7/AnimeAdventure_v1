@@ -55,6 +55,7 @@ export function StarterChoiceScreen({ view, onChoose }: StarterChoiceScreenProps
                       characterId={card.character.id}
                       imageData={card.character.imageData}
                       size="fill"
+                      figure
                     />
                   ) : (
                     <div className={styles.missing}>?</div>

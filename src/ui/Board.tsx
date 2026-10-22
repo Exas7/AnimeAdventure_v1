@@ -19,7 +19,7 @@ import {
   type NodeView,
   type PawnView,
 } from './boardModel';
-import { characterImage } from './characterImages';
+import { characterFace } from './characterImages';
 import styles from './Board.module.css';
 
 export interface ScreenPoint {
@@ -314,8 +314,8 @@ interface CellProps {
 }
 
 function Cell({ node, clipId, highlighted, onClick, onDoubleClick, onContextMenu }: CellProps) {
-  // The picture of the character or shopkeeper, cut to the circle (D-024).
-  const image = node.imageData ?? characterImage(node.characterId);
+  // The picture of the character or shopkeeper, cut to the circle (D-024): the face (D-081).
+  const image = node.imageData ?? characterFace(node.characterId);
   const classes = [
     onClick || onDoubleClick ? styles.interactive : '',
     node.conqueredBy ? styles.conquered : '',
