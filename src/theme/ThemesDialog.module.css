@@ -124,8 +124,3 @@
     inset 0 0 0 1px var(--accent-hi);
   font-weight: 700;
 }
-
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-}

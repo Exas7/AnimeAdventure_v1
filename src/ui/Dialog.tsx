@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { Frame, FrameTitle } from '../theme/Frame';
+import { CloseButton } from './CloseButton';
 import styles from './Dialog.module.css';
 
 interface DialogProps {
@@ -10,7 +11,10 @@ interface DialogProps {
   children: ReactNode;
 }
 
-/** A window over the page (spec 029, 2.5): Esc closes it, like "Annulla". */
+/**
+ * A window over the page (spec 029, 2.5): Esc closes it, like "Annulla".
+ * The title and «✕ Chiudi» stay at the top while the window scrolls (spec 065).
+ */
 export function Dialog({ title, narrow, onClose, children }: DialogProps) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -31,7 +35,10 @@ export function Dialog({ title, narrow, onClose, children }: DialogProps) {
         aria-modal="true"
         aria-label={title}
       >
-        <FrameTitle>{title}</FrameTitle>
+        <div className={styles.head}>
+          <FrameTitle className={styles.title}>{title}</FrameTitle>
+          <CloseButton onClose={onClose} />
+        </div>
         {children}
       </Frame>
     </div>

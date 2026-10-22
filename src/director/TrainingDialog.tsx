@@ -95,9 +95,6 @@ export function TrainingDialog({ game, state, player, itemId, onConfirm, onClose
         </p>
       ))}
       <div className={styles.buttons}>
-        <button type="button" onClick={onClose}>
-          Chiudi
-        </button>
         <button
           type="button"
           className={styles.confirm}

@@ -65,14 +65,6 @@
   line-height: 1.4;
 }
 
-.buttons {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.buttons button {
-  padding: 8px 14px;
-}
 
 /* The choices of «Versione telefono» (spec 052): the chosen one pressed in, in the accent colour. */
 .options {

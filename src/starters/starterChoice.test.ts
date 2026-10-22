@@ -53,7 +53,8 @@ describe('the starter choice scene (spec 025, 2.4)', () => {
         chosen: false,
       },
       { character: { id: 'tenshinhan', name: 'Tenshinhan' }, texts: [], chosen: false },
-      { character: null, texts: ['Parti con 3.500$ invece che 1.000$'], chosen: false },
+      // «Parti con …»: +1,500 since spec 063.
+      { character: null, texts: ['Parti con 2.500$ invece che 1.000$'], chosen: false },
     ]);
     expect(view.teams).toEqual({
       p1: { name: 'Maggi', coins: 1000, starter: null },
@@ -71,9 +72,9 @@ describe('the starter choice scene (spec 025, 2.4)', () => {
 
   it('the coins shown already count the extra starting coins of the chosen starter (criterion 8)', () => {
     const choice = chooseCard(startChoice('p1'), 2);
-    expect(starterChoiceView(proposals, choice, names, 1000, catalog).teams.p1.coins).toBe(3500);
+    expect(starterChoiceView(proposals, choice, names, 1000, catalog).teams.p1.coins).toBe(2500);
     expect(startingCoinsWith(1000, [everyTwo, perInteraction])).toBe(1000);
-    expect(startingCoinsWith(0, [richStart, richStart])).toBe(5000);
+    expect(startingCoinsWith(0, [richStart, richStart])).toBe(3000);
   });
 
   it('"Avanti" shows the other player, whose choice is kept apart', () => {
@@ -101,13 +102,13 @@ describe('the starter choice scene (spec 025, 2.4)', () => {
   });
 
   it('power texts follow the starting coins (spec 029, criterion 9)', () => {
-    expect(cardTextFor(richStart, 200)).toBe('Parti con 2.700$ invece che 200$');
-    expect(cardTextFor(richStart, 1000)).toBe('Parti con 3.500$ invece che 1.000$');
+    expect(cardTextFor(richStart, 200)).toBe('Parti con 1.700$ invece che 200$');
+    expect(cardTextFor(richStart, 1000)).toBe('Parti con 2.500$ invece che 1.000$');
     expect(cardTextFor(richStart, null)).toBe('Parti con {totale} invece che {iniziali}');
     expect(cardTextFor(everyTwo, 200)).toBe('Ogni 2 turni guadagni 200$');
     const choice = chooseCard(startChoice('p1'), 2);
     expect(starterChoiceView(proposals, choice, names, 200, catalog).cards[2]?.texts).toEqual([
-      'Parti con 2.700$ invece che 200$',
+      'Parti con 1.700$ invece che 200$',
     ]);
   });
 

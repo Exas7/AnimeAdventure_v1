@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 export const APP_INPUTS = [
   'src',
   'assets',
+  'public',
   'docs',
   'index.html',
   'vite.config.ts',

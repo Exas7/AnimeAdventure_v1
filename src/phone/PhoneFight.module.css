@@ -24,6 +24,19 @@
   font-size: 1.2em;
 }
 
+/* «← Indietro» and the title (spec 065): stuck to the top while the choice scrolls. */
+.head {
+  position: sticky;
+  top: -12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -12px -16px 0;
+  padding: 12px 16px 6px;
+  background: var(--bg);
+}
+
 .note {
   margin: 0;
   color: var(--muted);

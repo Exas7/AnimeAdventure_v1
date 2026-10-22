@@ -1,0 +1,10 @@
+/* «✕ Chiudi» (spec 065): small, always at the top, never squeezed by the title. */
+.close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}

@@ -9,6 +9,8 @@ import {
   isRepeatInteraction,
   mustSendAway,
   nextForms,
+  rechargeablePower,
+  rechargesStarter,
   shopListing,
   TEAM_SIZE,
   teamIsFull,
@@ -21,6 +23,7 @@ import {
   type Mission,
   type MissionType,
   type PlayerId,
+  type PowerState,
   type TrainingChoice,
 } from '../engine';
 import { blockReason } from '../phone/arbiter';
@@ -61,8 +64,11 @@ const HARD_MIN_CHANCE = 0.45;
 
 /** One step of the AI's turn, shown to the player one after the other (spec 053, 2.2). */
 export type AiStep =
-  /** An action of the game; `shop` while buying, to show the shop. */
-  | { kind: 'act'; action: GameAction; text: string; resolves?: string; shop?: string }
+  /**
+   * An action of the game; `shop` while buying, to show the shop; `reopens`
+   * a cell to deal with again: the AI retries its lost challenge (spec 063).
+   */
+  | { kind: 'act'; action: GameAction; text: string; resolves?: string; shop?: string; reopens?: string }
   /** The interaction with the character where the pawn stands: the scene opens. */
   | { kind: 'interact'; nodeId: string; text: string }
   | { kind: 'quiz'; nodeId: string; answer: number; text: string; resolves: string }
@@ -252,8 +258,8 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
   if (!content?.characterId || node?.type === 'shop' || state.conquests[nodeId] !== undefined) {
     return 0;
   }
-  // A character who beat it: the AI does not retry (spec 061, 2.4).
-  if (hasLostAt(state, player, nodeId)) {
+  // A character who beat it: only with a power to retry (spec 061, 2.4; spec 063, 2.4).
+  if (hasLostAt(state, player, nodeId) && !usablePower(state, player, 'retryChallenge')) {
     return 0;
   }
   const mission = cellMission(content);
@@ -306,6 +312,15 @@ function purchase(game: Game, state: GameState, shopId: string, level: AiLevel, 
           action: { type: 'buyItem', shopNodeId: shopId, itemId: entry.itemId },
           name: entry.name,
           value: entry.price * 0.8,
+        });
+      }
+      // A Senzu that recharges something worth it (spec 063, 2.4).
+      const recharge = item && rechargesStarter(item) ? rechargeValue(state, player) : 0;
+      if (recharge > entry.price && !entry.soldOut && entry.price <= coins) {
+        options.push({
+          action: { type: 'buyItem', shopNodeId: shopId, itemId: entry.itemId },
+          name: entry.name,
+          value: recharge,
         });
       }
     }
@@ -402,12 +417,14 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
   }
 
   if (rules.usesItems) {
-    // Manual powers with an effect the app applies: at once.
+    // Manual powers: coins at once; the others when they pay (spec 063, 2.4).
     for (const power of me.powers) {
       const { effect } = power.definition;
-      const useful = effect.type === 'addCoins' || effect.type === 'extraActions' || effect.type === 'skipOpponentTurn';
       const action: GameAction = { type: 'usePower', player, powerId: power.id };
-      if (useful && (power.usesLeft ?? 0) > 0 && allowed(action)) {
+      const now =
+        effect.type === 'addCoins' ||
+        (effect.type === 'skipOpponentTurn' && skipWorthIt(game, state, player, level, memory, random));
+      if (now && (power.usesLeft ?? 0) > 0 && allowed(action)) {
         return { kind: 'act', action, text: `Usa il potere «${power.definition.name}»` };
       }
     }
@@ -472,6 +489,27 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
     return { kind: 'close', resolves: cellKey };
   }
 
+  // Retry a lost challenge where it stands, when the character is worth it (spec 063, 2.4).
+  const retry = usablePower(state, player, 'retryChallenge');
+  if (
+    retry &&
+    rules.usesItems &&
+    actionsLeft > 0 &&
+    hasLostAt(state, player, position) &&
+    cellValue(game, state, position, level, memory, random) > 0
+  ) {
+    const action: GameAction = { type: 'usePower', player, powerId: retry.id };
+    if (allowed(action)) {
+      memory.chances.delete(position);
+      return {
+        kind: 'act',
+        action,
+        text: `Usa «${retry.definition.name}» per sfidare di nuovo ${nameAt(game, state, position)}`,
+        reopens: cellKey,
+      };
+    }
+  }
+
   // Interact with the character where it stands, when it is worth it.
   if (
     actionsLeft > 0 &&
@@ -487,10 +525,71 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
   if (actionsLeft > 0) {
     const move = chooseMove(game, state, level, memory, random);
     if (move) {
+      // Extra actions when they take it to its goal in this turn (spec 063, 2.4).
+      const extra = usablePower(state, player, 'extraActions');
+      const amount = extra?.definition.effect.type === 'extraActions' ? extra.definition.effect.amount : 0;
+      const needed = move.distance + (move.interact ? 1 : 0);
+      if (extra && rules.usesItems && needed > actionsLeft && needed <= actionsLeft + amount) {
+        const action: GameAction = { type: 'usePower', player, powerId: extra.id };
+        if (allowed(action)) {
+          return { kind: 'act', action, text: `Usa il potere «${extra.definition.name}» per arrivare prima` };
+        }
+      }
       return { kind: 'act', action: { type: 'move', to: move.to }, text: move.text };
     }
   }
   return { kind: 'end', text: 'Finisce il turno' };
+}
+
+/** A manual power of the player with this effect and uses left. */
+function usablePower(state: GameState, player: PlayerId, effect: string): PowerState | undefined {
+  return state.players[player].powers.find(
+    (power) => power.definition.effect.type === effect && (power.usesLeft ?? 0) > 0,
+  );
+}
+
+/**
+ * What a Senzu is worth to the AI (spec 063, 2.4): the extra starting coins
+ * paid again, or a use back for a manual power that has none left.
+ */
+function rechargeValue(state: GameState, player: PlayerId): number {
+  const power = rechargeablePower(state, player);
+  if (!power) {
+    return 0;
+  }
+  const { effect } = power.definition;
+  if (power.usesLeft === null) {
+    return effect.type === 'addCoins' ? effect.amount : 0;
+  }
+  return power.usesLeft === 0 ? 600 : 0;
+}
+
+/** From this turn on the AI uses «Salta turno» anyway: the game is near its end. */
+const LATE_TURN = 40;
+
+/**
+ * «Fai saltare un turno» when it slows the opponent at the right time (spec
+ * 063, 2.4): their team is about to be complete, or they are close and would
+ * win the showdown (Difficile), or the game is late.
+ */
+function skipWorthIt(game: Game, state: GameState, player: PlayerId, level: AiLevel, memory: AiMemory, random: Random): boolean {
+  const other: PlayerId = player === 'p1' ? 'p2' : 'p1';
+  const mine = state.players[player].team.length;
+  const theirs = state.players[other].team.length;
+  if (state.players[other].turnsToSkip > 0) {
+    return false;
+  }
+  if (theirs >= TEAM_SIZE - 1 && theirs >= mine) {
+    return true;
+  }
+  if (state.turn >= LATE_TURN) {
+    return true;
+  }
+  if (LEVELS[level].showdown) {
+    const near = (paths(game, state, other).distance.get(state.players[player].position) ?? Infinity) <= 3;
+    return near && showdownChance(game, state, player, memory, random) <= 0.4;
+  }
+  return false;
 }
 
 /** Characters ahead of the player that make the AI chase them (spec 061, 2.4). */
@@ -508,7 +607,13 @@ export function chaseWorthIt(state: GameState, player: PlayerId, other: PlayerId
 }
 
 /** Where the pawn goes next: one step towards the most convenient cell. */
-function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemory, random: Random): { to: string; text: string } | null {
+function chooseMove(
+  game: Game,
+  state: GameState,
+  level: AiLevel,
+  memory: AiMemory,
+  random: Random,
+): { to: string; text: string; distance: number; interact: boolean } | null {
   const player = state.currentPlayer;
   const other: PlayerId = player === 'p1' ? 'p2' : 'p1';
   const rules = LEVELS[level];
@@ -519,7 +624,8 @@ function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemo
   const legal = (to: string) => blockReason(game, { type: 'move', to }) === null;
 
   let avoid: string | null = null;
-  const targets: { node: string; value: number; text: string }[] = [];
+  // `interact`: once there it still needs an action to meet the character.
+  const targets: { node: string; value: number; text: string; interact?: boolean }[] = [];
   if (rules.showdown && state.players[player].team.length > 0) {
     const chance = showdownChance(game, state, player, memory, random);
     if (chance >= 0.6 && chaseWorthIt(state, player, other)) {
@@ -542,7 +648,7 @@ function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemo
     }
     const value = cellValue(game, state, node.id, level, memory, random);
     if (value > 0) {
-      targets.push({ node: node.id, value, text: `Va verso ${nameAt(game, state, node.id)}` });
+      targets.push({ node: node.id, value, text: `Va verso ${nameAt(game, state, node.id)}`, interact: true });
     }
   }
   // The places its accepted missions ask for (spec 053, 2.3).
@@ -576,7 +682,7 @@ function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemo
       return null;
     }
     const to = steps[Math.floor(random() * steps.length)] as string;
-    return { to, text: 'Si sposta' };
+    return { to, text: 'Si sposta', distance: 1, interact: false };
   }
   // Facile goes to the nearest useful cell; the others weigh the reward against the distance.
   const score = (target: { node: string; value: number }) =>
@@ -587,7 +693,7 @@ function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemo
   for (const target of ordered) {
     const step = first.get(target.node);
     if (step && steps.includes(step)) {
-      return { to: step, text: target.text };
+      return { to: step, text: target.text, distance: distance.get(target.node) ?? 1, interact: target.interact === true };
     }
   }
   return null;

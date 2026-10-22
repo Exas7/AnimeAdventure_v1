@@ -6,9 +6,11 @@ import {
   currentState,
   parseGame,
   serializeGame,
+  powerCatalog,
   testCatalog,
   testSetup,
   type AiLevel,
+  type PowerDefinition,
   type CellContent,
   type Game,
   type GameAction,
@@ -249,5 +251,60 @@ describe('the AI and the rules of spec 061 (criterion 5)', () => {
     expect(chaseWorthIt(state(opponent(full)), 'p1', 'p2')).toBe(false);
     const swapped = act(add(full, ['char-d']), { type: 'removeCharacter', player: 'p1', characterId: 'char-d' });
     expect(chaseWorthIt(state(opponent(swapped)), 'p1', 'p2')).toBe(true);
+  });
+});
+
+describe('the AI uses its powers when they pay (spec 063, criterion 4)', () => {
+  const withPowers = (powers: PowerDefinition[], coins = 0): Game => {
+    const game = aiGame({ coins });
+    const state = currentState(game);
+    const p1 = { ...state.players.p1, powers: powers.map((definition, index) => ({ id: `p1-${index}`, definition, usesLeft: definition.trigger.type === 'manual' ? definition.trigger.uses : null })) };
+    const entry = { ...game.history[0]!, state: { ...state, players: { ...state.players, p1 } } };
+    return { ...game, history: [entry] };
+  };
+
+  it('retries a lost challenge with «Ritenta», then meets the character again', () => {
+    const lost = act(act(place(withPowers([powerCatalog.retryLostChallenge(2)]), 'c1'), { type: 'interact', nodeId: 'c1' }), {
+      type: 'loseChallenge',
+      nodeId: 'c1',
+      player: 'p1',
+    });
+    const memory = newMemory();
+    memory.resolved.add('cell:c1');
+    const step = nextAiStep(lost, 'normal', seeded(1), memory);
+    expect(step).toMatchObject({ kind: 'act', action: { type: 'usePower', powerId: 'p1-0' }, reopens: 'cell:c1' });
+  });
+
+  it('uses «Doppio movimento» only when it takes it to its goal in this turn', () => {
+    const game = withPowers([powerCatalog.extraActionsOnDemand(2, 2, 'Doppio movimento')]);
+    // c1 is two steps away and needs an action to meet Personaggio A: 3 actions, 2 left.
+    expect(nextAiStep(game, 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'usePower', powerId: 'p1-0' },
+    });
+    const near = place(game, 'n1');
+    expect(nextAiStep(near, 'normal', seeded(1), newMemory())).toMatchObject({ kind: 'act', action: { type: 'move' } });
+  });
+
+  it('uses «Salta turno» when the opponent is about to complete the team, not before', () => {
+    const game = withPowers([powerCatalog.skipOpponentTurn(2)]);
+    expect(nextAiStep(game, 'normal', seeded(1), newMemory())).not.toMatchObject({ action: { type: 'usePower' } });
+    const close = ['char-e', 'char-f', 'char-g'].reduce(
+      (next, characterId) => act(next, { type: 'addCharacter', player: 'p2', characterId }),
+      game,
+    );
+    expect(nextAiStep(close, 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'usePower', powerId: 'p1-0' },
+    });
+  });
+
+  it('buys a Senzu when it pays the extra starting coins again', () => {
+    // In sh2 the characters cost more than its 300 coins.
+    const game = place(withPowers([powerCatalog.extraStartingCoins(1500)], 300), 'sh2');
+    expect(nextAiStep(game, 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'buyItem', itemId: 'senzu' },
+    });
   });
 });

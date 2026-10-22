@@ -163,7 +163,7 @@ export function applyAction(
       acceptMission(draft, action.nodeId, action.player, context, out);
       break;
     case 'completeMission':
-      completeMission(draft, action.nodeId, action.player, context, out);
+      completeMission(draft, action.nodeId, action.player, context, out, action.withoutCharacters === true);
       break;
     case 'abandonMission':
       abandonMission(draft, action.missionId);
@@ -368,7 +368,8 @@ function acceptMission(
  * "Dai il premio", "Vinta", "Completata" (spec 026, 2.3 and 2.4): the
  * reward goes to the player and the cell is conquered by them, in one action
  * that one undo takes back. The mission leaves the missions in progress of
- * both players: whoever completes it first wins it.
+ * both players: whoever completes it first wins it. `withoutCharacters`
+ * leaves out the characters of the reward (spec 063, D-092).
  */
 function completeMission(
   state: GameState,
@@ -376,6 +377,7 @@ function completeMission(
   playerId: PlayerId,
   context: GameContext,
   out: ActionOutput,
+  withoutCharacters = false,
 ): void {
   findNode(context.map, nodeId);
   const content = state.cells[nodeId];
@@ -395,10 +397,9 @@ function completeMission(
   }
 
   const { reward } = mission;
-  const joining = [
-    ...(reward.cellCharacter && content?.characterId ? [content.characterId] : []),
-    ...(reward.characters ?? []),
-  ];
+  const joining = withoutCharacters
+    ? []
+    : [...(reward.cellCharacter && content?.characterId ? [content.characterId] : []), ...(reward.characters ?? [])];
   for (const characterId of joining) {
     joinTeam(state, context, playerId, characterId, out);
   }
@@ -424,7 +425,8 @@ function completeMission(
 
   const prize = rewardText(reward, content?.characterId, context.catalog, context.items);
   const label = missionLabel(mission, context.catalog);
-  notify(state, out, `${player.name} · Missione completata: ${label}${prize ? ` → ${prize}` : ''}`);
+  const full = withoutCharacters ? ' (squadra completa: niente personaggi)' : '';
+  notify(state, out, `${player.name} · Missione completata: ${label}${prize ? ` → ${prize}` : ''}${full}`);
   setConquest(state, nodeId, playerId, context, out);
 }
 

@@ -26,15 +26,67 @@ export function makeReadyPower(id: string, cardText: string, effect: PowerForm):
 
 /**
  * Son Gohan's power in the channel's graphic (spec 028), with the effect of
- * spec 061 (D-090). Browsers used before get it once (storage version 9).
+ * spec 061 (D-090) and two uses since spec 063. Browsers used before get it
+ * once (storage versions 9 and 10).
  */
 export const RETRY_LOST_CHALLENGE_POWER: ReadyPower = makeReadyPower(
-  'potere-ritenta-sfida-persa',
-  'Una volta per partita puoi ritentare una sfida persa',
-  { ...newPowerForm('retryLostChallenge'), uses: 1 },
+  'potere-ritenta-sfida-persa-2',
+  'Due volte per partita puoi ritentare una sfida persa',
+  { ...newPowerForm('retryLostChallenge'), uses: 2 },
 );
 
-/** The three powers of the channel's graphic, and the one to retry a lost challenge (spec 025, 2.1; spec 061). */
+/** The powers that give no coins have two uses (spec 063, 2.2). */
+export const DOUBLE_MOVE_POWER: ReadyPower = makeReadyPower(
+  'potere-doppio-movimento-2',
+  'Due volte per partita: doppio movimento (2 azioni in più)',
+  { ...newPowerForm('extraActionsOnDemand'), name: 'Doppio movimento', amount: 2, uses: 2 },
+);
+
+export const SKIP_TURN_POWER: ReadyPower = makeReadyPower(
+  'potere-salta-turno-2',
+  "Due volte per partita fai saltare un turno all'avversario",
+  { ...newPowerForm('skipOpponentTurn'), name: 'Salta turno', uses: 2 },
+);
+
+/** «Parti con …»: 1,500 coins more since spec 063 (it was 2,500). The numbers follow the starting coins (spec 029, 2.5). */
+const EXTRA_STARTING_COINS_POWER: ReadyPower = makeReadyPower(
+  'potere-parti-con-2500',
+  'Parti con {totale} invece che {iniziali}',
+  { ...newPowerForm('extraStartingCoins'), amount: 1500 },
+);
+
+/**
+ * The ready powers of before spec 063 and what takes their place in a
+ * browser that still has them unchanged (storage version 10).
+ */
+export const REPLACED_READY_POWERS: [ReadyPower, ReadyPower][] = [
+  [
+    makeReadyPower('potere-parti-con-3500', 'Parti con {totale} invece che {iniziali}', {
+      ...newPowerForm('extraStartingCoins'),
+      amount: 2500,
+    }),
+    EXTRA_STARTING_COINS_POWER,
+  ],
+  [
+    makeReadyPower('potere-ritenta-sfida-persa', 'Una volta per partita puoi ritentare una sfida persa', {
+      ...newPowerForm('retryLostChallenge'),
+      uses: 1,
+    }),
+    RETRY_LOST_CHALLENGE_POWER,
+  ],
+];
+
+/** True when two ready powers say and do the same: same code, card and effect. */
+export function sameReadyPower(a: ReadyPower, b: ReadyPower): boolean {
+  const fields: (keyof PowerForm)[] = ['kind', 'name', 'amount', 'n', 'uses', 'text', 'moment'];
+  return a.id === b.id && a.cardText === b.cardText && fields.every((field) => a.effect[field] === b.effect[field]);
+}
+
+/**
+ * The ready powers a new browser starts with: the three of coins of the
+ * channel's graphic and three without coins, two uses each (spec 025, 2.1;
+ * spec 061; spec 063).
+ */
 export const DEFAULT_READY_POWERS: ReadyPower[] = [
   makeReadyPower('potere-ogni-2-turni-200', 'Ogni 2 turni guadagni 200$', {
     ...newPowerForm('coinsEveryNTurns'),
@@ -46,12 +98,10 @@ export const DEFAULT_READY_POWERS: ReadyPower[] = [
     'Ogni volta che interagisci con un PG prendi 250$',
     { ...newPowerForm('coinsPerInteraction'), amount: 250 },
   ),
-  // The numbers follow the starting coins of the game (spec 029, 2.5).
-  makeReadyPower('potere-parti-con-3500', 'Parti con {totale} invece che {iniziali}', {
-    ...newPowerForm('extraStartingCoins'),
-    amount: 2500,
-  }),
+  EXTRA_STARTING_COINS_POWER,
   RETRY_LOST_CHALLENGE_POWER,
+  DOUBLE_MOVE_POWER,
+  SKIP_TURN_POWER,
 ];
 
 /** The power as the engine knows it, with the same values and own name. */

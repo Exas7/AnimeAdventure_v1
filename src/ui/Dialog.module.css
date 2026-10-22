@@ -25,3 +25,21 @@
   gap: 10px;
   padding: 16px;
 }
+
+/* The title and «✕ Chiudi» (spec 065): stuck to the top of the window while it scrolls. */
+.head {
+  position: sticky;
+  top: -16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -16px -16px 0;
+  padding: 16px 16px 8px;
+  background: var(--panel);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+}

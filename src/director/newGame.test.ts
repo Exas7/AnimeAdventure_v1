@@ -104,7 +104,8 @@ describe('new game screen (spec 003, 2.2; spec 025, 2.3)', () => {
         },
         p2: {
           name: 'G2',
-          starter: { characterId: 'char-f', powers: [powerCatalog.extraStartingCoins(2500)] },
+          // «Parti con …»: +1,500 since spec 063.
+          starter: { characterId: 'char-f', powers: [powerCatalog.extraStartingCoins(1500)] },
           startNodeId: 's1',
         },
       },
@@ -116,7 +117,7 @@ describe('new game screen (spec 003, 2.2; spec 025, 2.3)', () => {
     expect(state.currentPlayer).toBe('p2');
     expect(state.players.p1.starterId).toBe('char-c');
     expect(state.players.p1.coins).toBe(500);
-    expect(state.players.p2.coins).toBe(3000);
+    expect(state.players.p2.coins).toBe(2000);
   });
 
   it('a player who has not chosen yet cannot start the game', () => {

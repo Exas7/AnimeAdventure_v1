@@ -61,9 +61,6 @@ export function ThemesDialog({ onClose }: { onClose(): void }) {
         })}
       </div>
       <FrameAndSymbol />
-      <div className={styles.buttons}>
-        <button onClick={onClose}>Chiudi</button>
-      </div>
     </Dialog>
   );
 }

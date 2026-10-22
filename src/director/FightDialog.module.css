@@ -14,6 +14,25 @@
 .dialog {
   flex: none;
   width: min(1200px, 100%);
+  max-height: calc(100vh - 48px - var(--frame-room));
+}
+
+/* The title and «✕ Chiudi» (spec 065): stuck to the top while the window scrolls. */
+.head {
+  position: sticky;
+  top: -16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -16px -18px 0;
+  padding: 16px 18px 8px;
+  background: var(--panel);
+}
+
+.head > :first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .content {

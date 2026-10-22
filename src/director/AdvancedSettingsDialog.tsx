@@ -60,9 +60,6 @@ export function AdvancedSettingsDialog({ catalog, onImportCatalog, onClose }: Ad
         </p>
       </section>
 
-      <div className={styles.buttons}>
-        <button onClick={onClose}>Chiudi</button>
-      </div>
     </Dialog>
   );
 }

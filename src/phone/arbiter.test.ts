@@ -305,3 +305,42 @@ describe('a character who beat the player (spec 061, criteria 1 and 2; D-090)', 
     expect(blockReason(game, { type: 'usePower', player: 'p1', powerId: 'p1-0' })).toMatch(/non ha perso/);
   });
 });
+
+describe('missions in progress after the sixth (spec 063, criterion 5; D-092)', () => {
+  const bring: Mission = { type: 'bring', targetId: 'char-e', reward: { cellCharacter: true, coins: 300 } };
+
+  it('a full team after the swap gets the coins of the reward, not the character', () => {
+    const accepted = play(
+      start(),
+      { type: 'setCellContent', nodeId: 'c1', content: { characterId: 'char-a', mission: bring } },
+      { type: 'acceptMission', nodeId: 'c1', player: 'p1' },
+      ...['char-f', 'char-g', 'char-h', 'char-b', 'char-c'].map(
+        (characterId): GameAction => ({ type: 'addCharacter', player: 'p1', characterId }),
+      ),
+      { type: 'removeCharacter', player: 'p1', characterId: 'char-c' },
+      // Personaggio E joins in the place of Personaggio B: the mission comes true.
+      { type: 'removeCharacter', player: 'p1', characterId: 'char-b' },
+      { type: 'addCharacter', player: 'p1', characterId: 'char-e' },
+    );
+    const due = rewardsDue(currentState(accepted));
+    expect(due).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1', withoutCharacters: true }]);
+    const done = play(accepted, ...due);
+    const p1 = currentState(done).players.p1;
+    expect(p1.team).not.toContain('char-a');
+    expect(p1.team).toHaveLength(5);
+    expect(p1.coins).toBe(300);
+    expect(currentState(done).conquests.c1).toBe('p1');
+  });
+
+  it('before the swap the mission gives its character, as the sixth', () => {
+    const accepted = play(
+      start(),
+      { type: 'setCellContent', nodeId: 'c1', content: { characterId: 'char-a', mission: bring } },
+      { type: 'acceptMission', nodeId: 'c1', player: 'p1' },
+      ...['char-f', 'char-g', 'char-h', 'char-e'].map(
+        (characterId): GameAction => ({ type: 'addCharacter', player: 'p1', characterId }),
+      ),
+    );
+    expect(rewardsDue(currentState(accepted))).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1' }]);
+  });
+});

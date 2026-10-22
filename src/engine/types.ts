@@ -443,7 +443,8 @@ export type GameAction =
   | { type: 'setCellContent'; nodeId: string; content: CellContent }
   // Missions (spec 026): accepted by a player, completed with the reward, or abandoned.
   | { type: 'acceptMission'; nodeId: string; player: PlayerId }
-  | { type: 'completeMission'; nodeId: string; player: PlayerId }
+  // withoutCharacters: on the phone a full team after the sixth gets the rest of the reward (spec 063, D-092).
+  | { type: 'completeMission'; nodeId: string; player: PlayerId; withoutCharacters?: boolean }
   | { type: 'abandonMission'; missionId: number }
   // A fight lost or a quiz answered wrong (spec 061, D-090): the player may not challenge that cell again.
   | { type: 'loseChallenge'; nodeId: string; player: PlayerId }

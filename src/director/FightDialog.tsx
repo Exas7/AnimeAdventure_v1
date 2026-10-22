@@ -7,6 +7,7 @@ import type { BattleView, SideNames } from '../battle/playback';
 import { usePlayback } from '../battle/usePlayback';
 import type { Character } from '../engine';
 import { Frame, FrameTitle } from '../theme/Frame';
+import { CloseButton } from '../ui/CloseButton';
 import pageStyles from '../battle/page/BattlePage.module.css';
 import styles from './FightDialog.module.css';
 
@@ -74,7 +75,10 @@ export function FightDialog(props: FightDialogProps) {
   return (
     <div className={styles.backdrop}>
       <Frame className={styles.dialog} contentClassName={styles.content} role="dialog" aria-modal="true" aria-label={title}>
-        <FrameTitle className={styles.title}>{title}</FrameTitle>
+        <div className={styles.head}>
+          <FrameTitle className={styles.title}>{title}</FrameTitle>
+          <CloseButton onClose={onClose} />
+        </div>
         {!record ? (
           <>
             <p className={styles.note}>
@@ -102,9 +106,6 @@ export function FightDialog(props: FightDialogProps) {
               <button type="button" className={pageStyles.primary} disabled={!ready} onClick={start}>
                 Avvia lo scontro
               </button>
-              <button type="button" onClick={onClose}>
-                Annulla
-              </button>
             </div>
           </>
         ) : (
@@ -121,11 +122,6 @@ export function FightDialog(props: FightDialogProps) {
               names={names}
             />
             {shown >= record.steps.length && <div className={styles.outcome}>{outcome(record)}</div>}
-            <div className={pageStyles.actions}>
-              <button type="button" onClick={onClose}>
-                Chiudi lo scontro
-              </button>
-            </div>
           </>
         )}
       </Frame>

@@ -1130,7 +1130,6 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
                   ) : (
                     exploreButton
                   )}
-                  <button onClick={close}>Chiudi</button>
                 </>
               );
             }}
@@ -1143,16 +1142,13 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
                   Simula
                 </button>
                 {exploreButton}
-                <button onClick={() => session.setOverlay(null)}>Chiudi</button>
               </>
             }
             shopActions={shopActions}
-            shopControls={
-              <>
-                {exploreButton}
-                <button onClick={() => session.setOverlay(null)}>Chiudi</button>
-              </>
-            }
+            shopControls={exploreButton}
+            onCloseScene={() => applyScreens(closeShown(screens))}
+            onCloseShop={() => session.setOverlay(null)}
+            onCloseShowdown={() => session.setOverlay(null)}
           />
           {traveling && travelingItem && (
             <div className={styles.traveling} role="status">

@@ -61,6 +61,24 @@ interface Notice {
   id: number;
 }
 
+/**
+ * The game without the browser's bar, where the browser allows it (spec 064,
+ * 2.2): Android and tablets, on a touch. On the iPhone it does not exist: the
+ * game opens full screen from the Home screen (D-093). Asked once.
+ */
+let fullScreen: 'not asked' | 'asked' | 'refused' = 'not asked';
+function goFullScreen(): void {
+  const page = document.documentElement;
+  if (fullScreen !== 'not asked' || !document.fullscreenEnabled || document.fullscreenElement) {
+    return;
+  }
+  fullScreen = 'asked';
+  // The browser may say no: the game stays as it is, and it is not asked again.
+  page.requestFullscreen({ navigationUI: 'hide' }).catch(() => {
+    fullScreen = 'refused';
+  });
+}
+
 /** The target of a highlighted cell, in board units (1600 wide): about a fingertip on a phone. */
 const TAP_RADIUS = 60;
 
@@ -268,6 +286,10 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
         }
         if (step.resolves) {
           memory.resolved.add(step.resolves);
+        }
+        if (step.reopens) {
+          // «Ritenta»: the scene of that cell is to be dealt with again (spec 063, 2.4).
+          memory.resolved.delete(step.reopens);
         }
         if (!aiAttempt(step.action, step.text)) {
           endAiTurn();
@@ -506,7 +528,6 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
             Completata
           </button>
         )}
-        <button onClick={closeOverlay}>Chiudi</button>
       </>
     );
   };
@@ -620,9 +641,36 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   }
 
   const stageOverlay: Overlay | null = overlay;
+  const panel = (playerId: PlayerId, side: 'left' | 'right') => (
+    <PhonePanel
+      playerId={playerId}
+      side={side}
+      state={state}
+      catalog={game.catalog}
+      items={game.items}
+      canUndo={canUndoOnPhone(game)}
+      locked={aiTurn}
+      onUsePower={(powerId) => attempt({ type: 'usePower', player: current, powerId })}
+      onUseItem={useItem}
+      onAbandonMission={(missionId) => attempt({ type: 'abandonMission', missionId })}
+      onEndTurn={askEndTurn}
+      onUndo={() => {
+        setTravel(null);
+        session.undo();
+      }}
+      onMenu={onMenu}
+    />
+  );
   return (
-    // The first touch anywhere closes the alert (spec 055, 2.2).
-    <div className={styles.game} onPointerDownCapture={() => setNotice(null)}>
+    // The first touch anywhere closes the alert (spec 055, 2.2) and asks for the full screen (spec 064, 2.2).
+    <div
+      className={styles.game}
+      onPointerDownCapture={() => {
+        setNotice(null);
+        goFullScreen();
+      }}
+    >
+      {panel('p1', 'left')}
       <div className={styles.board}>
         <Stage
           map={game.map}
@@ -648,7 +696,8 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
                   buyItem: (itemId) => attempt({ type: 'buyItem', shopNodeId, itemId }),
                 })
           }
-          shopControls={aiTurn ? undefined : <button onClick={closeOverlay}>Chiudi</button>}
+          onCloseScene={aiTurn ? undefined : closeOverlay}
+          onCloseShop={aiTurn ? undefined : closeOverlay}
           stackedShop
         />
         {aiTurn && ai && (
@@ -674,22 +723,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
           </div>
         )}
       </div>
-      <PhonePanel
-        state={state}
-        catalog={game.catalog}
-        items={game.items}
-        canUndo={canUndoOnPhone(game)}
-        locked={aiTurn}
-        onUsePower={(powerId) => attempt({ type: 'usePower', player: current, powerId })}
-        onUseItem={useItem}
-        onAbandonMission={(missionId) => attempt({ type: 'abandonMission', missionId })}
-        onEndTurn={askEndTurn}
-        onUndo={() => {
-          setTravel(null);
-          session.undo();
-        }}
-        onMenu={onMenu}
-      />
+      {panel('p2', 'right')}
       {confirmEnd && (
         <div className={styles.dialog} role="dialog" aria-modal="true">
           <div className={styles.dialogBox}>

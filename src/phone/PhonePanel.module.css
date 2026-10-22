@@ -1,75 +1,107 @@
-/* The narrow column at the right of the map (spec 052, 2.4). */
+/*
+ * One player's column at a side of the map (spec 064, 2.1). Sizes follow the
+ * height of the screen, so the five places, the powers and the commands fit
+ * on a phone held sideways.
+ */
 .panel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-  padding: 6px;
-  overflow-y: auto;
-  border-left: 3px solid var(--frame-mid);
-  background: var(--panel);
-  font-size: 13px;
-}
-
-.turn {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.actions {
-  color: var(--muted);
-}
-
-.p1 {
-  color: var(--p1);
-}
-
-.p2 {
-  color: var(--p2);
-}
-
-.player {
+  --slot: clamp(30px, 11.2vh, 52px);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: clamp(124px, 19vw, 196px);
+  min-height: 0;
   padding: 6px;
+  overflow: hidden;
   border: 2px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 12px;
 }
 
-.player.p1 {
-  border-color: var(--p1);
-  color: inherit;
+.current.p1 {
+  border: 3px solid var(--p1);
 }
 
-.player.p2 {
-  border-color: var(--p2);
-  color: inherit;
-}
-
-.short {
-  opacity: 0.85;
+.current.p2 {
+  border: 3px solid var(--p2);
 }
 
 .head {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 6px;
 }
 
 .name {
+  font-weight: 800;
+  font-size: 1.25em;
+}
+
+.p1 .name {
+  color: var(--p1);
+}
+
+.p2 .name {
+  color: var(--p2);
+}
+
+/* «i» (spec 064, 2.1): a round button, with the missions in progress counted on it. */
+.info {
+  --button-press: 0px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  font-family: Georgia, serif;
+  font-size: 15px;
   font-weight: 700;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 15px;
 }
 
 .coins {
   white-space: nowrap;
 }
 
+.turn {
+  color: var(--muted);
+  font-size: 0.92em;
+}
+
+/* The team on the outer edge, the powers and the items inside. */
+.body {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-height: 0;
+}
+
+.right .body {
+  flex-direction: row-reverse;
+}
+
 .team {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex: none;
+  flex-direction: column;
   gap: 3px;
   margin: 0;
   padding: 0;
@@ -78,38 +110,73 @@
 
 .slot,
 .empty {
-  aspect-ratio: 1;
+  width: var(--slot);
+  height: var(--slot);
   border-radius: 6px;
+}
+
+.slot {
+  overflow: hidden;
 }
 
 .empty {
   border: 1px dashed var(--border);
 }
 
-.row {
+.inner {
   display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.label {
   flex: 1;
+  flex-direction: column;
+  gap: 5px;
   min-width: 0;
 }
 
-.row button {
-  min-height: 32px;
-  padding: 2px 10px;
+/* «Usa potere» with the uses left (spec 064, 2.1). */
+.power {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-height: 0;
+  padding: 4px 4px;
+  background: var(--button-primary);
+  color: var(--on-accent);
+  line-height: 1.15;
 }
 
-.row button:disabled {
-  opacity: 0.45;
+.power small {
+  font-size: 0.85em;
+  font-weight: 400;
 }
 
-.itemIcon {
-  width: 24px;
-  height: 24px;
+.power:disabled {
+  opacity: 0.5;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.item {
+  --button-press: 0px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  min-height: 0;
+  padding: 2px;
+}
+
+.item img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+}
+
+.item:disabled {
+  opacity: 0.75;
 }
 
 .note {
@@ -118,15 +185,14 @@
 }
 
 .commands {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  margin-top: auto;
 }
 
 .commands button {
-  min-height: 40px;
-  padding: 4px;
+  min-height: clamp(30px, 9vh, 40px);
+  padding: 2px 6px;
 }
 
 .commands button:disabled {
@@ -136,25 +202,27 @@
 .primary {
   background: var(--button-primary);
   color: var(--on-accent);
-  font-weight: 700;
+  font-weight: 800;
 }
 
-/* A mission in progress (spec 058): the giver's name only, the task opens below on a tap. */
-.row .giver {
-  --button-press: 0px;
-  flex: 1;
-  min-width: 0;
-  padding: 2px 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-  color: inherit;
-  font-weight: 600;
-  text-align: left;
-}
-
-.task {
-  margin: 0;
-  padding: 0 0 2px 14px;
+/* The window of «i». */
+.section h3 {
+  margin: 0 0 2px;
   color: var(--muted);
+  font-size: 0.95em;
+}
+
+.section p {
+  margin: 0 0 4px;
+}
+
+.mission {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mission button {
+  flex: none;
 }

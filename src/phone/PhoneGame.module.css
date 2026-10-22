@@ -1,8 +1,13 @@
-/* The game on the phone (spec 052, 2.4): the map as large as possible, a narrow column at the right. */
+/*
+ * The game on the phone (spec 064, 2.1): the map in the middle, as tall as the
+ * screen; G1's column at its left, G2's at its right.
+ */
 .game {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(190px, 28vw, 300px);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 4px;
   height: 100%;
+  padding: 4px;
   overflow: hidden;
 }
 

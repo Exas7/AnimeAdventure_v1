@@ -136,9 +136,12 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
     return (
       <div className={styles.screen}>
         <div className={styles.choose}>
-          <h2 className={styles.title}>
-            Combattimento {mission?.format ?? '1v1'} · {opponent}
-          </h2>
+          <div className={styles.head}>
+            <button onClick={onCancel}>← Indietro</button>
+            <h2 className={styles.title}>
+              Combattimento {mission?.format ?? '1v1'} · {opponent}
+            </h2>
+          </div>
           {needed === 0 ? (
             <p className={styles.note}>Nessun personaggio della squadra può combattere nel simulatore.</p>
           ) : (
@@ -175,7 +178,6 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
             >
               Combatti
             </button>
-            <button onClick={onCancel}>Indietro</button>
           </div>
         </div>
       </div>

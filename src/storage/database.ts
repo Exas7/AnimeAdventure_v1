@@ -1,4 +1,12 @@
-import { DEFAULT_READY_POWERS, RETRY_LOST_CHALLENGE_POWER } from '../starters/readyPowers';
+import {
+  DEFAULT_READY_POWERS,
+  DOUBLE_MOVE_POWER,
+  REPLACED_READY_POWERS,
+  RETRY_LOST_CHALLENGE_POWER,
+  sameReadyPower,
+  SKIP_TURN_POWER,
+  type ReadyPower,
+} from '../starters/readyPowers';
 
 // The browser's IndexedDB storage of the app (D-011): one database with a
 // store for each kind of data. Version 2 adds the imported catalog (D-017),
@@ -7,11 +15,12 @@ import { DEFAULT_READY_POWERS, RETRY_LOST_CHALLENGE_POWER } from '../starters/re
 // (spec 010; new browsers no longer get it since spec 036), version 6 adds the special shopkeepers (D-035), version 7 the
 // list of ready powers, which starts with the channel's three (D-037),
 // version 8 the catalog of missions and the quiz questions (D-041), version
-// 9 the power to retry a lost challenge in the lists made before (D-090).
+// 9 the power to retry a lost challenge in the lists made before (D-090),
+// version 10 the ready powers of spec 063 in the lists made before.
 
 /** Internal code: stays 'arkanite' after the rename, or saved data would vanish (D-020). */
 const DB_NAME = 'arkanite';
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
 export type StoreName =
   | 'autosave'
@@ -59,6 +68,27 @@ function openDatabase(): Promise<IDBDatabase> {
         request.transaction
           ?.objectStore('powers')
           .put({ power: RETRY_LOST_CHALLENGE_POWER, createdAt: Date.now() }, RETRY_LOST_CHALLENGE_POWER.id);
+      }
+      // Once per browser used before (spec 063, 2.3): the ready powers the app
+      // put there and nobody changed take their new values, in the same place;
+      // «Doppio movimento» and «Salta turno» join the list, last.
+      if (event.oldVersion >= 7 && event.oldVersion < 10) {
+        const powers = request.transaction?.objectStore('powers');
+        for (const [old, next] of REPLACED_READY_POWERS) {
+          const read = powers?.get(old.id);
+          if (read) {
+            read.onsuccess = () => {
+              const entry = read.result as { power?: ReadyPower; createdAt?: number } | undefined;
+              if (entry?.power && sameReadyPower(entry.power, old)) {
+                powers?.delete(old.id);
+                powers?.put({ power: next, createdAt: entry.createdAt ?? Date.now() }, next.id);
+              }
+            };
+          }
+        }
+        [DOUBLE_MOVE_POWER, SKIP_TURN_POWER].forEach((power, index) =>
+          powers?.put({ power, createdAt: Date.now() + index }, power.id),
+        );
       }
     };
     request.onsuccess = () => resolve(request.result);

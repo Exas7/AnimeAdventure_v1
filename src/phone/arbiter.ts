@@ -119,12 +119,17 @@ function givesCharacters(mission: Mission | undefined): boolean {
   return Boolean(mission.reward.cellCharacter) || (mission.reward.characters?.length ?? 0) > 0;
 }
 
-/** The rewards of the missions whose condition came true: given at once (D-084, instead of D-040). */
+/**
+ * The rewards of the missions whose condition came true: given at once
+ * (D-084, instead of D-040). A full team after the sixth gets them without
+ * the characters (spec 063, D-092).
+ */
 export function rewardsDue(state: GameState): GameAction[] {
   return missionsDone(state).map((active) => ({
     type: 'completeMission',
     nodeId: active.nodeId,
     player: active.player,
+    ...(teamIsFull(state.players[active.player]) ? { withoutCharacters: true } : {}),
   }));
 }
 
