@@ -24,7 +24,17 @@ export function makeReadyPower(id: string, cardText: string, effect: PowerForm):
   return { id, cardText: cardText.trim(), effect };
 }
 
-/** The three powers of the channel's graphic: the list starts with them (spec 025, 2.1). */
+/**
+ * Son Gohan's power in the channel's graphic (spec 028), with the effect of
+ * spec 061 (D-090). Browsers used before get it once (storage version 9).
+ */
+export const RETRY_LOST_CHALLENGE_POWER: ReadyPower = makeReadyPower(
+  'potere-ritenta-sfida-persa',
+  'Una volta per partita puoi ritentare una sfida persa',
+  { ...newPowerForm('retryLostChallenge'), uses: 1 },
+);
+
+/** The three powers of the channel's graphic, and the one to retry a lost challenge (spec 025, 2.1; spec 061). */
 export const DEFAULT_READY_POWERS: ReadyPower[] = [
   makeReadyPower('potere-ogni-2-turni-200', 'Ogni 2 turni guadagni 200$', {
     ...newPowerForm('coinsEveryNTurns'),
@@ -41,6 +51,7 @@ export const DEFAULT_READY_POWERS: ReadyPower[] = [
     ...newPowerForm('extraStartingCoins'),
     amount: 2500,
   }),
+  RETRY_LOST_CHALLENGE_POWER,
 ];
 
 /** The power as the engine knows it, with the same values and own name. */

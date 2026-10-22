@@ -4,11 +4,14 @@ import { tierRank, type Random } from '../episode/fill';
 import {
   cellMission,
   currentState,
+  hasLostAt,
   isAdjacent,
   isRepeatInteraction,
+  mustSendAway,
   nextForms,
   shopListing,
   TEAM_SIZE,
+  teamIsFull,
   trainingRule,
   type AiLevel,
   type Character,
@@ -249,9 +252,14 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
   if (!content?.characterId || node?.type === 'shop' || state.conquests[nodeId] !== undefined) {
     return 0;
   }
+  // A character who beat it: the AI does not retry (spec 061, 2.4).
+  if (hasLostAt(state, player, nodeId)) {
+    return 0;
+  }
   const mission = cellMission(content);
   const accepted = (state.activeMissions ?? []).some((active) => active.nodeId === nodeId && active.player === player);
-  if (accepted || (givesCharacters(mission) && state.players[player].team.length >= TEAM_SIZE)) {
+  // A full team still takes its sixth, once (spec 061, D-091).
+  if (accepted || (givesCharacters(mission) && teamIsFull(state.players[player]))) {
     return 0;
   }
   if (!mission) {
@@ -277,7 +285,7 @@ function purchase(game: Game, state: GameState, shopId: string, level: AiLevel, 
   const coins = state.players[player].coins;
   const listing = shopListing(state, game, shopId, player);
   const options: { action: GameAction; name: string; value: number }[] = [];
-  if (state.players[player].team.length < TEAM_SIZE) {
+  if (!teamIsFull(state.players[player])) {
     for (const entry of listing.characters) {
       if (entry.soldTo === null && entry.price <= coins) {
         const character = game.catalog.find((candidate) => candidate.id === entry.characterId);
@@ -377,6 +385,22 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
   const interactionsLeft = state.actions.interactionsAvailable - state.actions.interactionsUsed;
   const allowed = (action: GameAction) => blockReason(game, action) === null;
 
+  // After the sixth it sends away its weakest character, never the starter (spec 061, 2.4).
+  if (mustSendAway(me)) {
+    const weakest = me.team
+      .filter((id) => id !== me.starterId)
+      .map((id) => game.catalog.find((character) => character.id === id))
+      .filter((character): character is Character => character !== undefined)
+      .sort((a, b) => characterValue(a) - characterValue(b))[0];
+    if (weakest) {
+      return {
+        kind: 'act',
+        action: { type: 'removeCharacter', player, characterId: weakest.id },
+        text: `Lascia ${weakest.name}: esce dalla partita`,
+      };
+    }
+  }
+
   if (rules.usesItems) {
     // Manual powers with an effect the app applies: at once.
     for (const power of me.powers) {
@@ -469,6 +493,20 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
   return { kind: 'end', text: 'Finisce il turno' };
 }
 
+/** Characters ahead of the player that make the AI chase them (spec 061, 2.4). */
+export const CHASE_LEAD = 3;
+
+/**
+ * Chasing for the showdown pays only with a clear lead: 3 characters more,
+ * or a team already finished with the swap of the sixth (spec 061, 2.4).
+ * Before that the AI keeps gathering characters.
+ */
+export function chaseWorthIt(state: GameState, player: PlayerId, other: PlayerId): boolean {
+  const me = state.players[player];
+  const finished = me.team.length >= TEAM_SIZE && me.sixthTaken === true;
+  return finished || me.team.length - state.players[other].team.length >= CHASE_LEAD;
+}
+
 /** Where the pawn goes next: one step towards the most convenient cell. */
 function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemory, random: Random): { to: string; text: string } | null {
   const player = state.currentPlayer;
@@ -484,7 +522,7 @@ function chooseMove(game: Game, state: GameState, level: AiLevel, memory: AiMemo
   const targets: { node: string; value: number; text: string }[] = [];
   if (rules.showdown && state.players[player].team.length > 0) {
     const chance = showdownChance(game, state, player, memory, random);
-    if (chance >= 0.6) {
+    if (chance >= 0.6 && chaseWorthIt(state, player, other)) {
       targets.push({ node: otherPosition, value: 4000, text: `Insegue ${state.players[other].name}` });
     } else if (chance <= 0.4) {
       avoid = otherPosition;

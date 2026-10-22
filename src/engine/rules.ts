@@ -1,8 +1,8 @@
 import { cellLabel, findCharacter, findItem } from './lookup';
 import { rechargesStarter, travelRule } from './itemUse';
 import { hasBought, isSoldOut, rechargeablePower } from './shop';
+import { teamIsFull } from './team';
 import {
-  TEAM_SIZE,
   type GameAction,
   type GameContext,
   type GameMap,
@@ -50,6 +50,11 @@ export function turnRuleWarnings(
       return [];
   }
   return warnings.filter((warning) => !state.acknowledgedThisTurn.includes(warning.kind));
+}
+
+/** True when the player lost the challenge of this cell (spec 061, D-090). */
+export function hasLostAt(state: GameState, playerId: PlayerId, nodeId: string): boolean {
+  return (state.defeats ?? []).some((defeat) => defeat.player === playerId && defeat.nodeId === nodeId);
 }
 
 /**
@@ -154,6 +159,12 @@ function boardWarnings(
         message: `${state.players[conqueror].name} ha già conquistato ${label(action.nodeId)}`,
       });
     }
+    if (hasLostAt(state, playerId, action.nodeId)) {
+      warnings.push({
+        kind: 'challengeLost',
+        message: `${player.name} ha già perso contro ${label(action.nodeId)}: non può sfidarlo di nuovo`,
+      });
+    }
   }
   if (
     action.type === 'move' &&
@@ -181,7 +192,7 @@ function itemUseWarnings(
   const player = state.players[action.player];
   const warnings: Warning[] = [];
   if (action.to === undefined) {
-    if (rechargesStarter(item) && !rechargeablePower(state, action.player)) {
+    if (rechargesStarter(item) && !rechargeablePower(state, action.player, action.powerId)) {
       warnings.push({
         kind: 'nothingToRecharge',
         message: `Lo starter di ${player.name} non ha poteri da ricaricare`,
@@ -233,7 +244,7 @@ function characterPurchaseWarnings(
       message: `${state.players[firstBuyer].name} ha già comprato ${character.name}`,
     });
   }
-  if (buyer.team.length >= TEAM_SIZE) {
+  if (teamIsFull(buyer)) {
     warnings.push({ kind: 'teamFull', message: `La squadra di ${buyer.name} è completa` });
   }
   return warnings;

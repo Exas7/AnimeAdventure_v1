@@ -142,11 +142,15 @@ export function hasBought(state: GameState, itemId: string, playerId: PlayerId):
   );
 }
 
-/** The power a Senzu would recharge: a manual power, or extra starting coins. */
-export function rechargeablePower(state: GameState, playerId: PlayerId): PowerState | undefined {
+/**
+ * The power a Senzu would recharge: a manual power, or extra starting coins;
+ * the one named, when the Senzu is used for it (spec 061, 2.1).
+ */
+export function rechargeablePower(state: GameState, playerId: PlayerId, powerId?: string): PowerState | undefined {
   return state.players[playerId].powers.find((power) => {
     const { trigger, effect } = power.definition;
-    return trigger.type === 'manual' || (trigger.type === 'gameStart' && effect.type === 'addCoins');
+    const rechargeable = trigger.type === 'manual' || (trigger.type === 'gameStart' && effect.type === 'addCoins');
+    return rechargeable && (powerId === undefined || power.id === powerId);
   });
 }
 
@@ -161,9 +165,10 @@ export function rechargeStarter(
   playerId: PlayerId,
   item: ItemDefinition,
   out: ActionOutput,
+  powerId?: string,
 ): void {
   const player = state.players[playerId];
-  const power = rechargeablePower(state, playerId);
+  const power = rechargeablePower(state, playerId, powerId);
   if (!power) {
     return;
   }

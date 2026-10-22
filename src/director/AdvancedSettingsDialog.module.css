@@ -74,7 +74,7 @@
   padding: 8px 14px;
 }
 
-/* The choices of «Aspetto» (spec 050, 2.6): the chosen one pressed in, in the accent colour. */
+/* The choices of «Versione telefono» (spec 052): the chosen one pressed in, in the accent colour. */
 .options {
   display: flex;
   flex-wrap: wrap;

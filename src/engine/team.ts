@@ -1,12 +1,39 @@
 import { EngineError } from './errors';
 import { findCharacter } from './lookup';
 import { warn, type ActionOutput } from './output';
-import { PLAYER_IDS, TEAM_SIZE, type GameContext, type GameState, type PlayerId } from './types';
+import {
+  PLAYER_IDS,
+  TEAM_SIZE,
+  type GameContext,
+  type GameState,
+  type PlayerId,
+  type PlayerState,
+} from './types';
+
+/**
+ * True when the team takes no more characters: past TEAM_SIZE, or full with
+ * the sixth already taken. Once per game a full team takes a sixth, and then
+ * the player sends one away (spec 061, D-091).
+ */
+export function teamIsFull(player: PlayerState): boolean {
+  return player.team.length > TEAM_SIZE || (player.team.length >= TEAM_SIZE && player.sixthTaken === true);
+}
+
+/** A full team that may still take its sixth character (spec 061, D-091). */
+export function sixthAvailable(player: PlayerState): boolean {
+  return player.team.length === TEAM_SIZE && player.sixthTaken !== true;
+}
+
+/** More than TEAM_SIZE: the player must send one away, never the starter (spec 061, 2.3). */
+export function mustSendAway(player: PlayerState): boolean {
+  return player.team.length > TEAM_SIZE;
+}
 
 /**
  * Adds a character to a team; beyond TEAM_SIZE it joins as an extra, with a
- * warning. Purchases pass `warnIfFull: false`: for them the full team is a
- * turn rule, already warned by rules.ts (D-015).
+ * warning. The first one beyond is the sixth of the game and joins without
+ * a warning (D-091). Purchases pass `warnIfFull: false`: for them the full
+ * team is a turn rule, already warned by rules.ts (D-015).
  */
 export function addToTeam(
   state: GameState,
@@ -18,8 +45,11 @@ export function addToTeam(
 ): void {
   const character = findCharacter(context.catalog, characterId);
   const player = state.players[playerId];
-  if (warnIfFull && player.team.length >= TEAM_SIZE) {
+  if (warnIfFull && teamIsFull(player)) {
     warn(out, 'teamFull', `La squadra di ${player.name} è completa`);
+  }
+  if (player.team.length >= TEAM_SIZE) {
+    player.sixthTaken = true;
   }
   player.team.push(character.id);
 }

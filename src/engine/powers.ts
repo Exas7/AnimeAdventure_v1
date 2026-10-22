@@ -51,6 +51,11 @@ export const powerCatalog = {
     trigger,
     effect: { type: 'reminder', text },
   }),
+  retryLostChallenge: (uses: number, name = 'Ritenta una sfida persa'): PowerDefinition => ({
+    name,
+    trigger: { type: 'manual', uses },
+    effect: { type: 'retryChallenge' },
+  }),
 };
 
 /** Fires every power of the owner whose trigger matches. */
@@ -94,5 +99,32 @@ function applyEffect(state: GameState, ownerId: PlayerId, effect: Effect): strin
     }
     case 'reminder':
       return effect.text;
+    case 'retryChallenge':
+      return retryChallenge(state, ownerId);
   }
+}
+
+/**
+ * «Ritenta una sfida persa» (spec 061, D-090): the defeat at the owner's cell
+ * is forgotten, and in their turn the next interaction there counts as a new
+ * one, with an interaction more if they had none left. The actions stay as
+ * they are: retrying needs one.
+ */
+function retryChallenge(state: GameState, ownerId: PlayerId): string {
+  const { position } = state.players[ownerId];
+  const defeats = state.defeats ?? [];
+  const left = defeats.filter((defeat) => !(defeat.player === ownerId && defeat.nodeId === position));
+  if (left.length === defeats.length) {
+    return 'nessuna sfida persa da ritentare qui';
+  }
+  state.defeats = left;
+  if (ownerId === state.currentPlayer) {
+    if (state.interactedNodeId === position) {
+      state.interactedNodeId = null;
+    }
+    if (state.actions.interactionsUsed >= state.actions.interactionsAvailable) {
+      state.actions.interactionsAvailable += 1;
+    }
+  }
+  return 'può ritentare la sfida';
 }

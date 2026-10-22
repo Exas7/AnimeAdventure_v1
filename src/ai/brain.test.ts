@@ -14,7 +14,7 @@ import {
   type GameAction,
 } from '../engine';
 import { blockReason, fightResults, quizRewards } from '../phone/arbiter';
-import { aiFight, aiStarterIndex, newMemory, nextAiStep, type AiMemory } from './brain';
+import { aiFight, aiStarterIndex, chaseWorthIt, newMemory, nextAiStep, type AiMemory } from './brain';
 
 /** A repeatable random sequence. */
 function seeded(seed: number): () => number {
@@ -207,5 +207,47 @@ describe('missions the AI never takes (spec 053, criterion 7)', () => {
       const game = place(aiGame({ content: { c1: content } }), 'c1');
       expect(nextAiStep(game, 'normal', seeded(1), newMemory()).kind).not.toBe('interact');
     }
+  });
+});
+
+describe('the AI and the rules of spec 061 (criterion 5)', () => {
+  const add = (game: Game, ids: string[]) =>
+    ids.reduce((next, characterId) => act(next, { type: 'addCharacter', player: 'p1', characterId }), game);
+
+  it('does not challenge again a character who beat it', () => {
+    const lost = act(place(aiGame(), 'c1'), { type: 'loseChallenge', nodeId: 'c1', player: 'p1' });
+    expect(nextAiStep(lost, 'normal', seeded(1), newMemory())).not.toMatchObject({ kind: 'interact', nodeId: 'c1' });
+  });
+
+  it('with a full team still goes for its sixth, and not after the swap', () => {
+    const full = place(add(aiGame(), ['char-e', 'char-f', 'char-g', 'char-h']), 'c1');
+    expect(nextAiStep(full, 'normal', seeded(1), newMemory())).toMatchObject({ kind: 'interact', nodeId: 'c1' });
+
+    const swapped = act(add(full, ['char-b']), { type: 'removeCharacter', player: 'p1', characterId: 'char-b' });
+    expect(nextAiStep(swapped, 'normal', seeded(1), newMemory())).not.toMatchObject({ kind: 'interact' });
+  });
+
+  it('after the sixth sends away its weakest character, never the starter', () => {
+    const six = add(aiGame(), ['char-a', 'char-b', 'char-c', 'char-d', 'char-e']);
+    expect(nextAiStep(six, 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'removeCharacter', player: 'p1', characterId: 'char-a' },
+    });
+  });
+
+  it('chases only with 3 characters more, or a team finished with the swap', () => {
+    const state = (game: Game) => currentState(game);
+    expect(chaseWorthIt(state(add(aiGame(), ['char-a'])), 'p1', 'p2')).toBe(false);
+    expect(chaseWorthIt(state(add(aiGame(), ['char-a', 'char-b', 'char-c'])), 'p1', 'p2')).toBe(true);
+
+    const full = add(aiGame(), ['char-e', 'char-f', 'char-g', 'char-h']);
+    const opponent = (game: Game) =>
+      ['char-a', 'char-b', 'char-c'].reduce(
+        (next, characterId) => act(next, { type: 'addCharacter', player: 'p2', characterId }),
+        game,
+      );
+    expect(chaseWorthIt(state(opponent(full)), 'p1', 'p2')).toBe(false);
+    const swapped = act(add(full, ['char-d']), { type: 'removeCharacter', player: 'p1', characterId: 'char-d' });
+    expect(chaseWorthIt(state(opponent(swapped)), 'p1', 'p2')).toBe(true);
   });
 });

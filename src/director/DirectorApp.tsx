@@ -1044,7 +1044,21 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
             onNodeClick={exploring ? undefined : handleNodeClick}
             onNodeDoubleClick={editMode ? undefined : handleNodeDoubleClick}
             onNextLine={showNextLine}
-            onAnswer={(answer) => applyScreens(chooseAnswer(screens, answer))}
+            onAnswer={(answer) => {
+              // A wrong answer shown to the public is a lost challenge (spec 061, D-090).
+              const shown = shownInDirector(screens);
+              const quiz = shown?.kind === 'challenge' ? cellMission(state.cells[shown.nodeId]) : undefined;
+              if (
+                !preview &&
+                shown?.kind === 'challenge' &&
+                shown.answer === undefined &&
+                quiz?.type === 'quiz' &&
+                quiz.quiz?.correct !== answer
+              ) {
+                perform({ type: 'loseChallenge', nodeId: shown.nodeId, player: current });
+              }
+              applyScreens(chooseAnswer(screens, answer));
+            }}
             onNodeMenu={exploring ? undefined : openNodeMenu}
             onEdgeMenu={exploring ? undefined : openEdgeMenu}
             onEdgeClick={editMode && !exploring ? openEdgeMenu : undefined}
@@ -1081,7 +1095,15 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
                         Simula
                       </button>
                       {complete(mission.condition === 'transform' ? 'Si è trasformato' : 'Vinta')}
-                      <button onClick={close}>Persa</button>
+                      <button
+                        title={`${name(current)} non potrà sfidarlo di nuovo senza il potere per ritentare`}
+                        onClick={() => {
+                          perform({ type: 'loseChallenge', nodeId, player: current });
+                          close();
+                        }}
+                      >
+                        Persa
+                      </button>
                     </>
                   )}
                   {mission?.type === 'quiz' &&
@@ -1221,7 +1243,13 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
           setup={fightSetup}
           perform={perform}
           onView={session.setBattle}
-          onLost={() => applyScreens(closeShown(screens))}
+          onLost={() => {
+            // «Persa» in the simulated fight: a lost challenge (spec 061, D-090).
+            if (fightSetup.kind === 'mission') {
+              perform({ type: 'loseChallenge', nodeId: fightSetup.nodeId, player: fightSetup.player });
+            }
+            applyScreens(closeShown(screens));
+          }}
           onClose={() => setFightSetup(null)}
         />
       )}

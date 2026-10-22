@@ -102,6 +102,11 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
 - **Puntate**: per preparare in anticipo una partita, con personaggi e
   missioni scelti da te.
 - **Editor delle mappe**: per disegnare mappe nuove sugli sfondi.
+- **Due regole da sapere**: chi perde una sfida (combattimento o quiz) non
+  può sfidare di nuovo quel personaggio, a meno che il suo starter abbia
+  il potere «Ritenta una sfida persa»; una volta per partita, con la
+  squadra completa, si può arruolare un sesto personaggio e poi cacciarne
+  uno (mai lo starter).
 - **Apri stream** (in regia): apre la finestra per gli spettatori.
 
 ## I tuoi dati

@@ -134,6 +134,20 @@
   text-align: center;
 }
 
+/* Who leaves the team after the sixth (spec 061, 2.3): one button per character, the chosen one lit. */
+.leaving {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.leaving button {
+  min-height: 44px;
+  padding: 6px 14px;
+}
+
 /* The AI's turn (spec 053, 2.2): at the top of the map, with «Salta». */
 .aiBanner {
   position: absolute;

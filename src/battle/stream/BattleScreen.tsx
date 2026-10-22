@@ -10,7 +10,9 @@ import {
   snapshotAt,
   type BattleView,
 } from '../playback';
+import { waveLook } from '../waveLook';
 import styles from './BattleScreen.module.css';
+import { EnergyWave } from './EnergyWave';
 
 interface BattleScreenProps {
   view: BattleView;
@@ -84,7 +86,7 @@ export function BattleScreen({ view }: BattleScreenProps) {
               </div>
             );
           })}
-          <Effects key={shown} event={event} />
+          <Effects key={shown} event={event} onField={onField} />
         </div>
         <TeamList side="b" name={names.b} fighters={current('b')} snapshot={snapshot} />
       </div>
@@ -204,8 +206,14 @@ function motionOf(event: FightEvent | undefined, side: Side): string | undefined
   }
 }
 
-/** Beams, sparks and damage numbers between the two fighters. */
-function Effects({ event }: { event: FightEvent | undefined }) {
+interface EffectsProps {
+  event: FightEvent | undefined;
+  /** The fighter on the field of a side: its aura and tier make its waves (spec 062). */
+  onField(side: Side): Fighter;
+}
+
+/** Energy waves, sparks and damage numbers between the two fighters. */
+function Effects({ event, onField }: EffectsProps) {
   if (!event) {
     return null;
   }
@@ -214,8 +222,8 @@ function Effects({ event }: { event: FightEvent | undefined }) {
       −{formatHp(amount)}
     </span>
   );
-  const beam = (from: Side, kind: 'reach' | 'fizzle') => (
-    <span className={`${styles.beam} ${styles[`from${from.toUpperCase()}`]} ${styles[kind]}`} />
+  const wave = (from: Side, moveName: string, mode: 'reach' | 'fizzle' | 'pushWin' | 'pushLose') => (
+    <EnergyWave key={from} look={waveLook(onField(from), moveName)} from={from} mode={mode} />
   );
 
   switch (event.type) {
@@ -224,18 +232,19 @@ function Effects({ event }: { event: FightEvent | undefined }) {
     case 'move':
       return (
         <>
-          {event.move.kind === 'wave' && beam(event.side, event.outcome === 'failed' ? 'fizzle' : 'reach')}
+          {event.move.kind === 'wave' &&
+            wave(event.side, event.move.name, event.outcome === 'failed' ? 'fizzle' : 'reach')}
           {event.outcome === 'hit' && damage(otherSide(event.side), event.damage, 'mid')}
         </>
       );
     case 'clash': {
       const loser = otherSide(event.winner);
+      const moveOf = (side: Side) => (side === event.side ? event.move : event.counter);
       if (event.kind === 'waves') {
         const wins = event.winner === 'a' ? styles.winsA : styles.winsB;
         return (
           <>
-            <span className={`${styles.struggle} ${styles.fromA} ${wins}`} />
-            <span className={`${styles.struggle} ${styles.fromB} ${wins}`} />
+            {SIDES.map((side) => wave(side, moveOf(side).name, side === event.winner ? 'pushWin' : 'pushLose'))}
             <span className={`${styles.junction} ${wins}`} />
             {damage(loser, event.damage, 'late')}
           </>
@@ -249,9 +258,10 @@ function Effects({ event }: { event: FightEvent | undefined }) {
           </>
         );
       }
+      // A rush against a wave: the wave always wins.
       return (
         <>
-          {beam(event.winner, 'reach')}
+          {wave(event.winner, moveOf(event.winner).name, 'reach')}
           {damage(loser, event.damage, 'mid')}
         </>
       );

@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import type { CatalogSummary } from '../catalog/importCatalog';
-import { ThemeSymbol } from '../theme/ThemeSymbol';
-import { useTheme } from '../theme/ThemeProvider';
-import { FRAMES, SYMBOLS, themeById } from '../theme/themes';
 import { Dialog } from '../ui/Dialog';
 import { browserPreferences } from './mapGroups';
 import {
@@ -24,14 +21,13 @@ interface AdvancedSettingsDialogProps {
 }
 
 /**
- * "Impostazioni avanzate" of the start page (spec 042, 2.2): the features
- * that are ready but still on trial, marked "Beta" (D-068), and the frame and
- * symbol of the windows (spec 050, 2.6; D-078).
+ * "Impostazioni avanzate" of the start page (spec 042, 2.2): the phone
+ * version, and the features that are ready but still on trial, marked "Beta"
+ * (D-068). The frame and the symbol moved to «Temi» (spec 060, D-089).
  */
 export function AdvancedSettingsDialog({ catalog, onImportCatalog, onClose }: AdvancedSettingsDialogProps) {
   return (
     <Dialog title="Impostazioni avanzate" narrow onClose={onClose}>
-      <LookSection />
       <PhoneSection />
 
       <section className={styles.section}>
@@ -108,64 +104,6 @@ function PhoneSection() {
         ))}
       </div>
       <p className={styles.note}>La pagina si ricarica: la partita in corso resta salvata.</p>
-    </section>
-  );
-}
-
-/** «Aspetto» (spec 050, 2.6): a frame or a symbol chosen here holds in every theme. */
-function LookSection() {
-  const { choice, choose } = useTheme();
-  const theme = themeById(choice.theme);
-  const themeFrame = FRAMES.find((frame) => frame.id === theme.frame);
-  const option = (chosen: boolean) => (chosen ? `${styles.option} ${styles.chosen}` : styles.option);
-  return (
-    <section className={styles.section}>
-      <h3 className={styles.heading}>Aspetto</h3>
-      <p className={styles.text}>
-        Cornice e simbolo delle finestre. Scelti qui valgono per tutti i temi; «quella del tema» e
-        «quello del tema» tornano a seguire ogni tema.
-      </p>
-
-      <h4 className={styles.label}>Cornice</h4>
-      <div className={styles.options}>
-        <button className={option(choice.frame === null)} aria-pressed={choice.frame === null} onClick={() => choose({ frame: null })}>
-          Quella del tema ({themeFrame?.letter} · {themeFrame?.name})
-        </button>
-        {FRAMES.map((frame) => (
-          <button
-            key={frame.id}
-            className={option(choice.frame === frame.id)}
-            aria-pressed={choice.frame === frame.id}
-            onClick={() => choose({ frame: frame.id })}
-          >
-            {frame.letter} · {frame.name}
-          </button>
-        ))}
-      </div>
-
-      <h4 className={styles.label}>Simbolo</h4>
-      <div className={styles.options}>
-        <button
-          className={option(choice.symbol === null)}
-          aria-pressed={choice.symbol === null}
-          onClick={() => choose({ symbol: null })}
-        >
-          <ThemeSymbol place="swatch" symbol={theme.symbol} />
-          Quello del tema
-        </button>
-        {SYMBOLS.map((symbol) => (
-          <button
-            key={symbol.id}
-            className={option(choice.symbol === symbol.id)}
-            aria-pressed={choice.symbol === symbol.id}
-            title={symbol.meaning}
-            onClick={() => choose({ symbol: symbol.id })}
-          >
-            <ThemeSymbol place="swatch" symbol={symbol.id} />
-            {symbol.name}
-          </button>
-        ))}
-      </div>
     </section>
   );
 }

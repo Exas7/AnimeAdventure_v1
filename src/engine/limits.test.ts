@@ -54,7 +54,7 @@ describe('limits and warnings, never blocks (spec 001, criteria 9-13)', () => {
     expect(currentState(game).actions.interactionsUsed).toBe(1);
   });
 
-  it('C12: a sixth character joins as an extra, with a warning', () => {
+  it('C12: past a full team the sixth of the game joins without a warning (spec 061, D-091), any other as an extra with a warning', () => {
     let game = createGame(testSetup());
     // These characters also stand in cells or shops: since spec 039 that gives its
     // own warning ("è già sulla casella"); here only the full team matters.
@@ -65,6 +65,10 @@ describe('limits and warnings, never blocks (spec 001, criteria 9-13)', () => {
     expect(currentState(game).players.p1.team).toHaveLength(5);
 
     game = act(game, { type: 'addCharacter', player: 'p1', characterId: 'char-e' });
+    expect(lastWarnings(game).map((w) => w.kind)).not.toContain('teamFull');
+    expect(currentState(game).players.p1.sixthTaken).toBe(true);
+
+    game = act(game, { type: 'addCharacter', player: 'p1', characterId: 'char-f' });
     expect(lastWarnings(game).map((w) => w.kind)).toContain('teamFull');
     expect(currentState(game).players.p1.team).toEqual([
       'hero-1',
@@ -73,6 +77,7 @@ describe('limits and warnings, never blocks (spec 001, criteria 9-13)', () => {
       'char-c',
       'char-d',
       'char-e',
+      'char-f',
     ]);
   });
 

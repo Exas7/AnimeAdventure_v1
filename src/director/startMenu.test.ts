@@ -7,7 +7,7 @@ import {
   startMenu,
 } from './startMenu';
 
-describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 050, criterion 3)', () => {
+describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 050, criterion 3; spec 059, criterion 1)', () => {
   it('with a saved game: every button in order, "Riprendi la partita" first and main', () => {
     const menu = startMenu(true);
     expect(menu.map((item) => item.label)).toEqual([
@@ -15,8 +15,8 @@ describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 05
       'Nuova partita',
       'Puntate',
       'Editor delle mappe',
-      'Carica partita da file',
       'Temi',
+      'Carica partita da file',
     ]);
     expect(menu.filter((item) => item.primary).map((item) => item.id)).toEqual(['resume']);
   });
@@ -41,6 +41,12 @@ describe('start page menu (spec 024, criterion 2; spec 042, criterion 1; spec 05
     expect(startMenu(true, true).map((item) => item.stars)).toEqual([null, 1, 2, 3, 4]);
     expect(startMenu(false, true).map((item) => item.stars)).toEqual([1, 2, 3, 4]);
     expect(startMenu(true, true).find((item) => item.id === 'themes')?.stars).toBe(4);
+  });
+
+  it('the hint of «Temi» speaks of frame and symbol, which are no longer in the advanced settings (spec 060, criterion 1)', () => {
+    const hint = startMenu(false).find((item) => item.id === 'themes')?.hint ?? '';
+    expect(hint).toMatch(/cornice e il simbolo/);
+    expect(hint).not.toMatch(/Impostazioni avanzate/);
   });
 
   it('every button has its own hint', () => {

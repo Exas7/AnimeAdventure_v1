@@ -1,14 +1,27 @@
 import { describe, expect, it } from 'vitest';
 import type { Fighter, FightRecord, Side } from '../battle/fight';
-import { act, createGame, currentState, testSetup, type Game, type GameAction, type Mission } from '../engine';
+import {
+  act,
+  createGame,
+  currentState,
+  powerCatalog,
+  testSetup,
+  type Game,
+  type GameAction,
+  type Mission,
+  type PowerDefinition,
+} from '../engine';
 import {
   blockReason,
   canUndoOnPhone,
   fightResults,
+  LOST_CHALLENGE_MESSAGE,
   moveTargets,
   phoneShowdownDue,
   quizRewards,
+  retryChoice,
   rewardsDue,
+  sendAwayChoices,
   showdownWinner,
 } from './arbiter';
 
@@ -59,7 +72,7 @@ describe('the referee refuses what the director only warns about (spec 052, crit
     expect(blockReason(game, { type: 'interact', nodeId: 'c1' })).toMatch(/già conquistato/);
   });
 
-  it('a character that would join a full team', () => {
+  it('a character that would join a full team, once the sixth of the game was taken (spec 061, D-091)', () => {
     const full = play(
       start(),
       { type: 'addCharacter', player: 'p1', characterId: 'char-e' },
@@ -68,7 +81,14 @@ describe('the referee refuses what the director only warns about (spec 052, crit
       { type: 'addCharacter', player: 'p1', characterId: 'char-h' },
       { type: 'placePawn', player: 'p1', nodeId: 'c1' },
     );
-    expect(blockReason(full, { type: 'interact', nodeId: 'c1' })).toMatch(/completa/);
+    expect(blockReason(full, { type: 'interact', nodeId: 'c1' })).toBeNull();
+
+    const swapped = play(
+      full,
+      { type: 'assign', nodeId: 'c2', player: 'p1' },
+      { type: 'removeCharacter', player: 'p1', characterId: 'char-e' },
+    );
+    expect(blockReason(swapped, { type: 'interact', nodeId: 'c1' })).toMatch(/completa/);
   });
 
   it('a purchase without enough coins, and one with them', () => {
@@ -105,14 +125,14 @@ describe('rewards apply by themselves (spec 052, criterion 4)', () => {
     expect(rewardsDue(currentState(done))).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1' }]);
   });
 
-  it('the right answer of a quiz gives the reward, a wrong one nothing', () => {
+  it('the right answer of a quiz gives the reward, a wrong one is a lost challenge (spec 061, D-090)', () => {
     const quiz: Mission = {
       type: 'quiz',
       quiz: { question: 'Chi è la moglie di Goku?', answers: ['Bulma', 'Chichi'], correct: 1 },
       reward: { coins: 100 },
     };
     expect(quizRewards(quiz, 1, 'c1', 'p1')).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1' }]);
-    expect(quizRewards(quiz, 0, 'c1', 'p1')).toEqual([]);
+    expect(quizRewards(quiz, 0, 'c1', 'p1')).toEqual([{ type: 'loseChallenge', nodeId: 'c1', player: 'p1' }]);
   });
 });
 
@@ -139,11 +159,13 @@ describe('simulated fights apply their outcome (spec 052, criterion 4)', () => {
   const fight: Mission = { type: 'fight', format: '1v1', condition: 'win', reward: { cellCharacter: true } };
   const transform: Mission = { ...fight, condition: 'transform' };
 
-  it('won gives the reward, lost gives nothing', () => {
+  it('won gives the reward, lost is a lost challenge (spec 061, D-090)', () => {
     expect(fightResults(fightRecord('a', { a: [0], b: [0] }), fight, 'c1', 'p1', ['hero-1'])).toEqual([
       { type: 'completeMission', nodeId: 'c1', player: 'p1' },
     ]);
-    expect(fightResults(fightRecord('b', { a: [0], b: [0] }), fight, 'c1', 'p1', ['hero-1'])).toEqual([]);
+    expect(fightResults(fightRecord('b', { a: [0], b: [0] }), fight, 'c1', 'p1', ['hero-1'])).toEqual([
+      { type: 'loseChallenge', nodeId: 'c1', player: 'p1' },
+    ]);
   });
 
   it('«costringimi a trasformarmi» is done when the opponent transformed, even if lost', () => {
@@ -154,13 +176,14 @@ describe('simulated fights apply their outcome (spec 052, criterion 4)', () => {
 
   it("the player's characters that transformed stay so, even after a lost fight", () => {
     expect(fightResults(fightRecord('b', { a: [1], b: [0] }), fight, 'c1', 'p1', ['hero-1'])).toEqual([
+      { type: 'loseChallenge', nodeId: 'c1', player: 'p1' },
       { type: 'transformCharacters', player: 'p1', changes: [{ from: 'hero-1', to: 'hero-1-ssj' }] },
     ]);
   });
 });
 
 describe('the showdown (spec 052, criterion 5)', () => {
-  it('is due with both pawns on one cell or with both teams full', () => {
+  it('is due with both pawns on one cell, or with both teams full after the swap of the sixth (spec 061, D-091)', () => {
     expect(phoneShowdownDue(currentState(start()))).toBe(false);
     const together = play(start(), { type: 'placePawn', player: 'p2', nodeId: 's1' });
     expect(phoneShowdownDue(currentState(together))).toBe(true);
@@ -172,7 +195,25 @@ describe('the showdown (spec 052, criterion 5)', () => {
       ...fill('p1', ['char-a', 'char-b', 'char-c', 'char-d']),
       ...fill('p2', ['char-e', 'char-f', 'char-g', 'char-h']),
     );
-    expect(phoneShowdownDue(currentState(fullTeams))).toBe(true);
+    expect(phoneShowdownDue(currentState(fullTeams))).toBe(false);
+
+    const oneSwap = play(
+      fullTeams,
+      { type: 'addCharacter', player: 'p1', characterId: 'keeper-1' },
+      { type: 'removeCharacter', player: 'p1', characterId: 'char-a' },
+    );
+    expect(phoneShowdownDue(currentState(oneSwap))).toBe(false);
+
+    const sixthNotSentAway = play(oneSwap, { type: 'addCharacter', player: 'p2', characterId: 'keeper-2' });
+    expect(phoneShowdownDue(currentState(sixthNotSentAway))).toBe(false);
+
+    const bothSwaps = play(sixthNotSentAway, { type: 'removeCharacter', player: 'p2', characterId: 'char-e' });
+    expect(phoneShowdownDue(currentState(bothSwaps))).toBe(true);
+  });
+
+  it('after the sixth, anyone but the starter may be sent away (spec 061, 2.3)', () => {
+    const game = play(start(), { type: 'addCharacter', player: 'p1', characterId: 'char-a' });
+    expect(sendAwayChoices(currentState(game), 'p1')).toEqual(['char-a']);
   });
 
   it('is won by the first player when side a wins', () => {
@@ -193,5 +234,74 @@ describe('«Annulla» on the phone (spec 052, criterion 6)', () => {
     expect(canUndoOnPhone(act(atC1, { type: 'interact', nodeId: 'c1' }))).toBe(false);
     expect(canUndoOnPhone(act(atC1, { type: 'completeMission', nodeId: 'c1', player: 'p1' }))).toBe(false);
     expect(canUndoOnPhone(play(start(), { type: 'move', to: 'n1' }, { type: 'endTurn' }))).toBe(false);
+  });
+});
+
+/** G1 on c1 (Personaggio A), where it interacted and lost the challenge. */
+function lostAtC1(powers: PowerDefinition[] = []): Game {
+  return play(
+    createGame(testSetup({ p1Powers: powers })),
+    { type: 'placePawn', player: 'p1', nodeId: 'c1' },
+    { type: 'interact', nodeId: 'c1' },
+    { type: 'loseChallenge', nodeId: 'c1', player: 'p1' },
+  );
+}
+
+describe('a character who beat the player (spec 061, criteria 1 and 2; D-090)', () => {
+  it('without the power: refused with the message of the format', () => {
+    expect(retryChoice(lostAtC1(), 'c1')).toEqual({ kind: 'refused', message: LOST_CHALLENGE_MESSAGE });
+    expect(blockReason(lostAtC1(), { type: 'interact', nodeId: 'c1' })).not.toBeNull();
+    expect(retryChoice(start(), 'c1')).toBeNull();
+  });
+
+  it('with the power: a window to use it, then the challenge is allowed in the same turn', () => {
+    const game = lostAtC1([powerCatalog.retryLostChallenge(1, 'Ritenta')]);
+    const choice = retryChoice(game, 'c1');
+    expect(choice).toEqual({
+      kind: 'offer',
+      message: 'Stai usando il potere dello starter «Ritenta» per sfidare di nuovo Personaggio A.',
+      actions: [{ type: 'usePower', player: 'p1', powerId: 'p1-0' }],
+    });
+    const after = play(game, ...(choice?.kind === 'offer' ? choice.actions : []));
+    expect(blockReason(after, { type: 'interact', nodeId: 'c1' })).toBeNull();
+  });
+
+  it('with the power out of uses and a Senzu: the Senzu recharges it', () => {
+    const game = act(lostAtC1([powerCatalog.retryLostChallenge(0, 'Ritenta')]), {
+      type: 'addToInventory',
+      player: 'p1',
+      itemId: 'senzu',
+    });
+    const choice = retryChoice(game, 'c1');
+    expect(choice?.kind).toBe('offer');
+    expect(choice?.message).toBe(
+      '«Ritenta» ha finito gli usi: puoi usare un Senzu per ricaricarlo e sfidare di nuovo Personaggio A.',
+    );
+    const after = play(game, ...(choice?.kind === 'offer' ? choice.actions : []));
+    expect(currentState(after).players.p1.inventory).toEqual([]);
+    expect(blockReason(after, { type: 'interact', nodeId: 'c1' })).toBeNull();
+  });
+
+  it('with the power out of uses and no Senzu: refused', () => {
+    expect(retryChoice(lostAtC1([powerCatalog.retryLostChallenge(0, 'Ritenta')]), 'c1')).toEqual({
+      kind: 'refused',
+      message: '«Ritenta» ha finito gli usi: non puoi sfidare un PG che te le ha già suonate',
+    });
+  });
+
+  it('with no action left the power waits for the next turn', () => {
+    const game = act(lostAtC1([powerCatalog.retryLostChallenge(1, 'Ritenta')]), {
+      type: 'setActions',
+      actions: { used: 2 },
+    });
+    expect(retryChoice(game, 'c1')).toEqual({
+      kind: 'refused',
+      message: 'G1 ha già usato tutte le azioni del turno: potrà ritentare al prossimo turno',
+    });
+  });
+
+  it('the power is not used away from a lost challenge', () => {
+    const game = createGame(testSetup({ p1Powers: [powerCatalog.retryLostChallenge(1, 'Ritenta')] }));
+    expect(blockReason(game, { type: 'usePower', player: 'p1', powerId: 'p1-0' })).toMatch(/non ha perso/);
   });
 });

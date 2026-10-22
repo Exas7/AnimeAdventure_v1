@@ -78,12 +78,17 @@ describe('shop: characters (spec 002, criteria 1-6)', () => {
     expect(currentState(game).players.p2.team).toContain('char-e');
   });
 
-  it('S6: with a full team the bought character joins as an extra, with a warning', () => {
+  it('S6: with a full team the first purchase is the sixth (spec 061, D-091); after it a bought character joins as an extra, with a warning', () => {
     let game = newGame();
     for (const characterId of ['char-a', 'char-b', 'char-c', 'char-d']) {
       game = act(game, { type: 'addCharacter', player: 'p1', characterId });
     }
     game = act(game, buyE);
+    expect(lastWarnings(game)).toEqual([]);
+    expect(currentState(game).players.p1.team).toHaveLength(6);
+
+    game = act(game, { type: 'removeCharacter', player: 'p1', characterId: 'char-a' });
+    game = act(game, { type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-f' });
     expect(lastWarnings(game).map((w) => w.kind)).toEqual(['teamFull']);
     expect(currentState(game).players.p1.team).toHaveLength(6);
   });

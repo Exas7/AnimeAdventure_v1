@@ -216,7 +216,9 @@ export type Effect =
   | { type: 'addCoins'; amount: number }
   | { type: 'extraActions'; amount: number }
   | { type: 'skipOpponentTurn' }
-  | { type: 'reminder'; text: string };
+  | { type: 'reminder'; text: string }
+  // On the cell of a character who beat the owner: they may challenge it again (spec 061, D-090).
+  | { type: 'retryChallenge' };
 
 export interface PowerDefinition {
   name: string;
@@ -322,6 +324,11 @@ export interface PlayerState {
   turnsToSkip: number;
   /** Own turns completed. Skipped turns do not count. */
   turnsPlayed: number;
+  /**
+   * A sixth character already joined the full team, once per game (spec 061,
+   * D-091). Missing in games saved before.
+   */
+  sixthTaken?: boolean;
 }
 
 export interface ItemPurchase {
@@ -350,6 +357,12 @@ export interface ActiveMission {
   reachedTarget?: boolean;
   /** skipTurns: turns still to be skipped. */
   turnsToSkipLeft?: number;
+}
+
+/** A player lost the challenge of the character at a cell (spec 061, D-090). */
+export interface Defeat {
+  player: PlayerId;
+  nodeId: string;
 }
 
 /** Message shown on screen, stream included, until the host closes it. */
@@ -386,6 +399,11 @@ export interface GameState {
   interactedNodeId?: string | null;
   /** Missions in progress (spec 026, 2.4). Missing in games saved before. */
   activeMissions?: ActiveMission[];
+  /**
+   * Challenges lost (spec 061, D-090): a fight lost or a quiz answered wrong
+   * at a cell. Missing in games saved before.
+   */
+  defeats?: Defeat[];
   nextMissionId?: number;
   notifications: Notification[];
   nextNotificationId: number;
@@ -427,13 +445,16 @@ export type GameAction =
   | { type: 'acceptMission'; nodeId: string; player: PlayerId }
   | { type: 'completeMission'; nodeId: string; player: PlayerId }
   | { type: 'abandonMission'; missionId: number }
+  // A fight lost or a quiz answered wrong (spec 061, D-090): the player may not challenge that cell again.
+  | { type: 'loseChallenge'; nodeId: string; player: PlayerId }
   // "Aggiorna la squadra" (spec 037, 2.4): characters that transformed in a
   // simulated fight take their new form in the team.
   | { type: 'transformCharacters'; player: PlayerId; changes: { from: string; to: string }[] }
   // "Usa" on a training item (spec 041): the chosen characters take later forms, the item is used up.
   | { type: 'useTraining'; player: PlayerId; itemId: string; choices: TrainingChoice[] }
   // "Usa" on a Senzu (no `to`) or on a travel item, whose pawn goes `to` a cell (spec 047).
-  | { type: 'useItem'; player: PlayerId; itemId: string; to?: string };
+  // A Senzu may name the power it recharges (spec 061, 2.1); otherwise the first rechargeable one.
+  | { type: 'useItem'; player: PlayerId; itemId: string; to?: string; powerId?: string };
 
 export type RecordedAction = { type: 'startGame' } | GameAction;
 
@@ -466,7 +487,11 @@ export type WarningKind =
   // A training item used past its rule (spec 041).
   | 'trainingRule'
   // A travel item taking the pawn beyond its reach (spec 047).
-  | 'travelRange';
+  | 'travelRange'
+  // A character who already beat the player (spec 061, D-090): a turn rule.
+  | 'challengeLost'
+  // «Ritenta una sfida persa» away from the cell of a character who beat the player.
+  | 'nothingToRetry';
 
 /** Non-blocking warning for the host, shown only in the director window (D-008). */
 export interface Warning {

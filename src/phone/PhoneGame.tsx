@@ -10,6 +10,7 @@ import {
   currentState,
   isRepeatInteraction,
   LASTING_MISSIONS,
+  mustSendAway,
   nextLineIndex,
   rechargesStarter,
   stepBackCell,
@@ -28,7 +29,9 @@ import {
   moveTargets,
   phoneShowdownDue,
   quizRewards,
+  retryChoice,
   rewardsDue,
+  sendAwayChoices,
   showdownWinner,
 } from './arbiter';
 import { PhoneFight, type PhoneFightSetup } from './PhoneFight';
@@ -87,6 +90,12 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   const [training, setTraining] = useState<string | null>(null);
   const [travel, setTravel] = useState<TravelChoice | null>(null);
   const [confirmEnd, setConfirmEnd] = useState(false);
+  // «Ritenta una sfida persa» (spec 061, 2.1): the window with «Annulla» and «Conferma».
+  const [retryOffer, setRetryOffer] = useState<{ nodeId: string; message: string; actions: GameAction[] } | null>(
+    null,
+  );
+  // The character chosen to leave the team after the sixth (spec 061, 2.3).
+  const [leaving, setLeaving] = useState<string | null>(null);
   // «Tocca a G2: passa il telefono» (spec 052, 2.8), and the winner of the showdown (2.9).
   const [passTo, setPassTo] = useState<PlayerId | null>(null);
   const [winner, setWinner] = useState<PlayerId | null>(null);
@@ -157,9 +166,13 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
     }
   };
 
-  /** An action of the player, if the referee allows it; then the rewards it made due. */
-  const attempt = (action: GameAction): Game | null => {
-    const reason = blockReason(game, action);
+  /**
+   * An action of the player, if the referee allows it; then the rewards it
+   * made due. `from` is the game to check when actions follow one another
+   * before the next render.
+   */
+  const attempt = (action: GameAction, from: Game = game): Game | null => {
+    const reason = blockReason(from, action);
     if (reason) {
       setMessage(reason);
       return null;
@@ -365,10 +378,49 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
     const open = () => setOverlay({ kind: 'challenge', nodeId, line: 0 });
     if (isRepeatInteraction(state, nodeId)) {
       open();
+      return;
+    }
+    // A character who already beat the player (spec 061, 2.1; D-090).
+    const retry = retryChoice(game, nodeId);
+    if (retry?.kind === 'refused') {
+      setMessage(retry.message);
+    } else if (retry?.kind === 'offer') {
+      setRetryOffer({ nodeId, message: retry.message, actions: retry.actions });
     } else if (attempt({ type: 'interact', nodeId })) {
       open();
     }
   };
+
+  /** «Conferma»: the power (and the Senzu) first, then the challenge opens again. */
+  const confirmRetry = () => {
+    const offer = retryOffer;
+    setRetryOffer(null);
+    if (!offer) {
+      return;
+    }
+    let latest = game;
+    for (const action of [...offer.actions, { type: 'interact', nodeId: offer.nodeId } as const]) {
+      const next = attempt(action, latest);
+      if (!next) {
+        return;
+      }
+      latest = next;
+    }
+    setOverlay({ kind: 'challenge', nodeId: offer.nodeId, line: 0 });
+  };
+
+  // After the sixth the player sends one away, never the starter (spec 061, 2.3; D-091).
+  const sendingAway = (['p1', 'p2'] as const).find(
+    (player) => player !== ai?.player && mustSendAway(state.players[player]),
+  );
+  const sendAway = () => {
+    if (sendingAway && leaving) {
+      apply([{ type: 'removeCharacter', player: sendingAway, characterId: leaving }]);
+    }
+    setLeaving(null);
+  };
+  const characterName = (characterId: string) =>
+    game.catalog.find((character) => character.id === characterId)?.name ?? characterId;
 
   const handlePawnDrop = (player: PlayerId, nodeId: string) => {
     if (player !== current) {
@@ -650,6 +702,45 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
                 Fine turno
               </button>
               <button onClick={() => setConfirmEnd(false)}>Continua a giocare</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {retryOffer && (
+        <div className={styles.dialog} role="dialog" aria-modal="true">
+          <div className={styles.dialogBox}>
+            <p>{retryOffer.message}</p>
+            <div className={styles.buttons}>
+              <button onClick={() => setRetryOffer(null)}>Annulla</button>
+              <button className={styles.primary} onClick={confirmRetry}>
+                Conferma
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {sendingAway && !fight && !aiFightView && (
+        <div className={styles.dialog} role="dialog" aria-modal="true">
+          <div className={styles.dialogBox}>
+            <p>
+              {name(sendingAway)} ha arruolato il sesto personaggio: chi lascia la squadra? Esce dalla partita.
+            </p>
+            <div className={styles.leaving}>
+              {sendAwayChoices(state, sendingAway).map((characterId) => (
+                <button
+                  key={characterId}
+                  className={characterId === leaving ? styles.primary : undefined}
+                  aria-pressed={characterId === leaving}
+                  onClick={() => setLeaving(characterId)}
+                >
+                  {characterName(characterId)}
+                </button>
+              ))}
+            </div>
+            <div className={styles.buttons}>
+              <button className={styles.primary} disabled={!leaving} onClick={sendAway}>
+                Conferma
+              </button>
             </div>
           </div>
         </div>

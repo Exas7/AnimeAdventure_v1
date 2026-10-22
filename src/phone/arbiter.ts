@@ -6,19 +6,24 @@ import {
   cellMission,
   characterPrice,
   currentState,
+  hasLostAt,
   isAdjacent,
   isRepeatInteraction,
   itemPrice,
   lastWarnings,
   missionsDone,
+  rechargeablePower,
+  rechargesStarter,
   stepBackCell,
   TEAM_SIZE,
+  teamIsFull,
   turnRuleWarnings,
   type Game,
   type GameAction,
   type GameState,
   type Mission,
   type PlayerId,
+  type PowerState,
 } from '../engine';
 
 // The referee of the phone version (spec 052, 2.6; D-084): there is no host,
@@ -92,14 +97,15 @@ function missingCoins(game: Game, state: GameState, action: GameAction): string 
 
 /**
  * A full team takes no more characters (format rules 6 and 8): the player
- * cannot open a character whose reward is a character.
+ * cannot open a character whose reward is a character. Once per game a full
+ * team may still take its sixth (spec 061, D-091).
  */
 function fullTeam(state: GameState, action: GameAction): string | null {
   if (action.type !== 'interact' || isRepeatInteraction(state, action.nodeId)) {
     return null;
   }
   const player = state.players[state.currentPlayer];
-  if (player.team.length < TEAM_SIZE || !givesCharacters(cellMission(state.cells[action.nodeId]))) {
+  if (!teamIsFull(player) || !givesCharacters(cellMission(state.cells[action.nodeId]))) {
     return null;
   }
   return `La squadra di ${player.name} è completa: non può prendere altri personaggi`;
@@ -122,18 +128,25 @@ export function rewardsDue(state: GameState): GameAction[] {
   }));
 }
 
-/** The player's answer to a quiz: right gives the reward, wrong gives nothing (spec 052, 2.6). */
+/**
+ * The player's answer to a quiz: right gives the reward (spec 052, 2.6),
+ * wrong is a lost challenge (spec 061, D-090).
+ */
 export function quizRewards(mission: Mission | undefined, answer: number, nodeId: string, player: PlayerId): GameAction[] {
-  return mission?.type === 'quiz' && mission.quiz?.correct === answer
+  if (mission?.type !== 'quiz') {
+    return [];
+  }
+  return mission.quiz?.correct === answer
     ? [{ type: 'completeMission', nodeId, player }]
-    : [];
+    : [{ type: 'loseChallenge', nodeId, player }];
 }
 
 /**
  * What a simulated fight of a mission does on the phone (spec 052, 2.7):
  * the reward when it is won (or the opponent transformed, for «costringimi
- * a trasformarmi»), and the player's characters that transformed stay so
- * (D-060), even after a lost fight.
+ * a trasformarmi»), a lost challenge otherwise (spec 061, D-090), and the
+ * player's characters that transformed stay so (D-060), even after a lost
+ * fight.
  */
 export function fightResults(
   record: FightRecord,
@@ -145,6 +158,8 @@ export function fightResults(
   const actions: GameAction[] = [];
   if (proposedOutcome(record, mission) !== 'lost') {
     actions.push({ type: 'completeMission', nodeId, player });
+  } else {
+    actions.push({ type: 'loseChallenge', nodeId, player });
   }
   const changes = teamChanges(record, team);
   if (changes.length > 0) {
@@ -155,11 +170,82 @@ export function fightResults(
 
 /**
  * The showdown opens by itself at the end of a turn with both pawns on one
- * cell (D-029) or with both teams full (spec 052, 2.9).
+ * cell (D-029), or when both players made the swap of the sixth character
+ * and have a full team (spec 052, 2.9; spec 061, D-091).
  */
 export function phoneShowdownDue(state: GameState): boolean {
   const { p1, p2 } = state.players;
-  return p1.position === p2.position || (p1.team.length >= TEAM_SIZE && p2.team.length >= TEAM_SIZE);
+  const swapped = (player: typeof p1) => player.sixthTaken === true && player.team.length === TEAM_SIZE;
+  return p1.position === p2.position || (swapped(p1) && swapped(p2));
+}
+
+/** Sent away after the sixth (spec 061, 2.3): anyone of the team but the starter. */
+export function sendAwayChoices(state: GameState, player: PlayerId): string[] {
+  const { team, starterId } = state.players[player];
+  return team.filter((characterId) => characterId !== starterId);
+}
+
+/**
+ * Challenging a character who beat the player (spec 061, 2.1; D-090): what
+ * the phone says or offers. Null when the player did not lose there. With
+ * the power «Ritenta una sfida persa», a window asks to use it, or a Senzu
+ * when it has no uses left; `actions` go before the interaction.
+ */
+export type RetryChoice =
+  | { kind: 'refused'; message: string }
+  | { kind: 'offer'; message: string; actions: GameAction[] };
+
+export const LOST_CHALLENGE_MESSAGE = 'Non puoi sfidare un PG che te le ha già suonate';
+
+export function retryChoice(game: Game, nodeId: string): RetryChoice | null {
+  const state = currentState(game);
+  const playerId = state.currentPlayer;
+  if (!hasLostAt(state, playerId, nodeId)) {
+    return null;
+  }
+  const player = state.players[playerId];
+  const power = retryPower(state, playerId);
+  if (!power) {
+    return { kind: 'refused', message: LOST_CHALLENGE_MESSAGE };
+  }
+  const name = power.definition.name;
+  const senzu = player.inventory.find((itemId) => {
+    const item = game.items.find((candidate) => candidate.id === itemId);
+    return item !== undefined && rechargesStarter(item);
+  });
+  const usable = (power.usesLeft ?? 0) > 0;
+  if (!usable && (!senzu || !rechargeablePower(state, playerId, power.id))) {
+    return { kind: 'refused', message: `«${name}» ha finito gli usi: non puoi sfidare un PG che te le ha già suonate` };
+  }
+  if (state.actions.used >= state.actions.available) {
+    return {
+      kind: 'refused',
+      message: `${player.name} ha già usato tutte le azioni del turno: potrà ritentare al prossimo turno`,
+    };
+  }
+  const character = game.catalog.find((candidate) => candidate.id === state.cells[nodeId]?.characterId);
+  const whom = character?.name ?? 'questo personaggio';
+  const use: GameAction = { type: 'usePower', player: playerId, powerId: power.id };
+  if (usable) {
+    return {
+      kind: 'offer',
+      message: `Stai usando il potere dello starter «${name}» per sfidare di nuovo ${whom}.`,
+      actions: [use],
+    };
+  }
+  return {
+    kind: 'offer',
+    message: `«${name}» ha finito gli usi: puoi usare un Senzu per ricaricarlo e sfidare di nuovo ${whom}.`,
+    actions: [{ type: 'useItem', player: playerId, itemId: senzu as string, powerId: power.id }, use],
+  };
+}
+
+/** The player's power to retry a lost challenge, the first with uses left if there are more. */
+function retryPower(state: GameState, playerId: PlayerId): PowerState | undefined {
+  const powers = state.players[playerId].powers.filter(
+    (power) => power.definition.effect.type === 'retryChallenge',
+  );
+  return powers.find((power) => (power.usesLeft ?? 0) > 0) ?? powers[0];
 }
 
 /** The winner of the showdown wins the game: side a is the first player (showdownSides). */

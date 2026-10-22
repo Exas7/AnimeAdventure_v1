@@ -34,6 +34,8 @@ export const POWER_KINDS: { kind: PowerKind; label: string; fields: PowerField[]
   { kind: 'extraActionsOnDemand', label: 'Azioni extra a comando', fields: ['amount', 'uses'] },
   { kind: 'skipOpponentTurn', label: 'Fai perdere un turno', fields: ['uses'] },
   { kind: 'reminder', label: 'Promemoria', fields: ['text', 'moment'] },
+  // Spec 061, D-090: the app offers it on the character who beat the player.
+  { kind: 'retryLostChallenge', label: 'Ritenta una sfida persa', fields: ['uses'] },
 ];
 
 export const REMINDER_MOMENTS: { moment: ReminderMoment; label: string }[] = [
@@ -84,6 +86,8 @@ export function powerDefinition(power: PowerForm): PowerDefinition {
       return powerCatalog.skipOpponentTurn(power.uses, name);
     case 'reminder':
       return powerCatalog.reminder(power.text, reminderTrigger(power), name);
+    case 'retryLostChallenge':
+      return powerCatalog.retryLostChallenge(power.uses, name);
   }
 }
 
@@ -106,6 +110,7 @@ export function describePower(power: PowerForm): string {
     case 'extraActionsOnDemand':
       return `${label}: ${signed(power.amount)}, ${uses}${own}`;
     case 'skipOpponentTurn':
+    case 'retryLostChallenge':
       return `${label}: ${uses}${own}`;
     case 'reminder': {
       const moment =

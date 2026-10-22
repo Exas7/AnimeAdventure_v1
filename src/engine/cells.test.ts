@@ -137,13 +137,16 @@ describe('purchases checked before buying (spec 004, criterion 6, D-015)', () =>
     for (const characterId of ['char-a', 'char-b', 'char-c']) {
       game = act(game, { type: 'addCharacter', player: 'p1', characterId });
     }
-    expect(check({ type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-f' })).toEqual([
+    // A full team may buy its sixth, once per game (spec 061, D-091).
+    expect(check({ type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-f' })).toEqual([]);
+    game = act(game, { type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-f' });
+    expect(check({ type: 'buyCharacter', shopNodeId: 'sh2', characterId: 'char-g' })).toEqual([
       'teamFull',
     ]);
 
-    game = act(game, { type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-f' });
+    game = act(game, { type: 'buyCharacter', shopNodeId: 'sh2', characterId: 'char-g' });
     expect(lastWarnings(game).map((warning) => warning.kind)).toEqual(['teamFull']);
-    expect(check({ type: 'buyCharacter', shopNodeId: 'sh2', characterId: 'char-g' })).toEqual([]);
+    expect(check({ type: 'buyCharacter', shopNodeId: 'sh1', characterId: 'char-h' })).toEqual([]);
   });
 
   it('warns about a Senzu that would have no effect', () => {

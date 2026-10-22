@@ -13,8 +13,10 @@ const SAVE_FORMAT = 'arkanite-game';
  * 5: cells may hold missions (spec 026); the new fields are optional, so a
  *    version 4 file opens as it is, while an older app refuses version 5
  *    files instead of dropping their missions (spec 038).
+ * 6: lost challenges and the sixth character (spec 061, D-090, D-091); the
+ *    new fields are optional, as in version 5.
  */
-export const SAVE_FORMAT_VERSION = 5;
+export const SAVE_FORMAT_VERSION = 6;
 
 /** A save file that cannot be loaded. The message is meant for the host. */
 export class SaveFileError extends Error {

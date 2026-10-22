@@ -10,19 +10,21 @@ import {
 } from './readyPowers';
 
 describe('the list of ready powers (spec 025)', () => {
-  it('starts with the three powers of the channel graphic, with the right effects (criterion 1)', () => {
+  it('starts with the three powers of the channel graphic and the one to retry a lost challenge, with the right effects (criterion 1; spec 061, criterion 6)', () => {
     expect(DEFAULT_READY_POWERS.map((power) => power.cardText)).toEqual([
       'Ogni 2 turni guadagni 200$',
       'Ogni volta che interagisci con un PG prendi 250$',
       // Spec 029 (2.5): the numbers follow the starting coins of the game.
       'Parti con {totale} invece che {iniziali}',
+      'Una volta per partita puoi ritentare una sfida persa',
     ]);
     expect(DEFAULT_READY_POWERS.map(readyPowerDefinition)).toEqual([
       powerCatalog.coinsEveryNTurns(200, 2),
       powerCatalog.coinsPerInteraction(250),
       powerCatalog.extraStartingCoins(2500),
+      powerCatalog.retryLostChallenge(1),
     ]);
-    expect(new Set(DEFAULT_READY_POWERS.map((power) => power.id)).size).toBe(3);
+    expect(new Set(DEFAULT_READY_POWERS.map((power) => power.id)).size).toBe(4);
     expect(DEFAULT_READY_POWERS.every(looksLikeReadyPower)).toBe(true);
   });
 

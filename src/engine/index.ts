@@ -36,11 +36,13 @@ export {
   rewardText,
   type PanelMission,
 } from './missions';
-export { isAdjacent, isRepeatInteraction, reachableCells, turnRuleWarnings } from './rules';
+export { hasLostAt, isAdjacent, isRepeatInteraction, reachableCells, turnRuleWarnings } from './rules';
+export { mustSendAway, sixthAvailable, teamIsFull } from './team';
 export { rechargesStarter, travelRule } from './itemUse';
 export {
   characterPrice,
   itemPrice,
+  rechargeablePower,
   shopListing,
   type ShopCharacterListing,
   type ShopItemListing,

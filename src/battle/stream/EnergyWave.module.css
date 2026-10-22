@@ -1,0 +1,458 @@
+/*
+ * The energy wave (spec 062). The wave is a line at mid height of the arena,
+ * from the hands of who throws it (30% from its side) towards the opponent:
+ * its width grows as the wave travels, so the head stays at the front.
+ * --wave-size is 1 for an average wave; colours come from the aura.
+ */
+.wave {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  height: 0;
+  animation-duration: var(--beat);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.a {
+  left: 30%;
+}
+
+.b {
+  right: 30%;
+}
+
+/* ---- The ray: white core, the aura at the edges, streaks running ahead ---- */
+
+.body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--wave-size) * -2.6cqh);
+  height: calc(var(--wave-size) * 5.2cqh);
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      100deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.4) 18%,
+      transparent 34%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      80deg,
+      transparent 0%,
+      color-mix(in srgb, var(--wave-color) 60%, transparent) 22%,
+      transparent 45%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--wave-color) 10%,
+      var(--wave-color) 24%,
+      var(--wave-halo) 36%,
+      #ffffff 45%,
+      #ffffff 55%,
+      var(--wave-halo) 64%,
+      var(--wave-color) 76%,
+      var(--wave-color) 90%,
+      transparent 100%
+    );
+  background-size:
+    calc(var(--wave-size) * 10cqh) 100%,
+    calc(var(--wave-size) * 6.5cqh) 100%,
+    100% 100%;
+  filter: drop-shadow(0 0 1.2cqw var(--wave-color)) drop-shadow(0 0 2.6cqw var(--wave-color));
+  animation:
+    flow calc(var(--beat) / 6) linear infinite,
+    wobble 90ms ease-in-out infinite alternate;
+}
+
+.b .body {
+  animation-direction: reverse, alternate;
+}
+
+/* The streaks run from the hands towards the opponent. */
+@keyframes flow {
+  from {
+    background-position-x: 0, 0, 0;
+  }
+  to {
+    background-position-x: calc(var(--wave-size) * 10cqh), calc(var(--wave-size) * 13cqh), 0;
+  }
+}
+
+@keyframes wobble {
+  from {
+    transform: scaleY(0.9);
+  }
+  to {
+    transform: scaleY(1.06);
+  }
+}
+
+/* ---- The comet tail behind the head: wide at the head, thin towards the hands ---- */
+
+.tail {
+  position: absolute;
+  right: 0;
+  top: calc(var(--wave-size) * -5cqh);
+  width: min(calc(var(--wave-size) * 36cqh), 100%);
+  height: calc(var(--wave-size) * 10cqh);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    color-mix(in srgb, var(--wave-color) 75%, transparent) 35%,
+    var(--wave-halo) 75%,
+    #ffffff 100%
+  );
+  clip-path: polygon(0% 45%, 100% 4%, 100% 96%, 0% 55%);
+}
+
+.b .tail {
+  right: auto;
+  left: 0;
+  transform: scaleX(-1);
+}
+
+/* ---- The charge on the hands and the big oval head --------------------------- */
+
+.charge,
+.head {
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+
+.charge {
+  left: 0;
+  width: calc(var(--wave-size) * 10cqh);
+  height: calc(var(--wave-size) * 10cqh);
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #ffffff 20%,
+    var(--wave-halo) 32%,
+    var(--wave-color) 52%,
+    transparent 70%
+  );
+  filter: drop-shadow(0 0 1.5cqw var(--wave-color)) drop-shadow(0 0 3cqw var(--wave-color));
+  animation: pulse 110ms ease-in-out infinite alternate;
+}
+
+.b .charge {
+  left: auto;
+  right: 0;
+  translate: 50% -50%;
+}
+
+.head {
+  right: 0;
+  translate: 50% -50%;
+  width: calc(var(--wave-size) * 16cqh);
+  height: calc(var(--wave-size) * 12cqh);
+  background: radial-gradient(
+    ellipse,
+    #ffffff 0%,
+    #ffffff 30%,
+    var(--wave-halo) 44%,
+    var(--wave-color) 60%,
+    transparent 71%
+  );
+  filter: drop-shadow(0 0 1.5cqw var(--wave-color)) drop-shadow(0 0 3cqw var(--wave-color));
+  animation: pulse 130ms ease-in-out infinite alternate;
+}
+
+.b .head {
+  right: auto;
+  left: 0;
+  translate: -50% -50%;
+}
+
+@keyframes pulse {
+  from {
+    scale: 0.92;
+  }
+  to {
+    scale: 1.06;
+  }
+}
+
+/* ---- A thin ray from a finger ------------------------------------------------ */
+
+.thin .body {
+  top: calc(var(--wave-size) * -0.8cqh);
+  height: calc(var(--wave-size) * 1.6cqh);
+}
+
+.thin .tail {
+  top: calc(var(--wave-size) * -1.6cqh);
+  width: min(calc(var(--wave-size) * 14cqh), 100%);
+  height: calc(var(--wave-size) * 3.2cqh);
+}
+
+.thin .charge {
+  width: calc(var(--wave-size) * 3.5cqh);
+  height: calc(var(--wave-size) * 3.5cqh);
+}
+
+.thin .head {
+  width: calc(var(--wave-size) * 5cqh);
+  height: calc(var(--wave-size) * 3.6cqh);
+}
+
+/* ---- An energy ball on its own: born on the hands, then it flies --------------- */
+
+.ball .head {
+  width: calc(var(--wave-size) * 16cqh);
+  height: calc(var(--wave-size) * 16cqh);
+  background:
+    radial-gradient(circle at 38% 35%, rgb(255 255 255 / 0.9) 0%, transparent 22%),
+    radial-gradient(circle, #ffffff 0%, var(--wave-halo) 30%, var(--wave-color) 55%, transparent 70%);
+  animation: form var(--beat) ease-out both;
+}
+
+/* The swirling energy on the ball. */
+.ball .head::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgb(255 255 255 / 0.35) 0deg 12deg, transparent 12deg 40deg);
+  animation: spin calc(var(--beat) / 3) linear infinite;
+}
+
+@keyframes form {
+  0% {
+    scale: 0.15;
+  }
+  18%,
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* ---- Electricity from tier A+ up: bolts that flash on and off, sparks flying off ---- */
+
+.electric {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bolt {
+  position: absolute;
+  width: calc(var(--wave-size) * 9cqh);
+  height: calc(var(--wave-size) * 3.6cqh);
+  overflow: visible;
+  translate: -50% -50%;
+  rotate: var(--angle);
+  fill: none;
+  stroke-linejoin: miter;
+  filter: drop-shadow(0 0 0.35cqw #bff0ff) drop-shadow(0 0 1cqw #39b8ff);
+  animation: zap var(--zap) steps(1, end) infinite;
+  animation-delay: var(--delay);
+}
+
+.ball .bolt {
+  width: calc(var(--wave-size) * 7cqh);
+  height: calc(var(--wave-size) * 2.8cqh);
+}
+
+.bolt polyline {
+  vector-effect: non-scaling-stroke;
+}
+
+.boltGlow {
+  stroke: #7fdcff;
+  stroke-width: 5px;
+  opacity: 0.45;
+}
+
+.boltCore {
+  stroke: #ffffff;
+  stroke-width: 1.8px;
+}
+
+.boltBranch {
+  stroke: #e6f9ff;
+  stroke-width: 1.1px;
+}
+
+/* On for almost half of its rhythm, then off: each bolt flashes at its own time. */
+@keyframes zap {
+  0% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.spark {
+  position: absolute;
+  width: calc(var(--wave-size) * 0.7cqh);
+  height: calc(var(--wave-size) * 0.7cqh);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 0.4cqw #bff0ff,
+    0 0 1cqw #39b8ff;
+  translate: -50% -50%;
+  animation: fly var(--zap) linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes fly {
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* ---- How the wave travels ----------------------------------------------------- */
+
+/* Reaches the opponent (who stands at 70%) at 40% of the beat, then fades. */
+.reach {
+  animation-name: reach;
+}
+
+@keyframes reach {
+  0% {
+    width: 0%;
+  }
+  40%,
+  75% {
+    width: 40%;
+    opacity: 1;
+  }
+  100% {
+    width: 40%;
+    opacity: 0;
+  }
+}
+
+/* The ball forms on the hands first, then flies: it lands at 45% of the beat. */
+.ball.reach {
+  animation-name: reachBall;
+}
+
+@keyframes reachBall {
+  0%,
+  18% {
+    width: 0%;
+  }
+  45%,
+  75% {
+    width: 40%;
+    opacity: 1;
+  }
+  100% {
+    width: 40%;
+    opacity: 0;
+  }
+}
+
+/* Dodged or failed: it dies out halfway. */
+.fizzle {
+  animation-name: fizzle;
+}
+
+@keyframes fizzle {
+  0% {
+    width: 0%;
+  }
+  30% {
+    width: 18%;
+    opacity: 1;
+  }
+  70%,
+  100% {
+    width: 18%;
+    opacity: 0;
+  }
+}
+
+/* Waves clash: widths in % of the arena; the two waves always add up to the 40% between the fighters. */
+.pushWin {
+  animation-name: pushWin;
+}
+
+.pushLose {
+  animation-name: pushLose;
+}
+
+@keyframes pushWin {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 20%;
+  }
+  35% {
+    width: 24%;
+  }
+  50% {
+    width: 16%;
+  }
+  65% {
+    width: 23%;
+  }
+  85%,
+  92% {
+    width: 40%;
+    opacity: 1;
+  }
+  100% {
+    width: 40%;
+    opacity: 0;
+  }
+}
+
+@keyframes pushLose {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 20%;
+  }
+  35% {
+    width: 16%;
+  }
+  50% {
+    width: 24%;
+  }
+  65% {
+    width: 17%;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    width: 0%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .charge,
+  .head,
+  .ball .head::after,
+  .bolt,
+  .spark {
+    animation: none;
+  }
+}

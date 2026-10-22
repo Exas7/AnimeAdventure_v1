@@ -18,7 +18,7 @@ import {
 } from './missions';
 import { emptyOutput, notify, warn, type ActionOutput } from './output';
 import { applyPower, firePowers } from './powers';
-import { isRepeatInteraction, turnRuleWarnings } from './rules';
+import { hasLostAt, isRepeatInteraction, turnRuleWarnings } from './rules';
 import { setCellContent, warnIfElsewhere } from './cells';
 import { travelRule, rechargesStarter } from './itemUse';
 import { buyCharacter, buyItem, rechargeStarter } from './shop';
@@ -168,6 +168,9 @@ export function applyAction(
     case 'abandonMission':
       abandonMission(draft, action.missionId);
       break;
+    case 'loseChallenge':
+      loseChallenge(draft, action.nodeId, action.player, context);
+      break;
   }
 
   return { state: draft, ...out };
@@ -265,7 +268,7 @@ function useItem(
       throw new EngineError(`Item "${action.itemId}" has no effect to use`);
     }
     player.inventory.splice(index, 1);
-    rechargeStarter(state, action.player, item, out);
+    rechargeStarter(state, action.player, item, out, action.powerId);
     return;
   }
   if (!travelRule(item)) {
@@ -425,6 +428,20 @@ function completeMission(
   setConquest(state, nodeId, playerId, context, out);
 }
 
+/**
+ * A fight lost or a quiz answered wrong (spec 061, D-090): recorded once. The
+ * next interaction there counts as a new one, so the turn rules see it.
+ */
+function loseChallenge(state: GameState, nodeId: string, playerId: PlayerId, context: GameContext): void {
+  findNode(context.map, nodeId);
+  if (!hasLostAt(state, playerId, nodeId)) {
+    (state.defeats ??= []).push({ player: playerId, nodeId });
+  }
+  if (state.interactedNodeId === nodeId) {
+    state.interactedNodeId = null;
+  }
+}
+
 /** "Abbandona" (spec 026, 2.4): the mission goes away without a reward. */
 function abandonMission(state: GameState, missionId: number): void {
   const missions = state.activeMissions ?? [];
@@ -459,6 +476,9 @@ function usePower(
         `${player.name} ha già usato tutti gli usi di ${power.definition.name}`,
       );
     }
+  }
+  if (power.definition.effect.type === 'retryChallenge' && !hasLostAt(state, playerId, player.position)) {
+    warn(out, 'nothingToRetry', `${player.name} non ha perso una sfida sulla casella dove si trova`);
   }
 
   applyPower(state, playerId, power, out);

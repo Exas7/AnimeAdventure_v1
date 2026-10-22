@@ -47,15 +47,15 @@ const ITEMS: Omit<StartMenuItem, 'primary'>[] = [
     stars: 3,
   },
   {
-    id: 'loadFile',
-    label: 'Carica partita da file',
-    hint: 'Riapre una partita esportata su file (.json), anche da un altro PC.',
+    id: 'themes',
+    label: 'Temi',
+    hint: "Scegli i colori dell'app tra cinque temi di Dragon Ball, e la cornice e il simbolo delle finestre.",
     stars: 4,
   },
   {
-    id: 'themes',
-    label: 'Temi',
-    hint: "Scegli i colori dell'app tra cinque temi di Dragon Ball. Cornice e simbolo si cambiano da Impostazioni avanzate.",
+    id: 'loadFile',
+    label: 'Carica partita da file',
+    hint: 'Riapre una partita esportata su file (.json), anche da un altro PC.',
     stars: 5,
   },
 ];
