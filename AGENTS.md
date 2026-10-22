@@ -109,6 +109,15 @@ pacchetti npm senza chiederlo.
    personaggio, 6-8 strade grigie, divise in modo simile tra i due lati.
 8. Caselle e percorsi sulla terra: il mare o la lava si attraversano solo
    per unire le isole, meglio dove lo sfondo disegna un ponte.
+9. **Caselle lontane dal bordo**: il tabellone finisce al bordo dello
+   sfondo, e la pedina sta in piedi sopra la casella. Una casella
+   personaggio vuole circa il 3,5% della larghezza ai lati e l'8,5%
+   dell'altezza in alto; il conto esatto è `cellsOffBoard` in
+   `src/ui/boardModel.ts`.
+10. **Caselle e percorsi che non si toccano**: tra due caselle almeno 10
+    unità (la mappa è larga 1600), e un percorso passa ad almeno 10
+    unità da ogni casella che non collega. I conti esatti sono
+    `touchingCells` e `pathsOverCells` in `src/ui/boardModel.ts`.
 
 Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
 «the three default maps» in `src/included/included.test.ts`, poi `npm test`.
@@ -149,6 +158,16 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   gruppo: `cattivi`, `arruolabili`, `storia`), tipo, valori del tipo,
   premio, peso e battute (separate da ` | `; `{obiettivo}`, `{premio}`,
   `{n}` diventano i valori veri). Vedi `src/missions/catalogCsv.ts`.
-- Domande (`docs/domande.csv`): `domanda;A;B;C;D;giusta`.
+  Regole del catalogo (D-069, D-070): i gruppi hanno solo combattimenti,
+  quiz, «attendi» e «salta turni»; «batti», «porta» e «vai da» sono
+  missioni personali con l'obiettivo scritto secondo la storia; chi è fino
+  a B+ non chiede obiettivi o avversari più forti di lui di oltre un
+  gradino; quiz, attese e turni saltati arruolano solo fino a B+; nessun
+  giro di «batti» e «porta» che si aspettano a vicenda; battute: prima
+  l'apertura, poi la missione. I test in
+  `src/missions/shippedCatalog.test.ts` le controllano.
+- Domande (`docs/domande.csv`): `domanda;A;B;C;D;giusta;livello`, con il
+  livello `facile` (per chi arruola fino a C+), `media` (B- e B, e i
+  personaggi della storia) o `difficile` (B+).
 - Se modifichi un CSV, modifica allo stesso modo il file Excel con lo
   stesso nome, se la persona lo usa.

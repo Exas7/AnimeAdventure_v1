@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import {
+  rechargesStarter,
   TEAM_SIZE,
   trainingRule,
+  travelRule,
   type PanelMission,
   type Character,
   type ItemDefinition,
   type PlayerId,
   type PlayerState,
 } from '../engine';
+import { placesIn, visibleItems } from './carriedItems';
 import { CharacterPicker } from './CharacterPicker';
 import { NumberField } from './NumberField';
 import { ownImage } from './characterImages';
+import { itemImage } from './itemImages';
 import { Placeholder } from './Placeholder';
 import styles from './PlayerPanel.module.css';
 
@@ -23,8 +27,8 @@ export interface PlayerPanelActions {
   setPowerUses(powerId: string, uses: number): void;
   addItem(itemId: string): void;
   removeItem(itemId: string): void;
-  /** "Usa" on a training item (spec 041): opens its window. */
-  trainItem(itemId: string): void;
+  /** "Usa" (spec 041, 047): training opens its window, travel highlights cells, the Senzu recharges. */
+  useItem(itemId: string): void;
   /** "Completata": the reward by hand, even if the app has not noticed (spec 026, 2.4). */
   completeMission(nodeId: string): void;
   abandonMission(missionId: number): void;
@@ -45,9 +49,19 @@ export function PlayerPanel(props: PlayerPanelProps) {
   const { playerId, player, catalog, items, isCurrent, actions } = props;
   const itemName = (itemId: string) =>
     items.find((item) => item.id === itemId)?.name ?? itemId;
-  const isTraining = (itemId: string) => {
+  // What "Usa" does with each item (spec 041, 047); an item without an effect has only the ×.
+  const useHint = (itemId: string): string | null => {
     const item = items.find((candidate) => candidate.id === itemId);
-    return item !== undefined && trainingRule(item) !== undefined;
+    if (!item) {
+      return null;
+    }
+    if (trainingRule(item)) {
+      return 'scegli chi sale di forma';
+    }
+    if (travelRule(item)) {
+      return 'scegli dove va la pedina';
+    }
+    return rechargesStarter(item) ? 'ricarica il potere dello starter' : null;
   };
   const nameOf = (characterId: string) =>
     catalog.find((character) => character.id === characterId)?.name ?? characterId;
@@ -83,35 +97,39 @@ export function PlayerPanel(props: PlayerPanelProps) {
         </span>
       </header>
 
-      <ol className={styles.team}>
-        {slots.map((characterId, index) => (
-          <li key={index} className={characterId ? styles.slot : styles.emptySlot}>
-            {characterId && (
-              <>
-                <Placeholder
-                  name={nameOf(characterId)}
-                  characterId={characterId}
-                  imageData={ownImage(catalog, characterId)}
-                />
-                {characterId === player.starterId && (
-                  <span className={styles.starter} title="Starter">
-                    ★
-                  </span>
-                )}
-                {actions && (
-                  <button
-                    className={styles.remove}
-                    title={`Togli ${nameOf(characterId)}`}
-                    onClick={() => actions.removeCharacter(characterId)}
-                  >
-                    ×
-                  </button>
-                )}
-              </>
-            )}
-          </li>
-        ))}
-      </ol>
+      <div className={styles.teamRow}>
+        <ol className={styles.team}>
+          {slots.map((characterId, index) => (
+            <li key={index} className={characterId ? styles.slot : styles.emptySlot}>
+              {characterId && (
+                <>
+                  <Placeholder
+                    name={nameOf(characterId)}
+                    characterId={characterId}
+                    imageData={ownImage(catalog, characterId)}
+                  />
+                  {characterId === player.starterId && (
+                    <span className={styles.starter} title="Starter">
+                      ★
+                    </span>
+                  )}
+                  {actions && (
+                    <button
+                      className={styles.remove}
+                      title={`Togli ${nameOf(characterId)}`}
+                      onClick={() => actions.removeCharacter(characterId)}
+                    >
+                      ×
+                    </button>
+                  )}
+                </>
+              )}
+            </li>
+          ))}
+        </ol>
+        {/* On the stream the items are pictures at the right of the team: the panel never grows (spec 045). */}
+        {!actions && <CarriedItems itemIds={player.inventory} itemName={itemName} />}
+      </div>
 
       {actions && extras.length > 0 && (
         <div className={styles.extras}>
@@ -172,16 +190,17 @@ export function PlayerPanel(props: PlayerPanelProps) {
         </p>
       )}
 
-      {(player.inventory.length > 0 || actions) && (
+      {actions && (
         <div className={styles.inventory}>
           {player.inventory.map((itemId, index) => (
             <span key={`${itemId}-${index}`} className={styles.item}>
+              <ItemPicture name={itemName(itemId)} className={styles.itemIcon} />
               {itemName(itemId)}
-              {actions && isTraining(itemId) && (
+              {actions && useHint(itemId) && (
                 <button
                   className={styles.use}
-                  title={`Usa ${itemName(itemId)}: scegli chi sale di forma`}
-                  onClick={() => actions.trainItem(itemId)}
+                  title={`Usa ${itemName(itemId)}: ${useHint(itemId)}`}
+                  onClick={() => actions.useItem(itemId)}
                 >
                   Usa
                 </button>
@@ -242,6 +261,55 @@ export function PlayerPanel(props: PlayerPanelProps) {
         </p>
       )}
     </section>
+  );
+}
+
+/** The picture of an item, if the host has one (spec 045). */
+function ItemPicture({ name, className }: { name: string; className?: string }) {
+  const image = itemImage(name);
+  return image ? <img className={className} src={image} alt="" /> : null;
+}
+
+/** Size and gap of the item pictures, as .carriedItem in PlayerPanel.module.css. */
+const CARRIED_SIZE = 80;
+const CARRIED_GAP = 6;
+
+/**
+ * The items on the stream, in the room at the right of the team: pictures
+ * only (a name for an item without one), as many as fit, then "+N".
+ */
+function CarriedItems({ itemIds, itemName }: { itemIds: string[]; itemName: (itemId: string) => string }) {
+  const room = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState(Infinity);
+
+  useLayoutEffect(() => {
+    const element = room.current;
+    if (!element) {
+      return;
+    }
+    const measure = () => setFit(placesIn(element.clientWidth, CARRIED_SIZE, CARRIED_GAP));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const { shown, more } = visibleItems(itemIds, fit);
+  return (
+    <div ref={room} className={styles.carried}>
+      {shown.map((itemId, index) => {
+        const name = itemName(itemId);
+        const image = itemImage(name);
+        return image ? (
+          <img key={`${itemId}-${index}`} className={styles.carriedItem} src={image} alt={name} title={name} />
+        ) : (
+          <span key={`${itemId}-${index}`} className={styles.carriedName}>
+            {name}
+          </span>
+        );
+      })}
+      {more > 0 && <span className={styles.carriedMore}>+{more}</span>}
+    </div>
   );
 }
 

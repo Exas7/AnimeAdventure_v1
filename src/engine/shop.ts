@@ -151,11 +151,12 @@ export function rechargeablePower(state: GameState, playerId: PlayerId): PowerSt
 }
 
 /**
- * Senzu: recharges the first rechargeable power of the buyer's starter.
+ * Senzu: recharges the first rechargeable power of the buyer's starter,
+ * when it is bought or, from the inventory, with "Usa" (spec 047).
  * A manual power gets one use back; extra starting coins are paid again.
  * With nothing to recharge it does nothing (the turn rules warned before).
  */
-function rechargeStarter(
+export function rechargeStarter(
   state: GameState,
   playerId: PlayerId,
   item: ItemDefinition,

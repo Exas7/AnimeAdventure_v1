@@ -6,17 +6,18 @@ import { tierRank } from '../episode/fill';
 import { randomEpisode } from '../episode/stepRandomize';
 import { EMPTY_TEXT_LIBRARY } from '../episode/textLibrary';
 import { DEFAULT_READY_POWERS } from '../starters/readyPowers';
+import { boardSize, cellRadius, cellsOffBoard } from '../ui/boardModel';
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 import { includedMapId, isIncludedMapId, listIncludedMaps, readIncludedMaps } from './includedMaps';
 
 describe('the lists that come with the app (spec 030, criterion 5)', () => {
-  it('read without errors: 166 characters, 45 missions, 45 questions', () => {
+  it('read without errors: 166 characters, 128 missions, 60 questions', () => {
     const catalog = includedCatalog();
     expect(catalog).toHaveLength(166);
     expect(catalog.filter((character) => character.possibleStarter)).toHaveLength(24);
-    // Spec 031: 5 new missions, for fewer fights (it was 39); spec 034: Cell + Cell Jr.
-    expect(includedMissions(catalog)).toHaveLength(45);
-    expect(includedQuestions()).toHaveLength(45);
+    // Spec 043: the catalog rewritten (it was 45 after specs 031 and 034), 20 questions for each level (it was 45).
+    expect(includedMissions(catalog)).toHaveLength(128);
+    expect(includedQuestions()).toHaveLength(60);
   });
 
   it('the challenge Cell + Cell Jr., given by Cell (forma perfetta) (spec 034, criterion 7)', () => {
@@ -176,6 +177,50 @@ describe('the maps that come with the app (spec 030, criterion 6)', () => {
     }
   });
 
+  it('cells and paths keep apart and inside the background (spec 044, criterion 3; spec 046, criterion 3)', async () => {
+    for (const { map } of (await listIncludedMaps()).maps) {
+      const size = boardSize(map);
+      const at = new Map(map.nodes.map((node) => [node.id, { x: node.x * size.width, y: node.y * size.height }]));
+      const place = (id: string) => at.get(id) as { x: number; y: number };
+      const radius = (id: string) => cellRadius(map.nodes.find((node) => node.id === id)?.type ?? 'empty');
+      // Measured here on straight lines: the default maps have no curved paths.
+      expect(map.edges.filter((edge) => edge.curve.length > 0), map.name).toEqual([]);
+      // Spec 046: at least 10 units between two cells (spec 044 allowed the overlaps of before, 8 at most).
+      const touching: string[] = [];
+      for (const [index, a] of map.nodes.entries()) {
+        for (const b of map.nodes.slice(index + 1)) {
+          const gap =
+            Math.hypot(place(a.id).x - place(b.id).x, place(a.id).y - place(b.id).y) - radius(a.id) - radius(b.id);
+          if (gap < 10) {
+            touching.push(`${a.id}-${b.id}`);
+          }
+        }
+      }
+      expect(touching, map.name).toEqual([]);
+      // Spec 046: a path at least 10 units from the cells it does not join (spec 044 allowed two over a cell).
+      const over: string[] = [];
+      for (const edge of map.edges) {
+        for (const node of map.nodes.filter((entry) => entry.id !== edge.from && entry.id !== edge.to)) {
+          if (segmentDistance(place(node.id), place(edge.from), place(edge.to)) < radius(node.id) + 10) {
+            over.push(`${edge.from}-${edge.to} over ${node.id}`);
+          }
+        }
+      }
+      expect(over, map.name).toEqual([]);
+      const crossing: string[] = [];
+      for (const [index, a] of map.edges.entries()) {
+        for (const b of map.edges.slice(index + 1)) {
+          const shared = [a.from, a.to].some((id) => id === b.from || id === b.to);
+          if (!shared && segmentsCross(place(a.from), place(a.to), place(b.from), place(b.to))) {
+            crossing.push(`${a.from}-${a.to} x ${b.from}-${b.to}`);
+          }
+        }
+      }
+      expect(crossing, map.name).toEqual([]);
+      expect(cellsOffBoard(map), map.name).toEqual([]);
+    }
+  });
+
   it('the two starts are near two opposite corners (spec 036, criterion 3)', async () => {
     for (const { map } of (await listIncludedMaps()).maps) {
       const [a, b] = map.nodes.filter((node) => node.type === 'start');
@@ -204,4 +249,28 @@ function seeded(seed: number): () => number {
     value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
     return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/** Distance from a point to the straight path between two cells. */
+function segmentDistance(
+  point: { x: number; y: number },
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): number {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = dx * dx + dy * dy || 1;
+  const t = Math.max(0, Math.min(1, ((point.x - from.x) * dx + (point.y - from.y) * dy) / length));
+  return Math.hypot(point.x - from.x - t * dx, point.y - from.y - t * dy);
+}
+
+/** Whether two straight paths cross each other, away from their ends. */
+function segmentsCross(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  c: { x: number; y: number },
+  d: { x: number; y: number },
+): boolean {
+  const side = (p: typeof a, q: typeof a, r: typeof a) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+  return side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0;
 }

@@ -20,7 +20,8 @@ import { emptyOutput, notify, warn, type ActionOutput } from './output';
 import { applyPower, firePowers } from './powers';
 import { isRepeatInteraction, turnRuleWarnings } from './rules';
 import { setCellContent, warnIfElsewhere } from './cells';
-import { buyCharacter, buyItem } from './shop';
+import { travelRule, rechargesStarter } from './itemUse';
+import { buyCharacter, buyItem, rechargeStarter } from './shop';
 import { joinTeam, addToTeam, removeFromTeam, transformInTeam } from './team';
 import { useTraining } from './training';
 import {
@@ -86,6 +87,9 @@ export function applyAction(
       break;
     case 'useTraining':
       useTraining(draft, context, action.player, action.itemId, action.choices, out);
+      break;
+    case 'useItem':
+      useItem(draft, context, action, out);
       break;
     case 'setConquest':
       setConquest(draft, action.nodeId, action.player, context, out);
@@ -235,6 +239,47 @@ function interact(
   }
 
   firePowers(state, state.currentPlayer, (trigger) => trigger.type === 'interaction', out);
+}
+
+/**
+ * "Usa" (spec 047, D-074): the Senzu recharges the starter as when it is
+ * bought; a travel item takes its owner's pawn to the cell, as the move of
+ * the turn when it is their turn (no action otherwise, as a correction,
+ * D-033). Either way the item is used up. Past the reach or the actions,
+ * the turn rules warned before (D-013).
+ */
+function useItem(
+  state: GameState,
+  context: GameContext,
+  action: Extract<GameAction, { type: 'useItem' }>,
+  out: ActionOutput,
+): void {
+  const player = state.players[action.player];
+  const item = findItem(context.items, action.itemId);
+  const index = player.inventory.indexOf(item.id);
+  if (index === -1) {
+    throw new EngineError(`Item "${action.itemId}" is not in the inventory`);
+  }
+  if (action.to === undefined) {
+    if (!rechargesStarter(item)) {
+      throw new EngineError(`Item "${action.itemId}" has no effect to use`);
+    }
+    player.inventory.splice(index, 1);
+    rechargeStarter(state, action.player, item, out);
+    return;
+  }
+  if (!travelRule(item)) {
+    throw new EngineError(`Item "${action.itemId}" does not move the pawn`);
+  }
+  findNode(context.map, action.to);
+  player.inventory.splice(index, 1);
+  movePawn(state, action.player, action.to);
+  if (action.player === state.currentPlayer) {
+    state.actions.used += 1;
+  }
+  const where = cellLabel(state, context.map, context.catalog, action.to);
+  // The log line "G1 usa ...: va su ..." already says it (spec 041, 7).
+  notify(state, out, `${player.name} · ${item.name}: su ${where}`, { inLog: false });
 }
 
 /** Puts a pawn on a cell. The current player leaving a cell can interact there again (spec 020). */

@@ -34,7 +34,8 @@ export {
   rewardText,
   type PanelMission,
 } from './missions';
-export { isAdjacent, isRepeatInteraction, turnRuleWarnings } from './rules';
+export { isAdjacent, isRepeatInteraction, reachableCells, turnRuleWarnings } from './rules';
+export { rechargesStarter, travelRule } from './itemUse';
 export {
   characterPrice,
   itemPrice,

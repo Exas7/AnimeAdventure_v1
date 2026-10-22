@@ -53,6 +53,9 @@ function actionKey(action: GameAction): string {
     // The other player's pawn: confirmed by a second drop on the same cell (D-033).
     case 'placePawn':
       return `placePawn:${action.player}:${action.nodeId}`;
+    // "Usa" (spec 047): the same item again, on the same cell for a travel item.
+    case 'useItem':
+      return `useItem:${action.player}:${action.itemId}:${action.to ?? ''}`;
     default:
       return action.type;
   }

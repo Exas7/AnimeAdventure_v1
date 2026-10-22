@@ -93,6 +93,22 @@
   opacity: 0.5;
 }
 
+/* A cell a travel item can reach (spec 047): a pulsing ring, on director and stream. */
+.reachable {
+  fill: none;
+  stroke: #facc15;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 6px #facc15);
+  pointer-events: none;
+  animation: reachable-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes reachable-pulse {
+  50% {
+    stroke-opacity: 0.35;
+  }
+}
+
 .conquered .placeholder {
   fill: #9ca3af;
 }

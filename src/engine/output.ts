@@ -16,11 +16,21 @@ export function warn(out: ActionOutput, kind: WarningKind, message: string): voi
   out.warnings.push({ kind, message });
 }
 
-/** Shows a message on screen, stream included, and writes it in the log. */
-export function notify(state: GameState, out: ActionOutput, text: string): void {
+/**
+ * Shows a message on screen, stream included, and writes it in the log;
+ * `inLog: false` when the log line of the action already says it.
+ */
+export function notify(
+  state: GameState,
+  out: ActionOutput,
+  text: string,
+  { inLog = true }: { inLog?: boolean } = {},
+): void {
   state.notifications.push({ id: state.nextNotificationId, text });
   state.nextNotificationId += 1;
-  out.events.push(text);
+  if (inLog) {
+    out.events.push(text);
+  }
 }
 
 export function signed(amount: number): string {

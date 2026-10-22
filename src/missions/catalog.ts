@@ -30,9 +30,34 @@ export interface CatalogMission {
   weight: number;
 }
 
+/** How hard a quiz question is (spec 043, D-069). */
+export type QuestionLevel = 'easy' | 'medium' | 'hard';
+
+export const QUESTION_LEVELS: { level: QuestionLevel; label: string; plural: string }[] = [
+  { level: 'easy', label: 'facile', plural: 'facili' },
+  { level: 'medium', label: 'media', plural: 'medie' },
+  { level: 'hard', label: 'difficile', plural: 'difficili' },
+];
+
 /** A question of the quiz library (spec 027, 2.3). */
 export interface QuestionEntry extends QuizQuestion {
   id: string;
+  /** Without a level (saved before spec 043) a question is good for any level. */
+  level?: QuestionLevel;
+}
+
+/** "60 domande: 20 facili, 20 medie, 20 difficili, 3 senza livello." */
+export function questionCount(questions: QuestionEntry[]): string {
+  const parts = [
+    ...QUESTION_LEVELS.map((entry) => {
+      const count = questions.filter((question) => question.level === entry.level).length;
+      return { count, label: count === 1 ? entry.label : entry.plural };
+    }),
+    { count: questions.filter((question) => question.level === undefined).length, label: 'senza livello' },
+  ].filter((part) => part.count > 0);
+  return `${questions.length} ${questions.length === 1 ? 'domanda' : 'domande'}: ${parts
+    .map((part) => `${part.count} ${part.label}`)
+    .join(', ')}.`;
 }
 
 export function newCatalogId(): string {
@@ -118,6 +143,7 @@ export function looksLikeQuestion(value: unknown): value is QuestionEntry {
     typeof entry.question === 'string' &&
     Array.isArray(entry.answers) &&
     entry.answers.every((answer) => typeof answer === 'string') &&
-    typeof entry.correct === 'number'
+    typeof entry.correct === 'number' &&
+    (entry.level === undefined || QUESTION_LEVELS.some((level) => level.level === entry.level))
   );
 }

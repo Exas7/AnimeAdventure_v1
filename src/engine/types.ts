@@ -243,6 +243,11 @@ export interface ItemDefinition {
   onPurchase?: 'rechargeStarter';
   /** Training items (spec 041, D-067): "Usa" makes characters of the team take later forms. */
   training?: TrainingRule;
+  /**
+   * Travel items (spec 047, D-074): "Usa" moves the pawn at most `steps`
+   * paths away along the paths open for the player; null for any distance.
+   */
+  travel?: { steps: number | null };
 }
 
 /**
@@ -426,7 +431,9 @@ export type GameAction =
   // simulated fight take their new form in the team.
   | { type: 'transformCharacters'; player: PlayerId; changes: { from: string; to: string }[] }
   // "Usa" on a training item (spec 041): the chosen characters take later forms, the item is used up.
-  | { type: 'useTraining'; player: PlayerId; itemId: string; choices: TrainingChoice[] };
+  | { type: 'useTraining'; player: PlayerId; itemId: string; choices: TrainingChoice[] }
+  // "Usa" on a Senzu (no `to`) or on a travel item, whose pawn goes `to` a cell (spec 047).
+  | { type: 'useItem'; player: PlayerId; itemId: string; to?: string };
 
 export type RecordedAction = { type: 'startGame' } | GameAction;
 
@@ -457,7 +464,9 @@ export type WarningKind =
   | 'missionAlreadyActive'
   | 'missionTaken'
   // A training item used past its rule (spec 041).
-  | 'trainingRule';
+  | 'trainingRule'
+  // A travel item taking the pawn beyond its reach (spec 047).
+  | 'travelRange';
 
 /** Non-blocking warning for the host, shown only in the director window (D-008). */
 export interface Warning {

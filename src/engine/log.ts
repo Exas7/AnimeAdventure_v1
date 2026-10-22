@@ -64,6 +64,10 @@ function describeAction(action: RecordedAction, before: GameState, context: Game
       const changes = action.changes.map((change) => `${character(change.from)} → ${character(change.to)}`);
       return `Squadra di ${name(action.player)} aggiornata: ${changes.join(', ')}`;
     }
+    case 'useItem':
+      return action.to === undefined
+        ? `${name(action.player)} usa ${item(action.itemId)}`
+        : `${name(action.player)} usa ${item(action.itemId)}: va su ${cell(action.to)}`;
     case 'useTraining': {
       const changes = trainingChanges(context.catalog, action.choices);
       return `${name(action.player)} usa ${item(action.itemId)}: ${trainingChangesText(context.catalog, changes)}`;

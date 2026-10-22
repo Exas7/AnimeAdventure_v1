@@ -1,46 +1,129 @@
 ﻿chi;tipo;formato;condizione;avversari;obiettivo;e torna;turni;testo;recluta;premio personaggi;premio monete;premio oggetti;dietro;peso;battute
-cattivi;combattimento;;vincere;;;;;;sì;;;;;3;Pensi davvero di potermi battere? | Fatti sotto!
-cattivi;combattimento;;vincere;;;;;;sì;;;;;2;Sei arrivato fin qui solo per farti male. | Vinci, e combatterò per te.
-arruolabili;combattimento;;vincere;;;;;;sì;;;;;4;Vediamo quanto sei forte! | Battimi e verrò con te.
+cattivi;combattimento;;vincere;;;;;;sì;;;;;2;Sei arrivato fin qui solo per farti male. | Battimi, e combatterò per te.
+cattivi;combattimento;;vincere;;;;;;sì;;;;;2;Pensi davvero di potermi battere? | Fatti sotto: se vinci, sarò tuo alleato.
+cattivi;combattimento;;vincere;;;;;;sì;;;;;1;Finalmente qualcuno da distruggere! | Se riesci a battermi, ti seguirò.
+cattivi;quiz;;;;;;;;sì;;;;;2;I muscoli non bastano: voglio un alleato sveglio. | Rispondi giusto e combatterò per te.
+cattivi;salta turni;;;;;;1;;sì;;;;;1;Io non prendo ordini da nessuno. | Lavora per me {n} turno, poi ti seguirò.
+arruolabili;combattimento;;vincere;;;;;;sì;;;;;2;Vediamo quanto sei forte! | Battimi e verrò con te.
+arruolabili;combattimento;;vincere;;;;;;sì;;;;;2;Non mi unisco a chi non sa combattere. | Battimi e sarò dei vostri.
+arruolabili;combattimento;;vincere;;;;;;sì;;;;;1;Un vero scontro vale più di mille parole. | Battimi e combatterò al tuo fianco.
 arruolabili;quiz;;;;;;;;sì;;;;;2;Prima di seguirti voglio sapere quanto ne sai. | Rispondi giusto e sarò dei vostri.
-arruolabili;vai da;;;;;sì;;;sì;;;;;1;Porta i miei saluti a {obiettivo} e torna da me. | Poi mi unirò a te.
-arruolabili;porta;;;;;;;;sì;;;;;1;Combatterò al tuo fianco solo se c'è anche {obiettivo}. | Portamelo!
-arruolabili;batti;;;;;;;;sì;;;;;1;{obiettivo} mi ha umiliato. | Battilo e sarò tuo alleato.
-storia;attendi;;;;;;2;;;;400;;;2;Aiutami ancora un po': ripassa tra {n} turni. | Avrai {premio}.
-storia;salta turni;;;;;;1;;;;600;;;1;Resta qui {n} turno a darmi una mano. | Ti ricompenserò con {premio}.
-storia;quiz;;;;;;;;;;300;;;2;Una domanda per te: rispondi bene e avrai {premio}.
-storia;vai da;;;;;sì;;;;;500;;;1;Porta questo messaggio a {obiettivo} e torna da me. | Avrai {premio}.
-Chichi (adulta);attendi;;;;;;3;;;Son Goten;;;;1;Goku è sempre in giro ad allenarsi... | Ripassa tra {n} turni: ti presento {premio}!
+arruolabili;attendi;;;;;;2;;sì;;;;;1;Devo finire il mio allenamento. | Torna tra {n} turni e verrò con te.
+arruolabili;salta turni;;;;;;1;;sì;;;;;1;Allenarsi da soli non serve a niente. | Allenati con me per {n} turno e poi verrò con te.
+storia;attendi;;;;;;2;;;;400;;;2;Ho mille cose da fare e nessuno che mi aiuti. | Ripassa tra {n} turni e avrai {premio}.
+storia;salta turni;;;;;;1;;;;600;;;1;Mi serve una mano, subito. | Resta qui {n} turno ad aiutarmi e avrai {premio}.
+storia;quiz;;;;;;;;;;300;;;2;Vediamo se sei preparato. | Rispondi giusto e avrai {premio}.
+Chichi (adulta);attendi;;;;;;3;;;Son Goten;;;;2;Goku è sempre in giro ad allenarsi... | Ripassa tra {n} turni: ti presento {premio}!
+Chichi (adulta);quiz;;;;;;;;;;300;;;1;Mio figlio deve studiare, non fare a botte! | Rispondi giusto e avrai {premio}.
 Bulma;attendi;;;;;;3;;;Trunks (bambino);;;;1;Vegeta non si accorge di niente... | Torna tra {n} turni e avrai {premio}!
-Bobbidi;combattimento;2v2;vincere;Dabura | Majin Buu (buono);;;;;;;800;Senzu;;1;Io non mi sporco le mani! | Dabura, Majin Bu: pensateci voi!
-Tapion;batti;;;;Hildegarn;;;;sì;;;;;1;Hildegarn sta per risvegliarsi. | Battilo e il mio flauto suonerà per te.
+Bobbidi;combattimento;2v2;vincere;Dabura | Majin Buu (buono);;;;;;;800;Senzu;;1;Io non mi sporco le mani! | Dabura, Majin Bu: pensateci voi! Batteteli e avrai {premio}.
 Cooler;combattimento;1v1;trasformazione;;;;;;sì;;;;Metal Cooler;1;Mio fratello non era alla mia altezza. | Costringimi a trasformarmi, se ci riesci!
-Freeza (prima forma);combattimento;1v1;trasformazione;;;;;;sì;;;;Freeza (forma finale);1;Non hai idea di quante trasformazioni mi restino. | Prova a farmene usare una!
-Cell (prima forma);combattimento;;trasformazione;;;;;;sì;;;;Cell (perfetto, massima potenza);1;Mi manca poco per diventare perfetto... | Fammi trasformare e capirai il tuo errore.
-Zarbon;combattimento;1v1;trasformazione;;;;;;sì;;;;;1;Non costringermi a mostrarti il mio vero aspetto!
-Ginyu;combattimento;2v2;vincere;Recoome | Butter;;;;;sì;;;;;1;Squadra Ginyu, in posizione! | Battete i miei uomini e sarò vostro.
-Vegeta (scouter);combattimento;;trasformazione;;;;;;sì;;;;;1;Il principe dei Saiyan non perde. | Se mi costringi a trasformarmi, ti seguirò.
-Broli;combattimento;;trasformazione;;;;;;sì;;;;;1;Kakaroth... | KAKAROTH!
-Son Goten;porta;;;;Trunks (bambino);;;;sì;;;;;1;Senza Trunks non vengo da nessuna parte! | Portami {obiettivo} e veniamo tutti e due.
-Trunks (bambino);porta;;;;Son Goten;;;;sì;;;;;1;Goten dov'è? Senza di lui ci si annoia. | Portami {obiettivo}!
-Krilin;porta;;;;C-18;;;;sì;;;;;1;Vengo volentieri... se viene anche C-18! | Portami {obiettivo}.
-Son Gohan (bambino);vai da;;;;Piccolo (inizio);sì;;;sì;;;;;1;Il signor Piccolo mi starà aspettando. | Accompagnami da {obiettivo} e poi torniamo qui.
-Piccolo (inizio);batti;;;;Raditz;;;;sì;;;;;1;Ho un conto in sospeso con {obiettivo}. | Battilo e combatterò al tuo fianco.
-Bardock;batti;;;;Freeza (prima forma);;;;sì;;;;;1;Freeza ha distrutto il mio pianeta. | Batti {obiettivo} e avrai la mia forza.
-Kaioshin;batti;;;;Dabura;;;;sì;;;;;1;Dabura serve Bobbidi: va fermato. | Batti {obiettivo} e ti aiuterò.
-Videl;vai da;;;;Great Saiyaman;sì;;;sì;;;;;1;Chi si nasconde dietro Great Saiyaman? | Vai da lui e torna a dirmelo!
-Great Saiyaman;quiz;;;;;;;;sì;;;;;1;La giustizia trionfa sempre! | Rispondi giusto e combatterò con te.
-Pan;porta;;;;Son Goku (GT);;;;sì;;;;;1;Nonno Goku viene con noi? | Portami {obiettivo}!
-Majin Buu (buono);attendi;;;;;;1;;sì;;;;;1;Bu ha fame! | Aspetta {n} turno che finisco i dolci.
-Muten Roshi (massima potenza);quiz;;;;;;;;sì;;;;;1;Un vero allievo conosce la storia delle arti marziali. | Rispondi alla domanda del maestro!
-Yamcha;quiz;;;;;;;;sì;;;;;1;Ho studiato tanto, sai? | Rispondi meglio di me e vengo con te.
+Freeza (prima forma);combattimento;1v1;trasformazione;;;;;;sì;;;;Freeza (forma finale);1;Non hai idea di quante trasformazioni mi restino. | Costringimi a usarne una, se ci riesci!
+Cell (prima forma);combattimento;;trasformazione;;;;;;sì;;;;Cell (perfetto, massima potenza);1;Mi manca poco per diventare perfetto... | Costringimi a trasformarmi e capirai il tuo errore.
+Son Goku (bambino);batti;;;;Tao Pai Pai;;;;sì;;;;;1;Tao Pai Pai ha ucciso il papà di Upa. | Batti {obiettivo} e verrò con te.
+Tao Pai Pai (cyborg);batti;;;;Tenshinhan;;;;sì;;;;;1;Tenshinhan ha tradito il suo maestro. | Batti {obiettivo} e il killer più famoso del mondo lavorerà per te.
+Tenshinhan;batti;;;;Tao Pai Pai;;;;sì;;;;;2;Tao Pai Pai era il mio maestro: ora è solo un assassino. | Batti {obiettivo} e verrò con te.
 Tenshinhan;vai da;;;;Krilin;sì;;;sì;;;;;1;Krilin non si fa vivo da un po'. | Vai a trovare {obiettivo} e torna: poi partiamo.
+Piccolo Daimao;porta;;;;Tambourine;;;;sì;;;;;1;Tambourine è il più fedele dei miei figli. | Portami {obiettivo} e il Grande Mago Piccolo combatterà per te.
+Tambourine;vai da;;;;Piccolo Daimao;sì;;;sì;;;;;1;Devo fare rapporto al Grande Mago Piccolo. | Vai da {obiettivo} e torna: poi verrò con te.
+Krilin;batti;;;;Tambourine;;;;sì;;;;;1;Al torneo un demone mi ha colto alle spalle... | Batti {obiettivo} e verrò con te.
+Yamcha;quiz;;;;;;;;sì;;;;;1;Ho studiato tanto, sai? | Rispondi meglio di me e vengo con te.
+C-8;vai da;;;;Son Goku (bambino);sì;;;sì;;;;;1;Goku mi ha salvato dall'esercito del Red Ribbon. | Portagli i miei saluti: vai da {obiettivo} e torna, poi verrò con te.
+Muten Roshi (massima potenza);combattimento;;vincere;;;;;;sì;;;;;1;Anche un vecchio maestro ha ancora qualche asso nella manica. | Battimi e verrò con te.
+Garlic Jr.;combattimento;;trasformazione;;;;;;sì;;;;;1;Con le sfere del drago sono diventato immortale. | Costringimi a trasformarmi e combatterò per te.
+Son Goku (inizio);batti;;;;Raditz;;;;sì;;;;;1;Raditz dice di essere mio fratello e ha rapito Gohan! | Batti {obiettivo} e verrò con te.
+Piccolo (inizio);batti;;;;Raditz;;;;sì;;;;;1;Ho un conto in sospeso con {obiettivo}. | Battilo e combatterò al tuo fianco.
+Raditz;porta;;;;Son Gohan (bambino);;;;sì;;;;;1;Kakaroth non vuole unirsi a me? Prenderò suo figlio. | Portami {obiettivo} e verrò con te.
+Son Gohan (bambino);vai da;;;;Piccolo (inizio);sì;;;sì;;;;;1;Il signor Piccolo mi starà aspettando. | Accompagnami da {obiettivo}, poi torniamo qui e verrò con te.
+Nappa;combattimento;2v2;vincere;Nappa | Saibaiman;;;;;sì;;;;;1;Saibaiman, uscite dal terreno! | Battete me e il mio Saibaiman, e vi seguirò.
+Vegeta (scouter);combattimento;;trasformazione;;;;;;sì;;;;;1;Il principe dei Saiyan non perde contro nessuno. | Costringimi a trasformarmi e ti seguirò.
+Vegeta (scouter);batti;;;;Kyui;;;;sì;;;;;1;Kyui si crede alla mia altezza. Che illuso. | Batti {obiettivo} e verrò con te.
+Re Vegeta;batti;;;;Freeza (prima forma);;;;sì;;;;;1;Freeza tiene in pugno il popolo dei Saiyan. | Batti {obiettivo} e il re dei Saiyan combatterà per te.
+Bardock;batti;;;;Freeza (prima forma);;;;sì;;;;;1;Freeza vuole distruggere il mio pianeta. | Batti {obiettivo} e avrai la mia forza.
+Selypa;batti;;;;Dodoria;;;;sì;;;;;1;Gli uomini di Dodoria hanno sterminato la nostra squadra. | Batti {obiettivo} e verrò con te.
+Son Goku (metà);salta turni;;;;;;1;;sì;;;;;1;Sto andando su Nameck: in astronave mi alleno a cento volte la gravità. | Allenati con me per {n} turno e verrò con te.
+Son Goku (metà);batti;;;;Ginyu;;;;sì;;;;;1;La Squadra Ginyu sta attaccando i miei amici. | Batti {obiettivo} e verrò con te.
+Son Goku (metà) SSJ;batti;;;;Freeza (forma finale);;;;sì;;;;;1;Freeza ha ucciso Krilin: per questo sono diventato Super Saiyan. | Batti {obiettivo} e combatterò al tuo fianco.
 Nail;batti;;;;Zarbon;;;;sì;;;;;1;Il pianeta Nameck è in pericolo. | Batti {obiettivo} e combatterò per te.
-Uub;combattimento;;vincere;;;;;;sì;;;;;1;Il signor Goku mi ha detto di allenarmi. | Battimi e vengo con te!
-Hildegarn;combattimento;3v3;vincere;;;;;;sì;;;;;1;...
-cattivi;batti;;;;;;;;sì;;;;;2;Vuoi che mi unisca a te? Prima batti {obiettivo}. | Poi ne riparliamo.
-cattivi;porta;;;;;;;;sì;;;;;1;Portami {obiettivo}. | Allora combatterò al tuo fianco.
-cattivi;quiz;;;;;;;;sì;;;;;1;Rispondi giusto, o te ne pentirai! | Se indovini, vengo con te.
-arruolabili;salta turni;;;;;;1;;sì;;;;;1;Allenati con me per {n} turno. | Poi verrò con te.
-arruolabili;attendi;;;;;;2;;sì;;;;;1;Torna tra {n} turni. | Sarò pronto a seguirti.
+Zarbon;combattimento;1v1;trasformazione;;;;;;sì;;;;;1;Non costringermi a mostrarti il mio vero aspetto! | Se ci riesci, verrò con te.
+Zarbon (trasformato);batti;;;;Vegeta (scouter);;;;sì;;;;;1;Quella scimmia di Vegeta si è presa gioco di me. | Batti {obiettivo} e combatterò per te.
+Dodoria;batti;;;;Bardock;;;;sì;;;;;1;Un Saiyan è sopravvissuto alla mia squadra. | Batti {obiettivo} e verrò con te.
+Ginyu;combattimento;2v2;vincere;Recoome | Guldo;;;;;sì;;;;;1;Squadra Ginyu, in posizione! | Battete Recoome e Guldo e sarò dei vostri.
+Recoome;batti;;;;Vegeta (scouter);;;;sì;;;;;1;Il principe dei Saiyan? L'ho già fatto piangere una volta. | Batti {obiettivo} e verrò con te.
+Guldo;salta turni;;;;;;1;;sì;;;;;1;Ho fermato il tempo! | Resta immobile per {n} turno, poi verrò con te.
+Butter;combattimento;2v2;vincere;Butter | Jeeth;;;;;sì;;;;;1;Sono il guerriero più veloce dell'universo! | Battete me e Jeeth, e verrò con voi.
+Jeeth;combattimento;2v2;vincere;Jeeth | Butter;;;;;sì;;;;;1;Io e Butter colpiamo sempre in coppia. | Battete tutti e due e verrò con voi.
+Freeza (seconda forma);combattimento;;trasformazione;;;;;;sì;;;;;1;La mia potenza supera il milione. | Costringimi a trasformarmi di nuovo e verrò con te.
+Freeza (terza forma);combattimento;;trasformazione;;;;;;sì;;;;;1;Questa forma non piace a nessuno, nemmeno a me. | Costringimi alla forma finale e verrò con te.
+Freeza (forma finale);combattimento;;trasformazione;;;;;;sì;;;;;1;Finora ho usato solo una parte della mia forza. | Costringimi alla massima potenza e Freeza combatterà per te.
+Trunks (spada);vai da;;;;Son Goku (metà) SSJ;sì;;;sì;;;;;1;Vengo dal futuro con un avvertimento per Son Goku. | Vai da {obiettivo} e torna: poi combatterò con te.
+Trunks (spada) SSJ;batti;;;;Mecha Freeza;;;;sì;;;;;1;Freeza è tornato, ricostruito come una macchina. | Batti {obiettivo} e la mia spada sarà tua.
+Mecha Freeza;porta;;;;Re Cold;;;;sì;;;;;1;Mio padre mi ha ricostruito: ora voglio vendetta. | Portami {obiettivo} e verrò con te.
+Trunks;porta;;;;Vegeta;;;;sì;;;;;1;Nel mio futuro non ho mai conosciuto mio padre. | Portami {obiettivo} e verrò con te.
+Trunks SSJ;batti;;;;Cell (prima forma);;;;sì;;;;;1;Cell viene dal mio futuro: là ha già vinto. | Batti {obiettivo} prima che diventi perfetto, e verrò con te.
+Super Trunks;batti;;;;Cell (forma perfetta);;;;sì;;;;;1;Ho più muscoli di Cell, ma sono troppo lento. | Batti {obiettivo} e verrò con te.
+Vegeta;salta turni;;;;;;1;;sì;;;;;1;Mi alleno nella stanza della gravità di Bulma. | Allenati con me per {n} turno e verrò con te.
+Vegeta SSJ;batti;;;;C-19;;;;sì;;;;;1;Sono diventato Super Saiyan anch'io. | Dimostrami che sei alla mia altezza: batti {obiettivo}.
+Super Vegeta;batti;;;;Cell (forma perfetta);;;;sì;;;;;1;Ho lasciato che Cell diventasse perfetto, per batterlo al suo meglio. | Batti {obiettivo} e verrò con te.
+Son Gohan (ragazzo);salta turni;;;;;;1;;sì;;;;;1;Papà mi allena nella Stanza dello Spirito e del Tempo. | Entra con noi per {n} turno e poi verrò con te.
+Son Gohan (ragazzo) SSJ;batti;;;;Cell Jr.;;;;sì;;;;;1;Cell ha liberato i suoi figli. | Batti {obiettivo} e combatterò al tuo fianco.
+Son Gohan (ragazzo) SSJ2;batti;;;;Cell (forma perfetta);;;;sì;;;;;1;Papà dice che tocca a me. | Batti {obiettivo} e combatterò per te.
+Piccolo (fine);batti;;;;C-17;;;;sì;;;;;1;Mi sono fuso con Kami per affrontare i cyborg. | Batti {obiettivo} e combatterò al tuo fianco.
+C-17;porta;;;;C-16;;;;sì;;;;;1;Abbiamo svegliato C-16: è uno strano tipo, ma è dei nostri. | Portami {obiettivo} e verrò con te.
+C-18;porta;;;;Krilin;;;;sì;;;;;1;Quel piccoletto pelato... non riesco a togliermelo dalla testa. | Portami {obiettivo} e verrò con te.
+C-18;porta;;;;C-17;;;;sì;;;;;1;Io e mio fratello non ci separiamo. | Portami {obiettivo} e combatterò per te.
+C-16;vai da;;;;Son Gohan (ragazzo);sì;;;sì;;;;;1;Gli uccelli e gli animali di questo pianeta vanno protetti. | Porta il mio messaggio a {obiettivo} e torna: poi combatterò con te.
+C-19;batti;;;;Son Goku (metà) SSJ;;;;sì;;;;;1;Il dottor Gero vuole Son Goku. Io voglio la sua energia. | Batti {obiettivo} e verrò con te.
+Dr. Gero (C-20);batti;;;;Son Goku (metà);;;;sì;;;;;1;Son Goku ha distrutto il mio esercito del Red Ribbon. | Batti {obiettivo} e i miei cyborg saranno tuoi.
+Cell (seconda forma);combattimento;;trasformazione;;;;;;sì;;;;;1;Ho assorbito C-17. Me ne manca solo una. | Costringimi a trasformarmi e verrò con te.
 Cell (forma perfetta);combattimento;2v2;vincere;Cell (forma perfetta) | Cell Jr.;;;;;sì;;;;;1;Ti presento mio figlio. | Battete noi due, e verrò con voi.
+Son Gohan (futuro);porta;;;;Trunks (spada);;;;sì;;;;;1;Nel mio futuro i cyborg hanno distrutto tutto: mi resta solo Trunks. | Portami {obiettivo} e combatteremo insieme.
+Son Gohan (futuro) SSJ;batti;;;;C-18;;;;sì;;;;;1;C-17 e C-18 seminano il terrore nel mio tempo. | Batti {obiettivo} e verrò con te.
+Cooler (forma finale);batti;;;;Son Goku (metà) SSJ;;;;sì;;;;;1;Il Saiyan che ha battuto mio fratello deve pagare. | Batti {obiettivo} e verrò con te.
+C-13;batti;;;;Son Goku (metà) SSJ;;;;sì;;;;;1;Il dottor Gero mi ha costruito per un solo scopo. | Batti {obiettivo} e combatterò per te.
+Turles;batti;;;;Son Goku (metà);;;;sì;;;;;1;Kakaroth e io sembriamo gemelli, ma il cattivo sono io. | Batti {obiettivo} e verrò con te.
+Slug;combattimento;;trasformazione;;;;;;sì;;;;;1;Il mio vero potere ha dimensioni enormi. | Costringimi a diventare gigante e verrò con te.
+Broli;combattimento;;trasformazione;;;;;;sì;;;;;1;Kakaroth... KAKAROTH! | Se mi fai trasformare, ti seguirò.
+Broli SSJ;batti;;;;Son Gohan (ragazzo) SSJ;;;;sì;;;;;1;Quel moccioso di Kakaroth mi ha già sfidato una volta. | Batti {obiettivo} e verrò con te.
+Zangya;batti;;;;Son Gohan (ragazzo);;;;sì;;;;;1;Bojack mi ha mandato a sfidare il ragazzo che ha battuto Cell. | Batti {obiettivo} e verrò con te.
+Bojack;porta;;;;Zangya;;;;sì;;;;;1;La mia squadra non lascia indietro nessuno. | Portami {obiettivo} e combatterò per te.
+Bojack (massima potenza);batti;;;;Son Gohan (ragazzo) SSJ2;;;;sì;;;;;1;Solo il ragazzo di Cell mi ha messo in difficoltà. | Batti {obiettivo} e verrò con te.
+Janemba;combattimento;;trasformazione;;;;;;sì;;;;;1;Il mondo dei morti è sottosopra per colpa mia! | Costringimi a trasformarmi e verrò con te.
+Paikuhan;batti;;;;Janemba;;;;sì;;;;;1;Nell'aldilà nessuno riesce a fermare Janemba. | Batti {obiettivo} e combatterò con te.
+Super Gogeta;batti;;;;Super Janemba;;;;sì;;;;;1;Goku e Vegeta, fusi per salvare l'aldilà. | Batti {obiettivo} e combatterò con te.
+Tapion;batti;;;;Hildegarn;;;;sì;;;;;1;Il demone Hildegarn sta per risvegliarsi. | Batti {obiettivo} e il mio flauto suonerà per te.
+Hildegarn;combattimento;3v3;vincere;;;;;;sì;;;;;1;GROOOAAAR! | Battilo con tre guerrieri e il demone sarà tuo.
+Arale;combattimento;;vincere;;;;;;sì;;;;;1;Ncha! Giochiamo a fare la lotta? | Battimi e vengo con te!
+Son Goku (fine);vai da;;;;Son Goten;sì;;;sì;;;;;1;Ho un giorno solo sulla Terra e non ho mai visto mio figlio Goten. | Vai da {obiettivo} e torna: poi verrò con te.
+Son Goku (fine) SSJ;batti;;;;Majin Vegeta;;;;sì;;;;;1;Vegeta si è fatto controllare da Bobbidi pur di combattere con me. | Batti {obiettivo} e verrò con te.
+Son Goku (fine) SSJ3;batti;;;;Majin Buu (puro);;;;sì;;;;;1;Majin Bu è tornato alla sua forma originale: la più pericolosa. | Batti {obiettivo} e verrò con te.
+Majin Vegeta;batti;;;;Son Goku (fine) SSJ2;;;;sì;;;;;1;La mia sfida con Kakaroth non è mai finita. | Batti {obiettivo} e verrò con te.
+Vegeta (seconda forma);porta;;;;Trunks (bambino);;;;sì;;;;;1;Trunks deve diventare più forte: lo alleno io. | Portami {obiettivo} e verrò con te.
+Trunks (bambino);vai da;;;;Vegeta (seconda forma);sì;;;sì;;;;;1;Papà mi ha promesso il parco giochi se lo batto. | Vai da {obiettivo} e torna: poi vengo con te.
+Son Goten;porta;;;;Trunks (bambino);;;;sì;;;;;1;Senza Trunks non vengo da nessuna parte! | Portami {obiettivo} e veniamo tutti e due.
+Son Goten SSJ;porta;;;;Trunks (bambino) SSJ;;;;sì;;;;;1;Io e Trunks abbiamo imparato la danza della fusione! | Portami {obiettivo} e la proviamo subito.
+Son Gohan;vai da;;;;Videl;sì;;;sì;;;;;1;Ho promesso a Videl che le avrei insegnato a volare. | Vai da {obiettivo} e torna: poi verrò con te.
+Son Gohan SSJ;batti;;;;Dabura;;;;sì;;;;;1;Dabura ha pietrificato Piccolo e Krilin. | Batti {obiettivo} e combatterò al tuo fianco.
+Son Gohan (Ultimate);batti;;;;Super Buu;;;;sì;;;;;1;Il Vecchio Kaioshin ha risvegliato tutto il mio potere. | Batti {obiettivo} e verrò con te.
+Great Saiyaman;quiz;;;;;;;;sì;;;;;1;La giustizia trionfa sempre! Io sono Great Saiyaman! | Rispondi giusto e combatterò al tuo fianco.
+Great Saiyaman 2-go;quiz;;;;;;;;sì;;;;;1;Anch'io combatto per la giustizia! | Rispondi giusto e verrò con te.
+Videl;vai da;;;;Great Saiyaman;sì;;;sì;;;;;1;Chi si nasconde dietro Great Saiyaman? | Vai da {obiettivo} e torna a dirmelo: poi verrò con te.
+Spopovitch;batti;;;;Videl;;;;sì;;;;;1;Bobbidi mi ha dato una forza enorme. | Batti {obiettivo} e verrò con te.
+Kaioshin;vai da;;;;Son Gohan;sì;;;sì;;;;;1;Il potere nascosto di Gohan va risvegliato. | Vai da {obiettivo} e torna a dirmi che è pronto: poi verrò con te.
+Kibitoshin;batti;;;;Dabura;;;;sì;;;;;1;Dabura serve Bobbidi: va fermato. | Batti {obiettivo} e ti aiuterò.
+Majin Buu (buono);porta;;;;Uub;;;;sì;;;;;1;Bu sente che quel bambino, Uub, è come lui. | Portami {obiettivo} e Bu verrà con te.
+Super Buu;batti;;;;Gotenks SSJ3;;;;sì;;;;;1;Quei due bambini fusi mi hanno fatto arrabbiare. | Batti {obiettivo} e Bu verrà con te.
+Super Buu (Gotenks assorbito);batti;;;;Son Gohan (Ultimate);;;;sì;;;;;1;Ora ho la forza di Gotenks e di Piccolo. | Batti {obiettivo} e verrò con te.
+Vegetto;batti;;;;Super Buu (Son Gohan assorbito);;;;sì;;;;;1;Io sono Vegetto: Goku e Vegeta in un solo guerriero. | Batti {obiettivo} e combatterò con te.
+Uub;combattimento;;vincere;;;;;;sì;;;;;1;Il signor Goku mi ha detto di allenarmi. | Battimi e vengo con te!
+Uub;vai da;;;;Son Goku (fine);sì;;;sì;;;;;1;Il signor Goku ha promesso di allenarmi. | Vai da {obiettivo} e torna: poi partiamo insieme.
+Pan;porta;;;;Son Goku (GT);;;;sì;;;;;1;Nonno Goku viene con noi? | Portami {obiettivo} e partiamo!
+Son Goku (GT);vai da;;;;Trunks;sì;;;sì;;;;;1;Con le sfere nere sono tornato bambino! | Vai da {obiettivo} e torna: ci serve un'astronave.
+Son Goku (GT) SSJ;batti;;;;Baby Vegeta;;;;sì;;;;;1;Baby ha preso il corpo di Vegeta. | Batti {obiettivo} e verrò con te.
+Son Goku (GT) SSJ3;batti;;;;Super Baby 2;;;;sì;;;;;1;Baby controlla tutta la Terra. | Batti {obiettivo} e verrò con te.
+Son Goku SSJ4;batti;;;;Baby Oozaru;;;;sì;;;;;1;Ho riavuto la coda: ora sono Super Saiyan 4. | Batti {obiettivo} e verrò con te.
+Vegeta SSJ4;porta;;;;Son Goku SSJ4;;;;sì;;;;;1;Bulma ha trovato il modo di farmi diventare Super Saiyan 4. | Portami {obiettivo}: è ora della fusione.
+Gogeta SSJ4;batti;;;;Super Ii Shenron;;;;sì;;;;;1;Il drago più forte è nato dalle sfere del drago. | Batti {obiettivo} e combatterò con te.
+Super C-17;batti;;;;Son Goku SSJ4;;;;sì;;;;;1;Due C-17 in uno, e un solo bersaglio. | Batti {obiettivo} e verrò con te.
+Super Uub;batti;;;;Super Baby 2;;;;sì;;;;;1;Con Majin Bu dentro di me ho una forza nuova. | Batti {obiettivo} e verrò con te.
+Ii Shenron;combattimento;;trasformazione;;;;;;sì;;;;;1;Dentro di me ci sono tutte e sette le sfere del drago. | Costringimi a usarle e verrò con te.

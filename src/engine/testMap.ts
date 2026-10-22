@@ -65,13 +65,21 @@ export const testItems: ItemDefinition[] = [
     oncePerPlayer: true,
     training: { characters: 2, formsEach: 2, formsTotal: 4 },
   },
-  { id: 'flying-nimbus', name: 'Nuvola Speedy', price: 250, copiesPerShop: null, oncePerPlayer: false },
+  {
+    id: 'flying-nimbus',
+    name: 'Nuvola Speedy',
+    price: 250,
+    copiesPerShop: null,
+    oncePerPlayer: false,
+    travel: { steps: 10 },
+  },
   {
     id: 'instant-transmission',
     name: 'Trasmissione Istantanea',
     price: 600,
     copiesPerShop: null,
     oncePerPlayer: false,
+    travel: { steps: null },
   },
 ];
 

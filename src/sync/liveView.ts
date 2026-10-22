@@ -30,12 +30,15 @@ export interface LiveView {
   state: GameState;
   overlay: Overlay | null;
   layout: StreamLayout;
+  /** Cells where a travel item can take the pawn, while the host chooses (spec 047). */
+  highlight?: string[] | null;
 }
 
 export function buildLiveView(
   game: Game,
   overlay: Overlay | null,
   layout: StreamLayout,
+  highlight: string[] | null = null,
 ): LiveView {
   return {
     map: game.map,
@@ -44,5 +47,6 @@ export function buildLiveView(
     state: currentState(game),
     overlay,
     layout,
+    highlight,
   };
 }

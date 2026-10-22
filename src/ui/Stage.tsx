@@ -37,6 +37,8 @@ interface StageProps {
   onEdgeMenu?: (edgeId: string, at: ScreenPoint) => void;
   onEdgeClick?: (edgeId: string, at: ScreenPoint) => void;
   onPawnDrop?: (player: PlayerId, nodeId: string) => void;
+  /** Cells where a travel item can take the pawn (spec 047). */
+  highlighted?: ReadonlySet<string>;
   onCloseNotification?: (notificationId: number) => void;
   challengeControls?: (nodeId: string, character: Character | undefined) => ReactNode;
   showdownControls?: ReactNode;
@@ -70,6 +72,7 @@ export function Stage(props: StageProps) {
         onEdgeMenu={props.onEdgeMenu}
         onEdgeClick={props.onEdgeClick}
         onPawnDrop={props.onPawnDrop}
+        highlighted={props.highlighted}
       />
       {challenge && (
         <ChallengeScreen

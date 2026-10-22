@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { FightRecord } from '../battle/fight';
-import { charactersInGame, missionSides, proposedOutcome, showdownSides, teamChanges } from '../battle/inGame';
+import { charactersInGame, proposedMissionSides, proposedOutcome, showdownSides, teamChanges } from '../battle/inGame';
 import pageStyles from '../battle/page/BattlePage.module.css';
 import type { BattleView, SideNames } from '../battle/playback';
 import { cellMission, type Game, type GameAction, type GameState, type PlayerId } from '../engine';
@@ -31,7 +31,9 @@ interface GameFightProps {
 export function GameFight({ game, state, setup, perform, onView, onLost, onClose }: GameFightProps) {
   // As they were when "Simula" was pressed: later clicks do not change the fight.
   const [initial] = useState(() =>
-    setup.kind === 'mission' ? missionSides(state, setup.nodeId, setup.player) : showdownSides(state),
+    setup.kind === 'mission'
+      ? proposedMissionSides(state, setup.nodeId, setup.player, game.catalog)
+      : showdownSides(state),
   );
   const [blocked] = useState(() => charactersInGame(state));
   const [team] = useState(() => (setup.kind === 'mission' ? state.players[setup.player].team : []));

@@ -75,6 +75,7 @@ export function StreamApp() {
           items={view.items}
           state={view.state}
           overlay={view.overlay}
+          highlighted={view.highlight ? new Set(view.highlight) : undefined}
         />
       </div>
       {view.layout.playerPanels === 'below' && (

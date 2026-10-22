@@ -7,6 +7,7 @@ import {
   type NodeType,
   type Point,
 } from '../engine';
+import { cellsOffBoard, pathsOverCells, touchingCells } from '../ui/boardModel';
 
 // Map editing operations (spec 006). Each one returns a new map and leaves
 // the given one untouched, so the editor can undo by keeping old maps.
@@ -260,7 +261,10 @@ export type MapIssueKind =
   | 'deadEnds'
   | 'roadWithoutOpener'
   | 'roadOpenerWrong'
-  | 'roadNotDeadEnd';
+  | 'roadNotDeadEnd'
+  | 'offBoard'
+  | 'touchingCells'
+  | 'pathOverCell';
 
 export interface MapIssue {
   kind: MapIssueKind;
@@ -323,7 +327,45 @@ export function checkMap(map: GameMap): MapIssue[] {
     });
   }
   issues.push(...checkRoads(map, linked));
+
+  // Cells and pawns stay inside the background (spec 044, D-071).
+  const offBoard = cellsOffBoard(map).map(cellNumber);
+  if (offBoard.length > 0) {
+    issues.push({
+      kind: 'offBoard',
+      message:
+        `Caselle troppo vicine al bordo: ${offBoard.join(', ')}. Loro o la pedina sopra escono ` +
+        "dalla mappa: spostale un po' verso l'interno.",
+    });
+  }
+
+  // Cells and paths keep some background between them (spec 046, D-073).
+  const touching = touchingCells(map).map(([a, b]) => `${cellNumber(a)} e ${cellNumber(b)}`);
+  if (touching.length > 0) {
+    issues.push({
+      kind: 'touchingCells',
+      message: `Caselle che si toccano: ${touching.join(', ')}. Allontanale un po'.`,
+    });
+  }
+  const over = new Map<MapEdge, string[]>();
+  for (const { edge, nodeId } of pathsOverCells(map)) {
+    over.set(edge, [...(over.get(edge) ?? []), cellNumber(nodeId)]);
+  }
+  if (over.size > 0) {
+    const paths = [...over].map(
+      ([edge, cells]) => `${cellNumber(edge.from)}–${cellNumber(edge.to)} passa su ${listed(cells)}`,
+    );
+    issues.push({
+      kind: 'pathOverCell',
+      message: `Percorsi sopra una casella: ${paths.join(', ')}. Sposta la casella o il percorso.`,
+    });
+  }
   return issues;
+}
+
+/** "#2", "#2 e #3", "#2, #3 e #4". */
+function listed(items: string[]): string {
+  return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} e ${items[items.length - 1]}`;
 }
 
 /**

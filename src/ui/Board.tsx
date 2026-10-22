@@ -41,6 +41,8 @@ interface BoardProps {
   onEdgeClick?: (edgeId: string, at: ScreenPoint) => void;
   /** Director only, outside edit mode: a pawn dragged and dropped on a cell (D-026). */
   onPawnDrop?: (player: PlayerId, nodeId: string) => void;
+  /** Cells where a travel item can take the pawn (spec 047), on both windows. */
+  highlighted?: ReadonlySet<string>;
 }
 
 const LINE_HEIGHT = 17;
@@ -71,6 +73,7 @@ export function Board(props: BoardProps) {
         onNodeMenu={props.onNodeMenu}
         onEdgeMenu={props.onEdgeMenu}
         onEdgeClick={props.onEdgeClick}
+        highlighted={props.highlighted}
       />
 
       <Pawns
@@ -234,14 +237,14 @@ function boardPoint(toBoard: DOMMatrix, clientX: number, clientY: number): Point
 
 type BoardLayersProps = Pick<
   BoardProps,
-  'onNodeClick' | 'onNodeDoubleClick' | 'onNodeMenu' | 'onEdgeMenu' | 'onEdgeClick'
+  'onNodeClick' | 'onNodeDoubleClick' | 'onNodeMenu' | 'onEdgeMenu' | 'onEdgeClick' | 'highlighted'
 > & {
   view: BoardView;
 };
 
 /** Background, paths and cells: the board without pawns, also used to prepare episodes (spec 007). */
 export function BoardLayers(props: BoardLayersProps) {
-  const { view, onNodeClick, onNodeDoubleClick, onNodeMenu, onEdgeMenu, onEdgeClick } = props;
+  const { view, onNodeClick, onNodeDoubleClick, onNodeMenu, onEdgeMenu, onEdgeClick, highlighted } = props;
   // Clip paths need ids unique in the page: two boards may be open at once.
   const clipPrefix = `clip${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
@@ -290,6 +293,7 @@ export function BoardLayers(props: BoardLayersProps) {
             key={node.id}
             node={node}
             clipId={`${clipPrefix}-${node.id}`}
+            highlighted={highlighted?.has(node.id) ?? false}
             onClick={onNodeClick && (() => onNodeClick(node.id))}
             onDoubleClick={onNodeDoubleClick && (() => onNodeDoubleClick(node.id))}
             onContextMenu={onNodeMenu && menuHandler(onNodeMenu, node.id)}
@@ -303,12 +307,13 @@ export function BoardLayers(props: BoardLayersProps) {
 interface CellProps {
   node: NodeView;
   clipId: string;
+  highlighted: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
   onContextMenu?: (event: MouseEvent) => void;
 }
 
-function Cell({ node, clipId, onClick, onDoubleClick, onContextMenu }: CellProps) {
+function Cell({ node, clipId, highlighted, onClick, onDoubleClick, onContextMenu }: CellProps) {
   // The picture of the character or shopkeeper, cut to the circle (D-024).
   const image = node.imageData ?? characterImage(node.characterId);
   const classes = [
@@ -326,6 +331,10 @@ function Cell({ node, clipId, onClick, onDoubleClick, onContextMenu }: CellProps
     >
       {/* The meaning of a special cell, in the director only: there the cells have a menu (spec 034). */}
       {onContextMenu && node.note && <title>{node.note}</title>}
+      {/* Where a travel item can take the pawn (spec 047): a glowing ring around the cell. */}
+      {highlighted && (
+        <circle className={styles.reachable} cx={node.x} cy={node.y} r={node.radius + 7} />
+      )}
       {/* Invisible larger target: small cells are easier to click. */}
       <circle
         className={styles.hit}

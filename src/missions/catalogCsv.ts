@@ -11,6 +11,7 @@ import { characterIdOf } from '../catalog/importCatalog';
 import {
   MISSION_GROUPS,
   newCatalogId,
+  QUESTION_LEVELS,
   type CatalogMission,
   type MissionGroup,
   type QuestionEntry,
@@ -39,7 +40,7 @@ export const CATALOG_COLUMNS = [
   'battute',
 ] as const;
 
-export const QUESTION_COLUMNS = ['domanda', 'A', 'B', 'C', 'D', 'giusta'] as const;
+export const QUESTION_COLUMNS = ['domanda', 'A', 'B', 'C', 'D', 'giusta', 'livello'] as const;
 
 const TYPE_NAMES: Record<MissionType, string> = {
   fight: 'combattimento',
@@ -222,17 +223,21 @@ export function catalogFromCsv(
   return { entries, skipped };
 }
 
-/** The questions as a CSV file: question, answers A to D, and the letter of the right one. */
+/** The questions as a CSV file: question, answers A to D, the letter of the right one, the level. */
 export function questionsToCsv(questions: QuestionEntry[]): string {
   const rows = questions.map((entry) => [
     entry.question,
     ...LETTERS.map((_, index) => entry.answers[index] ?? ''),
     LETTERS[entry.correct] ?? '',
+    QUESTION_LEVELS.find((level) => level.level === entry.level)?.label ?? '',
   ]);
   return toCsv([[...QUESTION_COLUMNS], ...rows]);
 }
 
-/** Reads the questions back: at least three answers, and the right one among them. */
+/**
+ * Reads the questions back: at least three answers, and the right one among
+ * them. The level may be missing (a file from before spec 043), never unknown.
+ */
 export function questionsFromCsv(text: string): CsvImport<QuestionEntry> {
   const rows = parseCsv(text);
   const entries: QuestionEntry[] = [];
@@ -250,7 +255,13 @@ export function questionsFromCsv(text: string): CsvImport<QuestionEntry> {
       );
       return;
     }
-    entries.push({ id: newCatalogId(), question, answers, correct });
+    const levelText = rest[5] ?? '';
+    const level = QUESTION_LEVELS.find((entry) => entry.label === normalize(levelText))?.level;
+    if (levelText && !level) {
+      skipped.push(`Riga ${index + 2}: livello «${levelText}» sconosciuto: facile, media o difficile.`);
+      return;
+    }
+    entries.push({ id: newCatalogId(), question, answers, correct, ...(level ? { level } : {}) });
   });
   return { entries, skipped };
 }

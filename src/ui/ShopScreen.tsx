@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { shopListing, type GameContext, type GameState } from '../engine';
 import { NumberField } from './NumberField';
 import { ownImage } from './characterImages';
+import { itemImage } from './itemImages';
 import { Placeholder } from './Placeholder';
 import styles from './ShopScreen.module.css';
 
@@ -95,6 +96,7 @@ export function ShopScreen(props: ShopScreenProps) {
                 key={entry.itemId}
                 className={entry.soldOut || entry.alreadyBought ? styles.grey : undefined}
               >
+                <ItemThumb name={entry.name} />
                 <span className={styles.name}>{entry.name}</span>
                 <Price
                   value={entry.price}
@@ -131,4 +133,14 @@ function Price({ value, label, onChange }: PriceProps) {
       {onChange ? <NumberField value={value} label={label} onCommit={onChange} /> : value} monete
     </span>
   );
+}
+
+/** The item's picture next to its name, if the host has one (spec 045). */
+function ItemThumb({ name }: { name: string }) {
+  const image = itemImage(name);
+  return image ? (
+    <div className={styles.thumb}>
+      <img className={styles.itemThumb} src={image} alt="" />
+    </div>
+  ) : null;
 }

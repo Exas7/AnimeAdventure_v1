@@ -1,4 +1,5 @@
 import { cellLabel, findCharacter, findItem } from './lookup';
+import { rechargesStarter, travelRule } from './itemUse';
 import { hasBought, isSoldOut, rechargeablePower } from './shop';
 import {
   TEAM_SIZE,
@@ -42,6 +43,9 @@ export function turnRuleWarnings(
     case 'endTurn':
       warnings = endTurnWarnings(state);
       break;
+    case 'useItem':
+      warnings = itemUseWarnings(state, action, context);
+      break;
     default:
       return [];
   }
@@ -72,9 +76,51 @@ export function isAdjacent(
     const connects =
       (edge.from === fromNodeId && edge.to === toNodeId) ||
       (edge.from === toNodeId && edge.to === fromNodeId);
-    const closed = state.edgeLocks[edge.id]?.[playerId] ?? edge.locked;
-    return connects && !closed;
+    return connects && isOpenFor(state, playerId, edge);
   });
+}
+
+/** A path is open for a player unless it is locked for them (D-027). */
+function isOpenFor(state: GameState, playerId: PlayerId, edge: GameMap['edges'][number]): boolean {
+  return !(state.edgeLocks[edge.id]?.[playerId] ?? edge.locked);
+}
+
+/**
+ * The cells the player's pawn reaches along the paths open for them, at
+ * most `steps` paths away (null: any distance), its own cell left out
+ * (spec 047: Nuvola Speedy, Trasmissione Istantanea).
+ */
+export function reachableCells(
+  map: GameMap,
+  state: GameState,
+  playerId: PlayerId,
+  steps: number | null,
+): Set<string> {
+  const start = state.players[playerId].position;
+  const neighbours = new Map<string, string[]>();
+  for (const edge of map.edges) {
+    if (isOpenFor(state, playerId, edge)) {
+      neighbours.set(edge.from, [...(neighbours.get(edge.from) ?? []), edge.to]);
+      neighbours.set(edge.to, [...(neighbours.get(edge.to) ?? []), edge.from]);
+    }
+  }
+  const distance = new Map<string, number>([[start, 0]]);
+  const queue = [start];
+  for (let index = 0; index < queue.length; index += 1) {
+    const nodeId = queue[index] as string;
+    const next = (distance.get(nodeId) ?? 0) + 1;
+    if (steps !== null && next > steps) {
+      continue;
+    }
+    for (const neighbour of neighbours.get(nodeId) ?? []) {
+      if (!distance.has(neighbour)) {
+        distance.set(neighbour, next);
+        queue.push(neighbour);
+      }
+    }
+  }
+  distance.delete(start);
+  return new Set(distance.keys());
 }
 
 function boardWarnings(
@@ -117,6 +163,41 @@ function boardWarnings(
       kind: 'notAdjacent',
       message: `Mossa non adiacente: nessun percorso aperto per ${player.name} porta a ${label(action.to)}`,
     });
+  }
+  return warnings;
+}
+
+/**
+ * "Usa" (spec 047): a Senzu with nothing to recharge, as when it is bought
+ * (D-015); a travel item taking the pawn beyond its reach, or past the
+ * actions of the turn when it is the player's turn (D-013).
+ */
+function itemUseWarnings(
+  state: GameState,
+  action: Extract<GameAction, { type: 'useItem' }>,
+  context: GameContext,
+): Warning[] {
+  const item = findItem(context.items, action.itemId);
+  const player = state.players[action.player];
+  const warnings: Warning[] = [];
+  if (action.to === undefined) {
+    if (rechargesStarter(item) && !rechargeablePower(state, action.player)) {
+      warnings.push({
+        kind: 'nothingToRecharge',
+        message: `Lo starter di ${player.name} non ha poteri da ricaricare`,
+      });
+    }
+    return warnings;
+  }
+  if (action.player === state.currentPlayer && state.actions.used >= state.actions.available) {
+    warnings.push({
+      kind: 'noActionsLeft',
+      message: `${player.name} ha già usato tutte le azioni del turno`,
+    });
+  }
+  const rule = travelRule(item);
+  if (rule && !reachableCells(context.map, state, action.player, rule.steps).has(action.to)) {
+    warnings.push({ kind: 'travelRange', message: `Casella fuori dalla portata della ${item.name}` });
   }
   return warnings;
 }

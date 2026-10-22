@@ -11,6 +11,8 @@ export interface DirectorShows {
   starterChoice: StarterChoiceView | null;
   /** A simulated fight of the game (spec 037, D-058): while set, the stream shows it. */
   battle: BattleView | null;
+  /** Cells highlighted while a travel item is used (spec 047). */
+  highlight?: string[] | null;
 }
 
 /**
@@ -28,7 +30,7 @@ export function directorMessage(shows: DirectorShows, wasShowing: boolean): Sync
     return starterChoiceMessage(shows.starterChoice);
   }
   if (shows.game) {
-    return viewMessage(buildLiveView(shows.game, shows.overlay, shows.layout));
+    return viewMessage(buildLiveView(shows.game, shows.overlay, shows.layout, shows.highlight ?? null));
   }
   return wasShowing ? viewMessage(null) : null;
 }

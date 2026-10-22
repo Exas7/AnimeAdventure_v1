@@ -61,6 +61,8 @@ export interface GameSession {
    * instead of everything else; null gives the stream back to the game.
    */
   setBattle(battle: BattleView | null): void;
+  /** Cells highlighted on both windows while a travel item is used (spec 047); null for none. */
+  setHighlight(cells: string[] | null): void;
   closeNotification(notificationId: number): void;
   showError(message: string): void;
   clearError(): void;
@@ -76,6 +78,7 @@ export function useGameSession(): GameSession {
   const [layout, setLayout] = useState<StreamLayout>(DEFAULT_LAYOUT);
   const [starterChoice, setStarterChoice] = useState<StarterChoiceView | null>(null);
   const [battle, setBattle] = useState<BattleView | null>(null);
+  const [highlight, setHighlight] = useState<string[] | null>(null);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [error, setError] = useState<string | null>(null);
   // What "Ripeti" can bring back: kept in this session only, never saved (spec 021).
@@ -84,8 +87,8 @@ export function useGameSession(): GameSession {
   // The latest values, readable from callbacks and timers without waiting for a render.
   const gameRef = useRef<Game | null>(null);
   const redoRef = useRef<HistoryEntry[]>([]);
-  const viewRef = useRef({ game, overlay, layout, starterChoice, battle });
-  viewRef.current = { game, overlay, layout, starterChoice, battle };
+  const viewRef = useRef({ game, overlay, layout, starterChoice, battle, highlight });
+  viewRef.current = { game, overlay, layout, starterChoice, battle, highlight };
 
   const setGame = useCallback((next: Game | null) => {
     gameRef.current = next;
@@ -194,12 +197,15 @@ export function useGameSession(): GameSession {
   }, []);
 
   useEffect(() => {
-    const message = directorMessage({ game, overlay, layout, starterChoice, battle }, showingRef.current);
+    const message = directorMessage(
+      { game, overlay, layout, starterChoice, battle, highlight },
+      showingRef.current,
+    );
     if (message) {
       channelRef.current?.send(message);
       showingRef.current = isShowing(message);
     }
-  }, [game, overlay, layout, starterChoice, battle]);
+  }, [game, overlay, layout, starterChoice, battle, highlight]);
 
   // --- Automatic save (D-011) ----------------------------------------------
   useEffect(() => {
@@ -270,6 +276,7 @@ export function useGameSession(): GameSession {
     setLayout,
     setStarterChoice,
     setBattle,
+    setHighlight,
     closeNotification,
     showError: setError,
     clearError: () => setError(null),

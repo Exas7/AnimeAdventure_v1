@@ -146,5 +146,8 @@ export function useTraining(
     replaceInTeam(state, playerId, from, to);
   }
   player.inventory.splice(index, 1);
-  notify(state, out, `${player.name} · ${item.name}: ${trainingChangesText(context.catalog, changes)}`);
+  // The log line "G1 usa ..." already lists the changes: one line only (spec 041, 7).
+  notify(state, out, `${player.name} · ${item.name}: ${trainingChangesText(context.catalog, changes)}`, {
+    inLog: false,
+  });
 }

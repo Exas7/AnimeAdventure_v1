@@ -56,6 +56,48 @@ export const PAWN_BODY_PATH =
 /** Small cells get a larger invisible target, so they are easy to click or drop on. */
 export const CELL_HIT_RADIUS = 26;
 
+/** On large cells the pawn stands on the upper part, leaving the name visible. */
+function pawnLift(radius: number): number {
+  return radius > 20 ? radius * 0.55 : 0;
+}
+
+/** Room for the outlines drawn around cells and pawns. */
+const OUTLINE = 4;
+
+/** How each type of cell is drawn on a board, when it holds what it is made for (D-023). */
+const TYPE_ROLE: Record<MapNode['type'], CellRole> = {
+  character: 'character',
+  shop: 'shop',
+  start: 'start',
+  special: 'special',
+  empty: 'passage',
+};
+
+/** The radius of a cell of this type on a board, in board units. */
+export function cellRadius(type: MapNode['type']): number {
+  return ROLE_RADIUS[TYPE_ROLE[type]];
+}
+
+/**
+ * Cells that come out of the board (spec 044, D-071): their circle, or the
+ * pawn standing on them, past the edge of the background, where nothing is
+ * drawn. Two pawns on one cell stand side by side.
+ */
+export function cellsOffBoard(map: GameMap): string[] {
+  const size = boardSize(map);
+  return map.nodes
+    .filter((node) => {
+      const radius = cellRadius(node.type);
+      const side = Math.max(radius, 2 * PAWN_HALF_WIDTH + 2) + OUTLINE;
+      const top = Math.max(radius, pawnLift(radius) + PAWN_HEAD_Y + PAWN_HEAD_RADIUS) + OUTLINE;
+      const bottom = radius + OUTLINE;
+      const x = node.x * size.width;
+      const y = node.y * size.height;
+      return x < side || x > size.width - side || y < top || y > size.height - bottom;
+    })
+    .map((node) => node.id);
+}
+
 export interface NodeView {
   id: string;
   role: CellRole;
@@ -224,6 +266,15 @@ export function edgePath(points: Point[]): string {
     const last = points[1] as Point;
     return `${path} L ${num(last.x)} ${num(last.y)}`;
   }
+  for (const [, c1, c2, p2] of curveSegments(points)) {
+    path += ` C ${num(c1.x)} ${num(c1.y)} ${num(c2.x)} ${num(c2.y)} ${num(p2.x)} ${num(p2.y)}`;
+  }
+  return path;
+}
+
+/** The Bézier pieces of the curve of edgePath: start, two control points, end. */
+function curveSegments(points: Point[]): [Point, Point, Point, Point][] {
+  const segments: [Point, Point, Point, Point][] = [];
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i] as Point;
     const p2 = points[i + 1] as Point;
@@ -231,9 +282,93 @@ export function edgePath(points: Point[]): string {
     const p3 = points[i + 2] ?? p2;
     const c1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
     const c2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
-    path += ` C ${num(c1.x)} ${num(c1.y)} ${num(c2.x)} ${num(c2.y)} ${num(p2.x)} ${num(p2.y)}`;
+    segments.push([p1, c1, c2, p2]);
   }
-  return path;
+  return segments;
+}
+
+/** Room between two cells, and between a path and a cell it does not join (spec 046, D-073). */
+const CLEARANCE = 10;
+
+/**
+ * Pairs of cells that touch (spec 046, D-073): less than CLEARANCE between
+ * their circles, so that their outlines meet or almost.
+ */
+export function touchingCells(map: GameMap): [string, string][] {
+  const size = boardSize(map);
+  const pairs: [string, string][] = [];
+  map.nodes.forEach((a, index) => {
+    for (const b of map.nodes.slice(index + 1)) {
+      const distance = Math.hypot((a.x - b.x) * size.width, (a.y - b.y) * size.height);
+      if (distance < cellRadius(a.type) + cellRadius(b.type) + CLEARANCE) {
+        pairs.push([a.id, b.id]);
+      }
+    }
+  });
+  return pairs;
+}
+
+/**
+ * Paths that run over a cell they do not join, or graze it (spec 046,
+ * D-073): their line passes less than CLEARANCE from the cell's circle.
+ * A curved path is measured along the curve that is drawn.
+ */
+export function pathsOverCells(map: GameMap): { edge: MapEdge; nodeId: string }[] {
+  const size = boardSize(map);
+  const toBoard = (point: Point): Point => ({ x: point.x * size.width, y: point.y * size.height });
+  const nodesById = new Map(map.nodes.map((node) => [node.id, node]));
+  const found: { edge: MapEdge; nodeId: string }[] = [];
+  for (const edge of map.edges) {
+    const from = nodesById.get(edge.from);
+    const to = nodesById.get(edge.to);
+    if (!from || !to) {
+      continue;
+    }
+    const line = pathLine([toBoard(from), ...edge.curve.map(toBoard), toBoard(to)]);
+    for (const node of map.nodes) {
+      if (node.id !== edge.from && node.id !== edge.to) {
+        if (lineDistance(toBoard(node), line) < cellRadius(node.type) + CLEARANCE) {
+          found.push({ edge, nodeId: node.id });
+        }
+      }
+    }
+  }
+  return found;
+}
+
+/** The path of edgePath as short straight pieces, close enough to measure distances. */
+function pathLine(points: Point[]): Point[] {
+  if (points.length <= 2) {
+    return points;
+  }
+  const STEPS = 16;
+  const line: Point[] = [points[0] as Point];
+  for (const [p1, c1, c2, p2] of curveSegments(points)) {
+    for (let step = 1; step <= STEPS; step++) {
+      const t = step / STEPS;
+      const u = 1 - t;
+      line.push({
+        x: u * u * u * p1.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t * t * t * p2.x,
+        y: u * u * u * p1.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t * t * t * p2.y,
+      });
+    }
+  }
+  return line;
+}
+
+/** Shortest distance from a point to a line made of straight pieces. */
+function lineDistance(point: Point, line: Point[]): number {
+  let shortest = Infinity;
+  for (let i = 0; i < line.length - 1; i++) {
+    const a = line[i] as Point;
+    const b = line[i + 1] as Point;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const length = dx * dx + dy * dy || 1;
+    const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / length));
+    shortest = Math.min(shortest, Math.hypot(point.x - a.x - t * dx, point.y - a.y - t * dy));
+  }
+  return shortest;
 }
 
 /** Splits a name into at most three short lines to fit inside a cell. */
@@ -274,9 +409,7 @@ function pawnViews(
       return [];
     }
     const center = toBoard(node);
-    const radius = ROLE_RADIUS[cellRole(node, state.cells[node.id])];
-    // On large cells the pawn stands on the upper part, leaving the name visible.
-    const lift = radius > 20 ? radius * 0.55 : 0;
+    const lift = pawnLift(ROLE_RADIUS[cellRole(node, state.cells[node.id])]);
     // Two pawns on the same cell stand side by side.
     const shift = together ? (index === 0 ? -1 : 1) * (PAWN_HALF_WIDTH + 2) : 0;
     return [

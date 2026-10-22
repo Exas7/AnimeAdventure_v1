@@ -232,18 +232,20 @@ describe('the map rules in the editor (spec 034, 2.4; D-051)', () => {
   /**
    * A ring: start, dot, Character, shop, dot, start, dot, Character, shop,
    * dot (n1-n10), and a grey road from n3 to n11, a Character cell in a
-   * dead end.
+   * dead end. The ring is a circle and n11 is in the middle, so that no
+   * path runs over a cell (spec 046).
    */
   function ringMap(): GameMap {
     let map = newMap('Anello');
     const types = ['start', 'empty', 'character', 'shop', 'empty', 'start', 'empty', 'character', 'shop', 'empty'] as const;
     types.forEach((type, index) => {
-      map = addNode(map, { x: 0.09 * (index + 1), y: 0.5 }, type).map;
+      const angle = (2 * Math.PI * index) / types.length;
+      map = addNode(map, { x: 0.5 + 0.36 * Math.sin(angle), y: 0.5 - 0.36 * Math.cos(angle) }, type).map;
     });
     for (let i = 1; i <= types.length; i++) {
       map = connect(map, `n${i}`, `n${(i % types.length) + 1}`)?.map ?? map;
     }
-    map = addNode(map, { x: 0.3, y: 0.8 }, 'character').map; // n11, behind the road
+    map = addNode(map, { x: 0.5, y: 0.5 }, 'character').map; // n11, behind the road
     const road = connect(map, 'n3', 'n11');
     return updateEdge(road?.map ?? map, road?.edgeId ?? '', { locked: true, unlockNodeId: 'n3' });
   }
@@ -279,6 +281,100 @@ describe('the map rules in the editor (spec 034, 2.4; D-051)', () => {
     // A second way in: the cell behind is no longer at the end of a dead end.
     const secondWay = connect(ringMap(), 'n11', 'n8')?.map as GameMap;
     expect(kinds(secondWay)).toEqual(['deadEnds', 'roadNotDeadEnd']);
+  });
+
+  describe('cells near the edge (spec 044, criterion 1; D-071)', () => {
+    /** The ring with one more cell, joined to two cells so that it is no dead end. */
+    const withCell = (point: { x: number; y: number }, type: 'character' | 'empty' | 'start') => {
+      let map = addNode(ringMap(), point, type).map;
+      map = connect(map, 'n2', 'n12')?.map ?? map;
+      return connect(map, 'n12', 'n7')?.map ?? map;
+    };
+    const offBoard = (map: GameMap) => checkMap(map).filter((issue) => issue.kind === 'offBoard');
+
+    it('a Character cell whose circle comes out of a side is listed', () => {
+      expect(offBoard(withCell({ x: 0.99, y: 0.5 }, 'character'))).toEqual([
+        {
+          kind: 'offBoard',
+          message:
+            'Caselle troppo vicine al bordo: #12. Loro o la pedina sopra escono dalla mappa: ' +
+            "spostale un po' verso l'interno.",
+        },
+      ]);
+    });
+
+    it('a cell near the top is listed when the pawn standing on it comes out', () => {
+      // Without a background the board is 1600 by 900: 0.08 is 72 units from the top,
+      // inside for the circle (48) but not for the pawn's head (about 100).
+      expect(offBoard(withCell({ x: 0.5, y: 0.08 }, 'character'))).toHaveLength(1);
+      // A dot has no circle to lift the pawn: 0.09 (81 units) is enough.
+      expect(offBoard(withCell({ x: 0.5, y: 0.09 }, 'empty'))).toEqual([]);
+      expect(offBoard(withCell({ x: 0.5, y: 0.08 }, 'empty'))).toHaveLength(1);
+    });
+
+    it('two pawns side by side need room on the sides, even on a dot', () => {
+      expect(offBoard(withCell({ x: 0.03, y: 0.5 }, 'empty'))).toHaveLength(1);
+      expect(offBoard(withCell({ x: 0.04, y: 0.5 }, 'empty'))).toEqual([]);
+    });
+
+    it('the height follows the background: the same point can be in on a tall map and out on a wide one', () => {
+      const tall = setBackground(withCell({ x: 0.5, y: 0.96 }, 'character'), {
+        image: 'data:image/png;base64,AAAA',
+        width: 1000,
+        height: 1000,
+      });
+      const wide = setBackground(tall, { image: 'data:image/png;base64,AAAA', width: 2000, height: 1000 });
+      // 0.96 of 1600 leaves 64 units below the centre; of 800, only 32: the circle needs 48 and its outline.
+      expect(offBoard(tall)).toEqual([]);
+      expect(offBoard(wide)).toHaveLength(1);
+    });
+
+    it('cells well inside give no warning', () => {
+      expect(offBoard(withCell({ x: 0.5, y: 0.5 }, 'character'))).toEqual([]);
+    });
+  });
+
+  describe('cells and paths that touch (spec 046, criterion 1; D-073)', () => {
+    const touching = (map: GameMap) => checkMap(map).filter((issue) => issue.kind === 'touchingCells');
+    const over = (map: GameMap) => checkMap(map).filter((issue) => issue.kind === 'pathOverCell');
+    // Without a background the board is 1600 units wide: n11 is in the middle, at 800.
+    const nextToMiddle = (units: number) => addNode(ringMap(), { x: (800 + units) / 1600, y: 0.5 }, 'character').map;
+
+    it('two cells with less than 10 units between their circles are listed', () => {
+      // Two Character cells (48 each) 100 units apart: 4 between the circles.
+      expect(touching(nextToMiddle(100))).toEqual([
+        { kind: 'touchingCells', message: "Caselle che si toccano: #11 e #12. Allontanale un po'." },
+      ]);
+    });
+
+    it('two cells with some background between them are not', () => {
+      // 108 units apart: 12 between the circles.
+      expect(touching(nextToMiddle(108))).toEqual([]);
+    });
+
+    it('a path that runs over cells it does not join lists them; the two cells it joins are not listed', () => {
+      // From the start at the top to the one at the bottom, through the middle.
+      const across = connect(ringMap(), 'n1', 'n6')?.map as GameMap;
+      const twoOver = addNode(across, { x: 0.5, y: 0.3 }, 'empty').map;
+      expect(over(twoOver)).toEqual([
+        {
+          kind: 'pathOverCell',
+          message: 'Percorsi sopra una casella: #1–#6 passa su #11 e #12. Sposta la casella o il percorso.',
+        },
+      ]);
+    });
+
+    it('a curved path is measured along the curve that is drawn', () => {
+      const across = connect(ringMap(), 'n1', 'n6');
+      // Bent to the right, it goes round n11 in the middle.
+      const bent = addCurvePoint(across?.map as GameMap, across?.edgeId as string, 0, { x: 0.62, y: 0.5 });
+      expect(over(bent)).toEqual([]);
+      // A dot on the bend, away from the straight line, is under the path.
+      const onTheBend = addNode(bent, { x: 0.62, y: 0.5 }, 'empty').map;
+      expect(over(onTheBend).map((issue) => issue.message)).toEqual([
+        'Percorsi sopra una casella: #1–#6 passa su #12. Sposta la casella o il percorso.',
+      ]);
+    });
   });
 });
 

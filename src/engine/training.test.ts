@@ -59,6 +59,8 @@ describe('"Usa" on the training items (spec 041)', () => {
     expect(gameLog(game).at(-1)?.text).toBe(
       'G1 usa Vestiti pesanti da allenamento: Son Goku (metà) → Son Goku (metà) SSJ',
     );
+    // One line in the log: the notification does not repeat it (spec 041, 7).
+    expect(gameLog(game).at(-1)?.details).toEqual([]);
     expect(state.notifications.at(-1)?.text).toBe(
       'G1 · Vestiti pesanti da allenamento: Son Goku (metà) → Son Goku (metà) SSJ',
     );

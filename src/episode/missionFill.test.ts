@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { cellMission, testItems, type Character, type GameMap, type NodeType } from '../engine';
 import type { CatalogMission, QuestionEntry } from '../missions/catalog';
 import { randomize, tierRank, type Content } from './fill';
-import { randomizeWithMissions, type MissionSources } from './missionFill';
+import { questionLevel, randomizeWithMissions, type MissionSources } from './missionFill';
 import { EMPTY_TEXT_LIBRARY } from './textLibrary';
 
 /**
@@ -532,5 +532,124 @@ describe('"Randomizza" after the review of spec 034', () => {
       }
     }
     expect(CELLS.filter((cell) => content[cell]?.characterId)).toHaveLength(2);
+  });
+});
+
+describe('"Randomizza" by strength (spec 043, criteria 3-4; D-069)', () => {
+  const rank = (id: string | undefined) => tierRank(characters.find((entry) => entry.id === id)?.tier) ?? -1;
+  const B_PLUS = tierRank('B+') as number;
+  /** The test catalog with the easy group missions too, heavy so that they come out often. */
+  const easyCatalog: CatalogMission[] = [
+    ...catalog,
+    {
+      id: 'wait',
+      giver: { group: 'recruitable' },
+      mission: { type: 'wait', turns: 2, reward: { cellCharacter: true } },
+      lines: [],
+      weight: 3,
+    },
+    {
+      id: 'skip',
+      giver: { group: 'villains' },
+      mission: { type: 'skipTurns', turns: 1, reward: { cellCharacter: true } },
+      lines: [],
+      weight: 3,
+    },
+  ];
+  const leveled: QuestionEntry[] = (['easy', 'medium', 'hard'] as const).flatMap((level) =>
+    [1, 2, 3].map((n) => ({ id: `${level}${n}`, question: `${level} ${n}?`, answers: ['A', 'B', 'C'], correct: 0, level })),
+  );
+  const runWith = (random: () => number, missionCatalog: CatalogMission[], questionList: QuestionEntry[]) =>
+    randomizeWithMissions(chainMap(), {}, characters, [], EMPTY_TEXT_LIBRARY, ALL, 1, random, {
+      catalog: missionCatalog,
+      questions: questionList,
+      items: testItems,
+    }).content;
+
+  it('the level of the question: easy up to C+, medium for B- and B, hard for B+, medium for story characters', () => {
+    expect(['E', 'D+', 'C-', 'C', 'C+'].map(questionLevel)).toEqual(['easy', 'easy', 'easy', 'easy', 'easy']);
+    expect(['B-', 'B', 'B+', 'A-'].map(questionLevel)).toEqual(['medium', 'medium', 'hard', 'hard']);
+    expect(questionLevel(undefined)).toBe('medium');
+  });
+
+  it('quiz, waits and skipped turns that recruit come only to characters up to B+', () => {
+    let easy = 0;
+    let strongFights = 0;
+    for (const random of RANDOMS) {
+      const content = runWith(random, easyCatalog, leveled);
+      for (const id of CELLS) {
+        const mission = content[id]?.mission;
+        const recruits = mission?.reward.cellCharacter === true;
+        if (recruits && ['quiz', 'wait', 'skipTurns'].includes(mission.type)) {
+          easy += 1;
+          expect(rank(content[id]?.characterId), `${id}: ${content[id]?.characterId}`).toBeLessThanOrEqual(B_PLUS);
+        }
+        if (recruits && rank(content[id]?.characterId) > B_PLUS) {
+          expect(['fight', 'defeat', 'bring', 'goTo']).toContain(mission.type);
+          strongFights += 1;
+        }
+      }
+    }
+    // The rule was put to the test: weak characters got easy missions, strong ones did not.
+    expect(easy).toBeGreaterThan(0);
+    expect(strongFights).toBeGreaterThan(0);
+  });
+
+  it('a mission that gives something else has no limit: a strong character can ask a quiz for coins', () => {
+    const coinsQuiz: CatalogMission = {
+      id: 'goku-quiz',
+      giver: { characterId: 'goku' },
+      mission: { type: 'quiz', reward: { coins: 300 } },
+      lines: [],
+      weight: 1,
+    };
+    let seen = 0;
+    for (const random of RANDOMS) {
+      const content = runWith(random, [...easyCatalog, coinsQuiz], leveled);
+      const cell = CELLS.find((id) => content[id]?.characterId === 'goku');
+      if (cell && cell !== 'k') {
+        seen += 1;
+        expect(content[cell]?.mission?.type).toBe('quiz');
+        // Goku is A: a hard question.
+        expect(content[cell]?.mission?.quiz?.question).toMatch(/^hard/);
+      }
+    }
+    expect(seen).toBeGreaterThan(0);
+  });
+
+  it('every quiz gets a question of the level of who asks it (criterion 4)', () => {
+    let quizzes = 0;
+    for (const random of RANDOMS) {
+      const content = runWith(random, easyCatalog, leveled);
+      for (const id of CELLS) {
+        const quiz = content[id]?.mission?.quiz;
+        if (quiz) {
+          quizzes += 1;
+          const tier = characters.find((entry) => entry.id === content[id]?.characterId)?.tier;
+          expect(quiz.question.split(' ')[0]).toBe(questionLevel(tier));
+        }
+      }
+    }
+    expect(quizzes).toBeGreaterThan(0);
+  });
+
+  it('once those of the level are over, a question without a level; without those either, another mission', () => {
+    // No easy questions: one without a level, and a hard one that the weak never get.
+    const few: QuestionEntry[] = [
+      { id: 'old', question: 'old?', answers: ['A', 'B', 'C'], correct: 0 },
+      { id: 'hard', question: 'hard?', answers: ['A', 'B', 'C'], correct: 0, level: 'hard' },
+    ];
+    const quizOnly = easyCatalog.filter((entry) => entry.mission.type === 'quiz' || entry.id === 'villains' || entry.id === 'fight');
+    for (const random of RANDOMS) {
+      const content = runWith(random, quizOnly, few);
+      const weakQuizzes = CELLS.filter(
+        (id) => content[id]?.mission?.type === 'quiz' && questionLevel(characters.find((entry) => entry.id === content[id]?.characterId)?.tier) === 'easy',
+      );
+      // At most one: the question without a level; the others got another mission.
+      expect(weakQuizzes.length).toBeLessThanOrEqual(1);
+      for (const id of weakQuizzes) {
+        expect(content[id]?.mission?.quiz?.question).toBe('old?');
+      }
+    }
   });
 });

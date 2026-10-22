@@ -13,6 +13,8 @@ import {
   SaveFileError,
   turnRuleWarnings,
   testItems,
+  trainingRule,
+  travelRule,
   type Game,
   type GameMap,
   type CellContent,
@@ -68,6 +70,7 @@ import { CorrectionsPanel } from './CorrectionsPanel';
 import { DiscardGameDialog } from './DiscardGameDialog';
 import { GameFight, type FightSetup } from './GameFight';
 import { TrainingDialog } from './TrainingDialog';
+import { activeTravel, copiesOf, travelCells, type TravelChoice } from './travel';
 import { downloadGame, readGameFile } from './fileIO';
 import { LogPanel } from './LogPanel';
 import { MessageBar } from './MessageBar';
@@ -161,6 +164,8 @@ export function DirectorApp() {
   const [fightSetup, setFightSetup] = useState<FightSetup | null>(null);
   // "Usa" on a training item (spec 041): whose inventory, which item.
   const [training, setTraining] = useState<{ player: PlayerId; itemId: string } | null>(null);
+  // "Usa" on a travel item (spec 047): the cells it reaches are highlighted until the pawn arrives.
+  const [travel, setTravel] = useState<TravelChoice | null>(null);
   // A character's scene, or the board, for the director only, over what the stream shows (D-032).
   const [preview, setPreview] = useState<DirectorPreview | null>(null);
 
@@ -228,6 +233,29 @@ export function DirectorApp() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [screen, undo, redo]);
+
+  // The cells of the travel item, on both windows (spec 047).
+  const { setHighlight } = session;
+  const highlight = game ? travelCells(game, currentState(game), travel) : null;
+  const highlightKey = highlight ? highlight.join(' ') : null;
+  useEffect(() => {
+    setHighlight(highlight);
+    // The key changes exactly when the highlighted cells change.
+  }, [highlightKey, setHighlight]);
+
+  // Esc puts the choice of the cell away, as "Annulla" (spec 047).
+  useEffect(() => {
+    if (!travel) {
+      return undefined;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setTravel(null);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [travel]);
 
   const closeMenu = useCallback(() => setMenu(null), []);
 
@@ -513,7 +541,11 @@ export function DirectorApp() {
     <MessageBar
       warnings={session.warnings}
       pending={pending?.warnings}
-      pendingIsMove={pending?.action.type === 'move' || pending?.action.type === 'placePawn'}
+      pendingIsMove={
+        pending?.action.type === 'move' ||
+        pending?.action.type === 'placePawn' ||
+        (pending?.action.type === 'useItem' && pending.action.to !== undefined)
+      }
       error={session.error}
       onCloseError={session.clearError}
       notice={startNotice}
@@ -640,6 +672,8 @@ export function DirectorApp() {
 
   const state = currentState(game);
   const name = (playerId: PlayerId) => state.players[playerId].name;
+  const traveling = activeTravel(state, travel);
+  const travelingItem = traveling && game.items.find((candidate) => candidate.id === traveling.itemId);
 
   // Off-rule moves, interactions and purchases, and an end of turn with
   // actions left, ask for a second click first (D-013, D-014, D-015, D-033).
@@ -743,6 +777,16 @@ export function DirectorApp() {
   };
 
   const handlePawnDrop = (playerId: PlayerId, nodeId: string) => {
+    // With a travel item in use, its owner's pawn goes with the item (spec 047).
+    if (traveling && traveling.player === playerId) {
+      if (state.players[playerId].position !== nodeId) {
+        // Arrived: the choice goes off, also when more copies of the item are left.
+        tryWithRules({ type: 'useItem', player: playerId, itemId: traveling.itemId, to: nodeId }, () =>
+          setTravel(null),
+        );
+      }
+      return;
+    }
     const action = pawnDropAction(state, playerId, nodeId);
     if (action?.type === 'move') {
       tryWithRules(action);
@@ -796,6 +840,43 @@ export function DirectorApp() {
     });
   };
 
+  /**
+   * "Usa" in the inventory: the window of a training item (spec 041); a
+   * travel item highlights where the pawn can go (spec 047), after a second
+   * click when it is not the owner's turn (D-033); the Senzu at once, after
+   * a second click when there is nothing to recharge (D-015).
+   */
+  const useInventoryItem = (playerId: PlayerId, itemId: string) => {
+    const item = game.items.find((candidate) => candidate.id === itemId);
+    if (!item) {
+      return;
+    }
+    if (trainingRule(item)) {
+      setTraining({ player: playerId, itemId });
+      return;
+    }
+    if (travelRule(item)) {
+      const warnings: Warning[] =
+        playerId === state.currentPlayer
+          ? []
+          : [
+              {
+                kind: 'otherPlayerPawn',
+                message: `Non è il turno di ${name(playerId)}: lo spostamento non conta azioni`,
+              },
+            ];
+      const decision = decideClick(pending, { type: 'useItem', player: playerId, itemId }, warnings);
+      if (decision.kind === 'ask') {
+        setPending(decision.pending);
+        return;
+      }
+      setPending(null);
+      setTravel({ player: playerId, itemId, turn: state.turn, copies: copiesOf(state, playerId, itemId) });
+      return;
+    }
+    tryWithRules({ type: 'useItem', player: playerId, itemId });
+  };
+
   const panelActions = (playerId: PlayerId): PlayerPanelActions => ({
     setCoins: (coins) => perform({ type: 'setCoins', player: playerId, coins }),
     addCharacter: (characterId) => perform({ type: 'addCharacter', player: playerId, characterId }),
@@ -806,7 +887,7 @@ export function DirectorApp() {
       perform({ type: 'setPowerUses', player: playerId, powerId, uses }),
     addItem: (itemId) => perform({ type: 'addToInventory', player: playerId, itemId }),
     removeItem: (itemId) => perform({ type: 'removeFromInventory', player: playerId, itemId }),
-    trainItem: (itemId) => setTraining({ player: playerId, itemId }),
+    useItem: (itemId) => useInventoryItem(playerId, itemId),
     completeMission: (nodeId) => perform({ type: 'completeMission', nodeId, player: playerId }),
     abandonMission: (missionId) => perform({ type: 'abandonMission', missionId }),
   });
@@ -894,6 +975,7 @@ export function DirectorApp() {
             onEdgeMenu={exploring ? undefined : openEdgeMenu}
             onEdgeClick={editMode && !exploring ? openEdgeMenu : undefined}
             onPawnDrop={editMode || exploring ? undefined : handlePawnDrop}
+            highlighted={highlight ? new Set(highlight) : undefined}
             onCloseNotification={session.closeNotification}
             challengeControls={(nodeId, character) => {
               // The buttons follow the mission (spec 026, 2.3); without one, "Assegna" as before.
@@ -976,6 +1058,15 @@ export function DirectorApp() {
               </>
             }
           />
+          {traveling && travelingItem && (
+            <div className={styles.traveling} role="status">
+              <span>
+                {travelingItem.name} di {name(traveling.player)}: trascina la pedina su una casella
+                evidenziata
+              </span>
+              <button onClick={() => setTravel(null)}>Annulla</button>
+            </div>
+          )}
           {exploring && session.overlay && (
             <div className={styles.exploring}>
               <span className={styles.directorOnly}>Solo in regia</span>

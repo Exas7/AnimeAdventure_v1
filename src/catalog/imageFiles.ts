@@ -17,3 +17,8 @@ export function imagesById(files: Record<string, string>): Record<string, string
   }
   return images;
 }
+
+/** The image whose file is named like this (D-024): an item's name, "Nuvola Speedy" (spec 045). */
+export function imageNamed(images: Record<string, string>, name: string): string | undefined {
+  return images[characterIdOf(name)];
+}

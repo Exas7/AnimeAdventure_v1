@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { testItems } from '../engine';
+import { testItems, type Character } from '../engine';
 import characterTable from '../../docs/personaggi-bt3.csv?raw';
 import missionTable from '../../docs/missioni-bt3.csv?raw';
 import questionTable from '../../docs/domande.csv?raw';
 import { importCatalog } from '../catalog/importCatalog';
+import { tierRank } from '../episode/fill';
+import { QUESTION_LEVELS, type CatalogMission } from './catalog';
 import { catalogFromCsv, questionsFromCsv } from './catalogCsv';
 
 describe('the files shipped in docs (spec 027, 2.1 to 2.3)', () => {
@@ -24,5 +26,99 @@ describe('the files shipped in docs (spec 027, 2.1 to 2.3)', () => {
     expect(result.entries.length).toBeGreaterThanOrEqual(40);
     const texts = result.entries.map((entry) => entry.question);
     expect(new Set(texts).size).toBe(texts.length);
+  });
+});
+
+describe('the rules of the catalog in docs (spec 043, criteria 5-6; D-069, D-070)', () => {
+  const list = importCatalog(characterTable);
+  const characters: Character[] = list.ok ? list.catalog : [];
+  const entries = catalogFromCsv(missionTable, characters, testItems).entries;
+  const find = (id: string | undefined) => characters.find((character) => character.id === id);
+  const name = (id: string | undefined) => find(id)?.name ?? id ?? '';
+  const rank = (id: string | undefined) => tierRank(find(id)?.tier);
+  const B_PLUS = tierRank('B+') as number;
+  const own = entries.filter(
+    (entry): entry is CatalogMission & { giver: { characterId: string } } => 'characterId' in entry.giver,
+  );
+
+  it('group missions are only fights, quiz, waits and skipped turns: no target drawn at random', () => {
+    const groups = entries.filter((entry) => 'group' in entry.giver);
+    expect(groups.length).toBeGreaterThan(0);
+    for (const entry of groups) {
+      expect(['fight', 'quiz', 'wait', 'skipTurns']).toContain(entry.mission.type);
+    }
+  });
+
+  it('nobody up to B+ asks to bring or beat, or to fight, someone more than one step stronger', () => {
+    const tooStrong = own.flatMap((entry) => {
+      const giver = rank(entry.giver.characterId);
+      if (!entry.mission.reward.cellCharacter || giver === null || giver > B_PLUS) {
+        return [];
+      }
+      const asked = [
+        ...(['defeat', 'bring'].includes(entry.mission.type) ? [entry.mission.targetId] : []),
+        ...(entry.mission.opponents ?? []).filter((id) => id !== entry.giver.characterId),
+      ];
+      return asked
+        .filter((id) => (rank(id) ?? 0) > giver + 1)
+        .map((id) => `${name(entry.giver.characterId)} → ${name(id)}`);
+    });
+    expect(tooStrong).toEqual([]);
+  });
+
+  it('no quiz, wait or skipped turns of their own recruits a character above B+', () => {
+    const easy = own.filter(
+      (entry) =>
+        ['quiz', 'wait', 'skipTurns'].includes(entry.mission.type) &&
+        entry.mission.reward.cellCharacter &&
+        (rank(entry.giver.characterId) ?? 0) > B_PLUS,
+    );
+    expect(easy.map((entry) => name(entry.giver.characterId))).toEqual([]);
+  });
+
+  it('no two missions wait for each other: "Batti" and "Porta" never go round in a circle', () => {
+    const next = new Map<string, string[]>();
+    for (const entry of own) {
+      if (['defeat', 'bring'].includes(entry.mission.type) && entry.mission.targetId) {
+        next.set(entry.giver.characterId, [...(next.get(entry.giver.characterId) ?? []), entry.mission.targetId]);
+      }
+    }
+    const circles: string[] = [];
+    for (const start of next.keys()) {
+      const queue: string[][] = [[start]];
+      while (queue.length > 0) {
+        const path = queue.shift() as string[];
+        for (const id of next.get(path[path.length - 1] as string) ?? []) {
+          if (id === start) {
+            circles.push([...path, id].map(name).join(' → '));
+          } else if (!path.includes(id)) {
+            queue.push([...path, id]);
+          }
+        }
+      }
+    }
+    expect(circles).toEqual([]);
+  });
+
+  it('one or two lines for each mission, the placeholders only where they mean something', () => {
+    for (const entry of entries) {
+      expect(entry.lines.length, name('characterId' in entry.giver ? entry.giver.characterId : '')).toBeGreaterThanOrEqual(1);
+      expect(entry.lines.length).toBeLessThanOrEqual(2);
+      const text = entry.lines.join(' ');
+      if (text.includes('{obiettivo}')) {
+        expect(entry.mission.targetId).toBeDefined();
+      }
+      if (text.includes('{n}')) {
+        expect(entry.mission.turns).toBeDefined();
+      }
+    }
+  });
+
+  it('every question has a level, at least 18 for each', () => {
+    const questions = questionsFromCsv(questionTable).entries;
+    expect(questions.filter((entry) => entry.level === undefined)).toEqual([]);
+    for (const { level } of QUESTION_LEVELS) {
+      expect(questions.filter((entry) => entry.level === level).length, level).toBeGreaterThanOrEqual(18);
+    }
   });
 });

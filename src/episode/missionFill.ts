@@ -15,6 +15,7 @@ import {
   ownMissions,
   type CatalogMission,
   type QuestionEntry,
+  type QuestionLevel,
 } from '../missions/catalog';
 import {
   openDistances,
@@ -66,6 +67,36 @@ export const CELLS_PER_STORY_CHARACTER = 8;
 
 /** The only missions of a cell that opens a locked path: hard ones (D-052). */
 const OPENER_MISSIONS: readonly Mission['type'][] = ['fight', 'defeat'];
+
+/** Easy missions: they recruit only characters up to B+ (D-069). */
+const EASY_MISSIONS: readonly Mission['type'][] = ['quiz', 'wait', 'skipTurns'];
+const STRONGEST_FOR_EASY = tierRank('B+') as number;
+
+/**
+ * The level of the quiz question for a character (spec 043, 2.3): easy up
+ * to C+, medium for B- and B, hard above; medium for a story character.
+ */
+export function questionLevel(tier: string | undefined): QuestionLevel {
+  const rank = tierRank(tier);
+  if (rank === null) {
+    return 'medium';
+  }
+  if (rank <= (tierRank('C+') as number)) {
+    return 'easy';
+  }
+  return rank <= (tierRank('B') as number) ? 'medium' : 'hard';
+}
+
+/** A quiz, a wait or skipped turns that would recruit a character stronger than B+ (D-069). */
+function tooEasyFor(mission: Mission, character: Character): boolean {
+  const rank = tierRank(character.tier);
+  return (
+    EASY_MISSIONS.includes(mission.type) &&
+    mission.reward.cellCharacter === true &&
+    rank !== null &&
+    rank > STRONGEST_FOR_EASY
+  );
+}
 
 /** Where a cell stands for the missions: its side, and how far along it. */
 interface CellPlace {
@@ -247,8 +278,9 @@ export function randomizeWithMissions(
       continue;
     }
     const own = chained.get(cellId);
-    // Who opens a locked path gives a hard mission (D-052).
-    const fits = (entry: CatalogMission) => !openers.has(cellId) || OPENER_MISSIONS.includes(entry.mission.type);
+    // Who opens a locked path gives a hard mission (D-052); a strong character never an easy one (D-069).
+    const fits = (entry: CatalogMission) =>
+      (!openers.has(cellId) || OPENER_MISSIONS.includes(entry.mission.type)) && !tooEasyFor(entry.mission, character);
     // Their own missions first; if none fits here, those of their group.
     const candidates = own
       ? [[own]]
@@ -383,8 +415,12 @@ export function randomizeWithMissions(
       }
       case 'quiz': {
         if (!mission.quiz?.question) {
+          // A question of the giver's level; once those are over, one without a level (D-069).
           const free = sources.questions.filter((question) => !usedQuestions.has(question.question));
-          const question = free[Math.floor(random() * free.length)];
+          const wanted = questionLevel(giver?.tier);
+          const ofLevel = free.filter((question) => question.level === wanted);
+          const pool = ofLevel.length > 0 ? ofLevel : free.filter((question) => question.level === undefined);
+          const question = pool[Math.floor(random() * pool.length)];
           if (!question) {
             return null;
           }

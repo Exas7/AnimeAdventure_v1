@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import screenStyles from '../director/Screens.module.css';
 import { InfoButton } from '../ui/InfoButton';
-import { newCatalogId, type QuestionEntry } from './catalog';
+import { newCatalogId, QUESTION_LEVELS, questionCount, type QuestionEntry, type QuestionLevel } from './catalog';
 import styles from './CatalogPanels.module.css';
 
 interface QuestionsPanelProps {
@@ -16,7 +16,13 @@ const LETTERS = ['A', 'B', 'C', 'D'];
 
 type Draft = Omit<QuestionEntry, 'id'>;
 
-const EMPTY: Draft = { question: '', answers: ['', '', '', ''], correct: 0 };
+const EMPTY: Draft = { question: '', answers: ['', '', '', ''], correct: 0, level: 'medium' };
+
+/** "Facile", or "Senza livello" for a question saved before spec 043. */
+function levelName(level: QuestionLevel | undefined): string {
+  const label = QUESTION_LEVELS.find((entry) => entry.level === level)?.label;
+  return label ? label.charAt(0).toUpperCase() + label.slice(1) : 'Senza livello';
+}
 
 /** "Domande" in the episode library (spec 027, 2.3): the quiz questions. */
 export function QuestionsPanel({ questions, onChange, onExport, onImport }: QuestionsPanelProps) {
@@ -31,7 +37,12 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
       return;
     }
     const answers = draft.answers.map((answer) => answer.trim()).filter(Boolean);
-    const clean = { question: draft.question.trim(), answers, correct: Math.min(draft.correct, answers.length - 1) };
+    const clean = {
+      question: draft.question.trim(),
+      answers,
+      correct: Math.min(draft.correct, answers.length - 1),
+      ...(draft.level ? { level: draft.level } : {}),
+    };
     onChange(
       editing
         ? questions.map((entry) => (entry.id === editing ? { ...clean, id: editing } : entry))
@@ -52,7 +63,8 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
         Domande
         <InfoButton label="Domande">
           Le domande a risposta multipla dei quiz: «Randomizza» ne mette una diversa in ogni casella
-          con un quiz. Controllale prima della diretta: una risposta sbagliata in onda è peggio di
+          con un quiz, del livello di chi la fa: facile fino a C+, media per B- e B, difficile per
+          B+ (spec 043). Controllale prima della diretta: una risposta sbagliata in onda è peggio di
           nessuna domanda.
         </InfoButton>
       </h2>
@@ -100,6 +112,24 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
             Domanda
             <input value={draft.question} onChange={(event) => setDraft({ ...draft, question: event.target.value })} />
           </label>
+          <label className={styles.field}>
+            Livello
+            <select
+              value={draft.level ?? ''}
+              onChange={(event) => {
+                const { level: _old, ...rest } = draft;
+                const level = event.target.value as QuestionLevel | '';
+                setDraft(level ? { ...rest, level } : rest);
+              }}
+            >
+              {QUESTION_LEVELS.map((entry) => (
+                <option key={entry.level} value={entry.level}>
+                  {levelName(entry.level)}
+                </option>
+              ))}
+              <option value="">Senza livello (va bene per tutti)</option>
+            </select>
+          </label>
           {LETTERS.map((letter, index) => (
             <span key={letter} className={styles.row}>
               <label className={styles.correct} title="Risposta giusta">
@@ -142,7 +172,7 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
       <p className={screenStyles.note}>
         {questions.length === 0
           ? 'Nessuna domanda: importa docs/domande.csv con «Importa da Excel».'
-          : `${questions.length} domande.`}
+          : questionCount(questions)}
       </p>
       <ul className={screenStyles.mapList}>
         {questions.map((entry) => (
@@ -150,6 +180,7 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
             <div>
               <strong>{entry.question}</strong>
               <span className={screenStyles.note}>
+                {levelName(entry.level)} ·{' '}
                 {entry.answers
                   .map((answer, index) => `${LETTERS[index]}) ${answer}${index === entry.correct ? ' ✓' : ''}`)
                   .join('   ')}
@@ -163,6 +194,7 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
                     question: entry.question,
                     answers: LETTERS.map((_, index) => entry.answers[index] ?? ''),
                     correct: entry.correct,
+                    ...(entry.level ? { level: entry.level } : {}),
                   });
                 }}
               >
