@@ -9,30 +9,36 @@ import { includedCatalog, includedMissions, includedQuestions } from './included
  * The fingerprints of the included missions of before (codes left out): a
  * browser that still has one of those lists, never changed, gets the new one
  * (spec 063 and 066, 2.3: more coins; spec 069, 2.6: the story missions; spec 071: more chains;
- * spec 074, 2.7: the guests). Any other list stays as it is.
+ * spec 074, 2.7: the guests; spec 079: the lines of the characters who do not speak). Any other
+ * list stays as it is.
+ *
+ * Spec 079 (D-103): the fingerprints of before are those of the lists with «Babidi» in place of
+ * «Bobbidi», as the browsers keep them once their database is renamed (version 12).
  */
-export const MISSIONS_BEFORE_063 = '06dfb42d';
-export const MISSIONS_BEFORE_066 = '21906f4f';
-export const MISSIONS_BEFORE_069 = 'd7074836';
-export const MISSIONS_BEFORE_071 = '440cbbd5';
-export const MISSIONS_BEFORE_074 = 'caa9fe9b';
+export const MISSIONS_BEFORE_063 = 'ac97f167';
+export const MISSIONS_BEFORE_066 = 'eadf9369';
+export const MISSIONS_BEFORE_069 = '206a3dec';
+export const MISSIONS_BEFORE_071 = '56cf8b91';
+export const MISSIONS_BEFORE_074 = 'd7acf173';
+export const MISSIONS_BEFORE_079 = '15c3e083';
 const OLD_MISSIONS = [
   MISSIONS_BEFORE_063,
   MISSIONS_BEFORE_066,
   MISSIONS_BEFORE_069,
   MISSIONS_BEFORE_071,
   MISSIONS_BEFORE_074,
+  MISSIONS_BEFORE_079,
 ];
 
 /** The included questions of before spec 074, never changed: they get the guests' ones (spec 074, 2.7). */
-export const QUESTIONS_BEFORE_074 = 'ec8759d6';
+export const QUESTIONS_BEFORE_074 = 'e074236a';
 
 /**
  * The fingerprint of codes and prices of the included characters before
  * spec 066: a character list with all of them unchanged gets the new prices,
  * and keeps everything else (spec 066, 2.3).
  */
-export const PRICES_BEFORE_066 = 'bc4e6e98';
+export const PRICES_BEFORE_066 = 'c1cf89be';
 
 export interface FilledLists {
   /** The character list to use: the browser's, or the included one just saved. */

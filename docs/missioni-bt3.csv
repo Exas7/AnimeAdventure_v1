@@ -22,7 +22,7 @@ Kami;accompagnami da;;;;Piccolo (inizio);;;;;;800;;;1;Io e Piccolo siamo una cos
 Kami;accompagnami da;;;;Son Goku (inizio);;;;;;800;;;1;Goku ha bisogno di un nuovo allenamento. | Accompagnami da {obiettivo} e avrai {monete} monete.
 Karin;accompagnami da;;;;Son Goku (bambino);;;;;;800;;;1;Ho preparato i fagioli magici per quel ragazzino. | Accompagnami da {obiettivo} e avrai {monete} monete.
 Baba la Veggente;accompagnami da;;;;Muten Roshi (massima potenza);;;;;;800;;;1;Mio fratello ha bisogno di me. | Accompagnami da {obiettivo} e avrai {monete} monete.
-Bobbidi;combattimento;2v2;vincere;Dabura | Majin Buu (buono);;;;;;;2000;Senzu;;1;Io non mi sporco le mani! | Dabura, Majin Bu: pensateci voi! Batteteli e avrai {premio}.
+Babidi;combattimento;2v2;vincere;Dabura | Majin Buu (buono);;;;;;;2000;Senzu;;1;Io non mi sporco le mani! | Dabura, Majin Bu: pensateci voi! Batteteli e avrai {premio}.
 Dabura;batti;;;;Majin Buu (buono) | Majin Buu (puro male) | Super Buu | Majin Buu (puro);;;;sì;;400;;;1;Majin Bu è una minaccia anche per i demoni. | Batti {obiettivo} e il re dei demoni verrà con te.
 Dabura;combattimento;1v1;vincere;;;;;;sì;;400;;Super Buu;1;Majin Bu si è risvegliato... e sta cambiando. | Battimi e potrai vedere che cosa è diventato.
 Cooler;combattimento;1v1;trasformazione;;;;;;sì;;400;;Metal Cooler;1;Mio fratello non era alla mia altezza. | Costringimi a trasformarmi, se ci riesci!
@@ -103,16 +103,16 @@ C-13;combattimento;;trasformazione;;;;;;;;1200;;Super C-13;1;C-14 e C-15 mi hann
 Turles;combattimento;;trasformazione;;;;;;sì;;400;;;1;L'albero della potenza mi rende invincibile! | Costringimi a trasformarmi e ti seguirò.
 Slug;combattimento;;trasformazione;;;;;;sì;;400;;;1;Il mio vero potere ha dimensioni enormi. | Costringimi a diventare gigante e verrò con te.
 Slug;combattimento;;trasformazione;;;;;;;;1200;;Slug (gigante);1;La Terra sarà la mia nuova astronave. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
-Broli;combattimento;;trasformazione;;;;;;sì;;400;;;1;Kakaroth... KAKAROTH! | Se mi fai trasformare, ti seguirò.
-Broli;combattimento;;trasformazione;;;;;;;;1200;;Broli SSJ;1;Kakaroth... | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
-Broli SSJ;combattimento;;trasformazione;;;;;;sì;;400;;;1;Kakaroth... KAKAROTH! | Costringimi a trasformarmi e verrò con te.
-Broli SSJ;combattimento;;trasformazione;;;;;;;;1200;;Broli Super Saiyan Leggendario;1;Il mio potere non ha limiti! | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
+Broli;combattimento;;trasformazione;;;;;;sì;;400;;;1;(Fissa il vuoto, senza dire una parola.) | Fallo trasformare e si unirà a te.
+Broli;combattimento;;trasformazione;;;;;;;;1200;;Broli SSJ;1;(Il suo sguardo è perso nel vuoto.) | Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.
+Broli SSJ;combattimento;;trasformazione;;;;;;sì;;400;;;1;(Non parla: immobile, guarda nel vuoto.) | Costringilo a trasformarsi e verrà con te.
+Broli SSJ;combattimento;;trasformazione;;;;;;;;1200;;Broli Super Saiyan Leggendario;1;Kakaroth... KAKAROTH! | Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.
 Zangya;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Bojack ci ha liberati: ora la Terra è nostra. | Battimi e ti seguirò.
 Bojack;combattimento;2v2;vincere;Bojack | Zangya;;;;;sì;;400;;;1;Il mio gruppo è libero, finalmente. | Battete me e Zangya, e verrò con voi.
 Bojack;combattimento;1v1;trasformazione;;;;;;;;1200;;Bojack (massima potenza);1;Il mio vero potere ti spazzerà via. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Bojack (massima potenza);combattimento;1v1;vincere;;;;;;sì;;400;;;1;Ora vedrai il mio vero potere! | Battimi e ti seguirò.
-Janemba;combattimento;;trasformazione;;;;;;sì;;400;;;1;Il mondo dei morti è sottosopra per colpa mia! | Costringimi a trasformarmi e verrò con te.
-Janemba;combattimento;;trasformazione;;;;;;;;1200;;Super Janemba;1;L'inferno si sta riversando sulla Terra... | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
+Janemba;combattimento;;trasformazione;;;;;;sì;;400;;;1;(Ghigna e fa un verso gutturale.) | Costringilo a trasformarsi e verrà con te.
+Janemba;combattimento;;trasformazione;;;;;;;;1200;;Super Janemba;1;(Un ruggito basso fa tremare l'aria.) | Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.
 Paikuhan;batti;;;;Janemba;;;;sì;;400;;;1;Nell'aldilà nessuno riesce a fermare Janemba. | Batti {obiettivo} e combatterò con te.
 Super Gogeta;batti;;;;Super Janemba;;;;sì;;400;;;1;Goku e Vegeta, fusi per salvare l'aldilà. | Batti {obiettivo} e combatterò con te.
 Tapion;batti;;;;Hildegarn;;;;sì;;400;;;1;Il demone Hildegarn sta per risvegliarsi. | Batti {obiettivo} e il mio flauto suonerà per te.
@@ -120,9 +120,9 @@ Tapion;combattimento;1v1;vincere;;;;;;sì;;400;;Hildegarn;1;È troppo pericoloso
 Hildegarn;combattimento;3v3;vincere;;;;;;sì;;400;;;1;GROOOAAAR! | Battilo con tre guerrieri e il demone sarà tuo.
 Arale;combattimento;;vincere;;;;;;sì;;400;;;1;Ncha! Giochiamo a fare la lotta? | Battimi e vengo con te!
 Son Goku (fine);porta;;;;Son Goten;;;;sì;;400;;;1;Non ho ancora conosciuto il mio secondo figlio! | Portami {obiettivo} e verrò con te.
-Son Goku (fine) SSJ;batti;;;;Majin Vegeta;;;;sì;;400;;;1;Vegeta si è fatto controllare da Bobbidi pur di combattere con me. | Batti {obiettivo} e verrò con te.
+Son Goku (fine) SSJ;batti;;;;Majin Vegeta;;;;sì;;400;;;1;Vegeta si è fatto controllare da Babidi pur di combattere con me. | Batti {obiettivo} e verrò con te.
 Son Goku (fine) SSJ3;batti;;;;Majin Buu (puro);;;;sì;;400;;;1;Majin Bu è tornato alla sua forma originale: la più pericolosa. | Batti {obiettivo} e verrò con te.
-Majin Vegeta;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Bobbidi mi ha dato ciò che volevo: il potere! | Battimi, se ci riesci, e verrò con te.
+Majin Vegeta;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Babidi mi ha dato ciò che volevo: il potere! | Battimi, se ci riesci, e verrò con te.
 Vegeta (seconda forma);porta;;;;Trunks (bambino);;;;sì;;400;;;1;Trunks deve diventare più forte: lo alleno io. | Portami {obiettivo} e verrò con te.
 Trunks (bambino);attendi;;;;;;2;;sì;;1400;;;1;Sto finendo l'allenamento nella stanza gravitazionale. | Ripassa tra {n} turni e verrò con te.
 Son Goten;porta;;;;Trunks (bambino);;;;sì;;400;;;1;Senza Trunks non vengo da nessuna parte! | Portami {obiettivo} e veniamo tutti e due.
@@ -133,9 +133,9 @@ Son Gohan (Ultimate);batti;;;;Super Buu;;;;sì;;400;;;1;Il Vecchio Kaioshin ha r
 Great Saiyaman;quiz;;;;;;;;sì;;400;;;1;La giustizia trionfa sempre! Io sono Great Saiyaman! | Rispondi giusto e combatterò al tuo fianco.
 Great Saiyaman 2-go;quiz;;;;;;;;sì;;400;;;1;Anch'io combatto per la giustizia! | Rispondi giusto e verrò con te.
 Videl;batti;;;;Spopovitch;;;;sì;;400;;;1;Al torneo Spopovitch mi ha umiliata. | Batti {obiettivo} e verrò con te.
-Spopovitch;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Bobbidi mi ha dato un potere enorme! | Battimi e verrò con te.
-Kaioshin;batti;;;;Bobbidi;;;;sì;;400;;;1;Bobbidi vuole risvegliare Majin Bu. | Batti {obiettivo} e verrò con te.
-Kibitoshin;batti;;;;Dabura;;;;sì;;400;;;1;Dabura serve Bobbidi: va fermato. | Batti {obiettivo} e ti aiuterò.
+Spopovitch;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Babidi mi ha dato un potere enorme! | Battimi e verrò con te.
+Kaioshin;batti;;;;Babidi;;;;sì;;400;;;1;Babidi vuole risvegliare Majin Bu. | Batti {obiettivo} e verrò con te.
+Kibitoshin;batti;;;;Dabura;;;;sì;;400;;;1;Dabura serve Babidi: va fermato. | Batti {obiettivo} e ti aiuterò.
 Majin Buu (buono);porta;;;;Uub;;;;sì;;400;;;1;Bu sente che quel bambino, Uub, è come lui. | Portami {obiettivo} e Bu verrà con te.
 Majin Buu (puro male);combattimento;1v1;vincere;;;;;;sì;;400;;Super Buu;1;Il Bu cattivo è uscito... e vuole tutto. | Battimi e vedrai che cosa diventerò.
 Super Buu;combattimento;;trasformazione;;;;;;sì;;400;;;1;Buu ha fame... Buu assorbe! | Costringimi a trasformarmi e verrò con te.

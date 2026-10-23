@@ -195,7 +195,7 @@ Gigante: gli impeti normali non lo colpiscono. Risucchio: la mossa restituisce e
 | Super Buu (Son Gohan assorbito) | SS | 3.600 | 4 | 3 | 3 |  | Super Kamehameha (onda) | Chocolate Beam (onda) | Super Ghost Buu Attack (onda) |  |  |
 | Majin Buu (puro) | SS | 3.600 | 4 | 3 | 3 |  | Super Kamehameha (onda) | Mystic Combination (impeto) | Planet Burst (onda) |  |  |
 | Dabura | A+ | 1.800 | 4 | 3 | 3 |  | Evil Impulse (onda) | Evil Flame (onda) | Darkness Sword Attack (impeto) |  |  |
-| Bobbidi | D- |  | 3 | 2 | 4 |  | Pui Pui Nice Shot (impeto) | Yakon Is Next! (impeto) | Babidi's Ultimate Power (onda) |  |  |
+| Babidi | D- |  | 3 | 2 | 4 |  | Pui Pui Nice Shot (impeto) | Yakon Is Next! (impeto) | Babidi's Ultimate Power (onda) |  |  |
 | Spopovitch | C |  | 4 | 3 | 3 |  | Berserker Crash (impeto) | Mad Banquet (impeto) | Majin Buu Resurrection (impeto) |  |  |
 
 ### GT (16)

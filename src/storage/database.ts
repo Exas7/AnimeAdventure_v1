@@ -8,6 +8,7 @@ import {
   SKIP_TURN_POWER,
   type ReadyPower,
 } from '../starters/readyPowers';
+import { renameBabidi } from './renameBabidi';
 
 // The browser's IndexedDB storage of the app (D-011): one database with a
 // store for each kind of data. Version 2 adds the imported catalog (D-017),
@@ -18,11 +19,12 @@ import {
 // version 8 the catalog of missions and the quiz questions (D-041), version
 // 9 the power to retry a lost challenge in the lists made before (D-090),
 // version 10 the ready powers of spec 063 in the lists made before,
-// version 11 «Doppia azione» in place of «Doppio movimento» (spec 067).
+// version 11 «Doppia azione» in place of «Doppio movimento» (spec 067),
+// version 12 «Babidi» in place of «Bobbidi» in everything saved (spec 079).
 
 /** Internal code: stays 'arkanite' after the rename, or saved data would vanish (D-020). */
 const DB_NAME = 'arkanite';
-const DB_VERSION = 11;
+const DB_VERSION = 12;
 
 export type StoreName =
   | 'autosave'
@@ -86,10 +88,32 @@ function openDatabase(): Promise<IDBDatabase> {
       if (event.oldVersion === 10) {
         replaceUnchanged(request.transaction?.objectStore('powers'), REPLACED_READY_POWERS_067);
       }
+      // Once per browser used before (spec 079, 2.2): «Bobbidi» becomes «Babidi»
+      // in every store, codes included.
+      if (event.oldVersion >= 1 && event.oldVersion < 12) {
+        for (const store of STORES) {
+          renameInStore(request.transaction?.objectStore(store));
+        }
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error ?? new Error('Cannot open IndexedDB'));
   });
+}
+
+/** Every value of the store rewritten with the new spelling, under the same key. */
+function renameInStore(store: IDBObjectStore | undefined): void {
+  const cursorRequest = store?.openCursor();
+  if (!cursorRequest) {
+    return;
+  }
+  cursorRequest.onsuccess = () => {
+    const cursor = cursorRequest.result;
+    if (cursor) {
+      cursor.update(renameBabidi(cursor.value));
+      cursor.continue();
+    }
+  };
 }
 
 /** Each old ready power still as the app put it takes the place of the new one; changed ones stay. */

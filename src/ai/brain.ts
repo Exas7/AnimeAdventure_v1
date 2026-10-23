@@ -53,9 +53,9 @@ export interface LevelRules {
 }
 
 export const LEVELS: Record<AiLevel, LevelRules> = {
-  easy: { quiz: 0.5, wander: 0.6, lasting: ['wait', 'goTo'], fights: 'any', buysBest: false, usesItems: false, showdown: false },
-  normal: { quiz: 0.7, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait', 'escort'], fights: 'tier', buysBest: true, usesItems: true, showdown: false },
-  hard: { quiz: 0.9, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait', 'escort'], fights: 'simulate', buysBest: true, usesItems: true, showdown: true },
+  easy: { quiz: 0.5, wander: 0.6, lasting: ['goTo'], fights: 'any', buysBest: false, usesItems: false, showdown: false },
+  normal: { quiz: 0.7, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'escort'], fights: 'tier', buysBest: true, usesItems: true, showdown: false },
+  hard: { quiz: 0.9, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'escort'], fights: 'simulate', buysBest: true, usesItems: true, showdown: true },
 };
 
 export const LEVEL_NAMES: Record<AiLevel, string> = { easy: 'Facile', normal: 'Normale', hard: 'Difficile' };
@@ -292,6 +292,7 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
       return reward * quizChance(mission, level);
     case 'other':
     case 'skipTurns':
+    case 'wait':
       return 0;
     default:
       return LEVELS[level].lasting.includes(mission.type) ? reward * 0.5 : 0;

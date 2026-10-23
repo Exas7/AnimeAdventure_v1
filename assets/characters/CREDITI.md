@@ -115,7 +115,7 @@ fatte sono indicate nelle note.
 | Super Buu (Son Gohan assorbito) | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Super_Buu_%28Gohan_absorbed%29_artwork.png) | rosa |  |
 | Majin Buu (puro) | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Kid_Buu_artwork.png) | rosa |  |
 | Dabura | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Dabura_artwork.png) | rosso e nero |  |
-| Bobbidi | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Babidi_artwork.png) | bianco |  |
+| Babidi | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Babidi_artwork.png) | bianco |  |
 | Spopovitch | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Spopovich_artwork.png) | bianco |  |
 | Super Garlic Jr. | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Super_Garlic_Jr._artwork.png) | bianco |  |
 | Dr. Uiro | Dragon Ball: Sparking! ZERO (Bandai Namco), dalla Dragon Ball Wiki | [link](https://dragonball.fandom.com/wiki/File:Sparking%21_Zero_-_Dr._Wheelo_artwork.png) | bianco |  |

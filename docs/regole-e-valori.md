@@ -102,7 +102,7 @@ I poteri pronti che «Randomizza» e «Nuova partita» propongono con gli starte
 - **Vai da**: portare la pedina sulla casella di un altro personaggio.
 - **Batti**: conquistare la casella di un altro personaggio, battendolo.
 - **Porta**: avere in squadra un certo personaggio.
-- **Attendi**: lasciar passare alcuni dei propri turni.
+- **Attendi**: stare fermi mentre passano alcuni turni, che l'app salta da sola.
 - **Salta turni**: saltare alcuni turni.
 - **Altro**: una missione scritta a mano: in regia la giudica chi conduce, sul telefono vale la parola del giocatore.
 - **Accompagnami da**: il personaggio viaggia con il giocatore fino alla casella di un altro; un compagno alla volta.
@@ -183,13 +183,13 @@ Nella partita PvP / PvIA e sul telefono l'IA è G2 e gioca con lo stesso arbitro
 | Quiz giusti | 5 su 10 | 7 su 10 | 9 su 10 |
 | Dove va | a caso 6 volte su 10, se no verso la casella utile più vicina | verso la casella più conveniente: il premio diviso per la distanza | verso la casella più conveniente: il premio diviso per la distanza |
 | Combattimenti | li accetta tutti | solo se i suoi personaggi non sono più deboli di quelli della missione | simula 40 scontri e combatte se ne vince almeno il 45% |
-| Missioni che durano | «Attendi» e «Vai da» | «Vai da», «Batti», «Porta», «Attendi» e «Accompagnami da» | «Vai da», «Batti», «Porta», «Attendi» e «Accompagnami da» |
+| Missioni che durano | «Vai da» | «Vai da», «Batti», «Porta» e «Accompagnami da» | «Vai da», «Batti», «Porta» e «Accompagnami da» |
 | Negozi | un personaggio a caso fra quelli che può permettersi | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene |
 | Oggetti e poteri da usare a mano | no | sì | sì |
 | Showdown | non ci pensa | non ci pensa | se lo vincerebbe insegue l'avversario, con la squadra completa o 3 personaggi più di lui; se lo perderebbe gli sta lontano |
 | Starter | a caso | il più forte | il più forte |
 
-- Non accetta mai «Salta turni» e «Altro», e non compra né usa Nuvola Speedy e Trasmissione
+- Non accetta mai «Attendi», «Salta turni» e «Altro», e non compra né usa Nuvola Speedy e Trasmissione
   Istantanea.
 - Usa «Salta turno» quando l'avversario sta per completare la squadra, a livello Difficile anche quando è
   vicino e lo showdown lo perderebbe, e comunque dal turno 40 in poi.

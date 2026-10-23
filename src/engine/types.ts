@@ -362,7 +362,7 @@ export interface ActiveMission {
   turnsPlayedAtStart: number;
   /** goTo with return: the pawn has already reached the target. */
   reachedTarget?: boolean;
-  /** skipTurns: turns still to be skipped. */
+  /** skipTurns and wait (spec 078): turns still to be skipped; absent in a wait accepted before. */
   turnsToSkipLeft?: number;
 }
 

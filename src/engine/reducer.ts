@@ -382,9 +382,9 @@ function acceptMission(
     nodeId,
     player: playerId,
     turnsPlayedAtStart: player.turnsPlayed,
-    ...(mission.type === 'skipTurns' ? { turnsToSkipLeft: turns } : {}),
+    ...(mission.type === 'skipTurns' || mission.type === 'wait' ? { turnsToSkipLeft: turns } : {}),
   });
-  if (mission.type === 'skipTurns' && turns > 0) {
+  if ((mission.type === 'skipTurns' || mission.type === 'wait') && turns > 0) {
     player.turnsToSkip += turns;
     out.events.push(`${player.name} salterà ${turns} ${turns === 1 ? 'turno' : 'turni'}`);
   }

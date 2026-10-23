@@ -1,3 +1,4 @@
+import { renameBabidiText } from '../storage/renameBabidi';
 import { parseGame, serializeGame, type Game, type GameMap } from '../engine';
 import { serializeMap } from '../editor/mapFile';
 import { serializeEpisode, type Episode } from '../episode/episodeFile';
@@ -24,7 +25,8 @@ export function downloadCsv(text: string, fileName: string): void {
 
 /** Reads a saved game. Throws SaveFileError with a clear message if the file is not valid. */
 export async function readGameFile(file: File): Promise<Game> {
-  return parseGame(await file.text());
+  // A file saved before spec 079 still says «Bobbidi».
+  return parseGame(renameBabidiText(await file.text()));
 }
 
 export function saveFileName(date: Date): string {

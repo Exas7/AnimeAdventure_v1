@@ -8,6 +8,7 @@ import {
   MISSIONS_BEFORE_069,
   MISSIONS_BEFORE_071,
   MISSIONS_BEFORE_074,
+  MISSIONS_BEFORE_079,
   PRICES_BEFORE_066,
   QUESTIONS_BEFORE_074,
   withGuestsOf,
@@ -17,6 +18,21 @@ import { missionsFingerprint, pricesFingerprint, questionsFingerprint } from './
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 
 const missions = () => includedMissions(includedCatalog());
+
+/** Spec 079, fuori spec: the lines of the missions of Broli and Janemba before they stopped speaking. */
+const SPOKEN_LINES: [string[], string[]][] = [
+  [['(Fissa il vuoto, senza dire una parola.)', 'Fallo trasformare e si unirà a te.'], ['Kakaroth... KAKAROTH!', 'Se mi fai trasformare, ti seguirò.']],
+  [['(Il suo sguardo è perso nel vuoto.)', 'Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.'], ['Kakaroth...', 'Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.']],
+  [['(Non parla: immobile, guarda nel vuoto.)', 'Costringilo a trasformarsi e verrà con te.'], ['Kakaroth... KAKAROTH!', 'Costringimi a trasformarmi e verrò con te.']],
+  [['Kakaroth... KAKAROTH!', 'Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.'], ['Il mio potere non ha limiti!', 'Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.']],
+  [['(Ghigna e fa un verso gutturale.)', 'Costringilo a trasformarsi e verrà con te.'], ['Il mondo dei morti è sottosopra per colpa mia!', 'Costringimi a trasformarmi e verrò con te.']],
+  [["(Un ruggito basso fa tremare l'aria.)",'Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.'], ["L'inferno si sta riversando sulla Terra...", 'Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.']],
+];
+const withSpokenLines = (list: CatalogMission[]) =>
+  list.map((entry) => {
+    const old = SPOKEN_LINES.find(([now]) => now.join('|') === entry.lines.join('|'));
+    return old ? { ...entry, lines: old[1] } : entry;
+  });
 const isStory = (entry: CatalogMission) => 'group' in entry.giver && entry.giver.group === 'story';
 const turnsToWait = ({ mission }: CatalogMission) =>
   mission.type === 'wait' || mission.type === 'skipTurns' ? (mission.turns ?? 0) : 0;
@@ -42,7 +58,7 @@ describe('the missions give coins (spec 063 and 066, criterion 1)', () => {
     expect(coins('quiz')).toEqual([800]);
   });
 
-  it("Bulma and Chichi's waits of 3 turns give 1,500 coins as well as their characters; Bobbidi's fight 2,000", () => {
+  it("Bulma and Chichi's waits of 3 turns give 1,500 coins as well as their characters; Babidi's fight 2,000", () => {
     const others = missions().filter((entry) => !isStory(entry) && !entry.mission.reward.cellCharacter);
     const waits = others.filter((entry) => entry.mission.type === 'wait');
     expect(waits).toHaveLength(2);
@@ -87,7 +103,7 @@ describe('a browser with the untouched lists of before gets the new values (spec
     });
   }
 
-  /** Before spec 063: coins only from the story, Chichi's quiz and Bobbidi's fight. */
+  /** Before spec 063: coins only from the story, Chichi's quiz and Babidi's fight. */
   const before063 = (entry: CatalogMission) => {
     if (entry.mission.reward.cellCharacter) {
       return undefined;
@@ -162,8 +178,14 @@ describe('a browser with the untouched lists of before gets the guests (spec 074
   const ofGuest = (entry: CatalogMission) => 'characterId' in entry.giver && isGuest(entry.giver.characterId);
 
   it("the missions of before are today's without the guests' ones", () => {
-    expect(missionsFingerprint(missions().filter((entry) => !ofGuest(entry)))).toBe(MISSIONS_BEFORE_074);
+    // Spec 079 changed the lines of Broli and Janemba after that: they are put back as they were.
+    expect(missionsFingerprint(withSpokenLines(missions()).filter((entry) => !ofGuest(entry)))).toBe(MISSIONS_BEFORE_074);
     expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_074);
+  });
+
+  it("the missions of before spec 079 are today's with the old lines of Broli and Janemba", () => {
+    expect(missionsFingerprint(withSpokenLines(missions()))).toBe(MISSIONS_BEFORE_079);
+    expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_079);
   });
 
   it("the questions of before are today's without those of one character", () => {

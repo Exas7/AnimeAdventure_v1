@@ -226,7 +226,10 @@ function missionTask(active: ActiveMission, state: GameState, catalog: Character
     case 'escort':
       return `viaggia con te fino a ${target}`;
     case 'wait': {
-      const left = Math.max(0, turns - (state.players[active.player].turnsPlayed - active.turnsPlayedAtStart));
+      // Spec 078: the turns are skipped by the app; a mission accepted before plays them (old rule).
+      const left =
+        active.turnsToSkipLeft ??
+        Math.max(0, turns - (state.players[active.player].turnsPlayed - active.turnsPlayedAtStart));
       return `attendi ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
     }
     case 'skipTurns': {
@@ -290,7 +293,9 @@ function isDone(state: GameState, active: ActiveMission): boolean {
     case 'escort':
       return targetNode !== undefined && player.position === targetNode;
     case 'wait':
-      return player.turnsPlayed - active.turnsPlayedAtStart >= (mission.turns ?? 0);
+      return active.turnsToSkipLeft !== undefined
+        ? active.turnsToSkipLeft <= 0
+        : player.turnsPlayed - active.turnsPlayedAtStart >= (mission.turns ?? 0);
     case 'skipTurns':
       return (active.turnsToSkipLeft ?? 0) <= 0;
     case 'fight':

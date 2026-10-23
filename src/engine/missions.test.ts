@@ -203,6 +203,46 @@ describe('missions in progress and their conditions (spec 026, 2.4)', () => {
     expect(doneIds(game)).toEqual(['c3']);
   });
 
+  it('Attendi stops the player like Salta turni: the turns pass by themselves (spec 078, criteria 1 and 2)', () => {
+    let game = withMission('c3', { type: 'wait', turns: 2, reward: { coins: 900 } });
+    game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });
+    expect(currentState(game).players.p1.turnsToSkip).toBe(2);
+    expect(doneIds(game)).toEqual([]);
+    // p1 ends the turn; p2 plays and ends: p1 is skipped once; p2 ends again: p1 is skipped twice.
+    game = play(game, { type: 'endTurn' }, { type: 'endTurn' });
+    expect(currentState(game).currentPlayer).toBe('p2');
+    expect(doneIds(game)).toEqual([]);
+    game = act(game, { type: 'endTurn' });
+    const state = currentState(game);
+    expect(state.currentPlayer).toBe('p2');
+    expect(state.players.p1.turnsToSkip).toBe(0);
+    expect(doneIds(game)).toEqual(['c3']);
+    game = act(game, { type: 'endTurn' });
+    expect(currentState(game).currentPlayer).toBe('p1');
+  });
+
+  it('Attendi: «Abbandona» gives back the turns not yet skipped (spec 078, criterion 3)', () => {
+    let game = withMission('c3', { type: 'wait', turns: 3, reward: {} });
+    game = play(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' }, { type: 'endTurn' }, { type: 'endTurn' });
+    expect(currentState(game).players.p1.turnsToSkip).toBe(2);
+    const [active] = currentState(game).activeMissions ?? [];
+    game = act(game, { type: 'abandonMission', missionId: active?.id ?? 0 });
+    expect(currentState(game).players.p1.turnsToSkip).toBe(0);
+  });
+
+  it('an Attendi accepted before spec 078 keeps the old rule: played turns, nothing skipped (criterion 5)', () => {
+    let game = withMission('c3', { type: 'wait', turns: 2, reward: {} });
+    game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });
+    const old = structuredClone(currentState(game));
+    old.players.p1.turnsToSkip = 0;
+    for (const active of old.activeMissions ?? []) {
+      delete active.turnsToSkipLeft;
+    }
+    expect(missionsDone(old)).toEqual([]);
+    old.players.p1.turnsPlayed += 2;
+    expect(missionsDone(old).map((active) => active.nodeId)).toEqual(['c3']);
+  });
+
   it('fights, quizzes and "other" missions are never detected: the host judges them', () => {
     let game = withMission('c3', { type: 'other', text: 'Canta', reward: { coins: 50 } });
     game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });

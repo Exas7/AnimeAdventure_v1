@@ -196,7 +196,7 @@ export function MissionEditor({ mission, onChange, catalog, groups, items }: Mis
 
       {(mission?.type === 'wait' || mission?.type === 'skipTurns') && (
         <label className={styles.field}>
-          {mission.type === 'wait' ? 'Turni da attendere (intanto si gioca)' : 'Turni da saltare'}
+          {mission.type === 'wait' ? 'Turni da attendere (il giocatore sta fermo)' : 'Turni da saltare'}
           <NumberField
             label="Turni"
             value={mission.turns ?? 1}
