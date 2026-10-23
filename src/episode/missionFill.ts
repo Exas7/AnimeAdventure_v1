@@ -31,6 +31,7 @@ import {
   type Random,
   type RandomizeResult,
 } from './fill';
+import { silentLines } from './silent';
 import type { TextLibrary } from './textLibrary';
 
 // "Randomizza" with the missions of the catalog (spec 027, 2.4): story
@@ -307,10 +308,13 @@ export function randomizeWithMissions(
           groupMissions(character, sources.catalog).filter(fits),
         ];
     let chosen: Planned | null = null;
-    for (const group of candidates) {
+    // Whether the mission is written for this very character (it keeps its lines) or comes from the group.
+    let ownLines = Boolean(own);
+    for (const [index, group] of candidates.entries()) {
       for (const entry of weightedOrder(group, random)) {
         chosen = plan(entry, cellId, place);
         if (chosen) {
+          ownLines = Boolean(own) || index === 0;
           break;
         }
       }
@@ -372,7 +376,10 @@ export function randomizeWithMissions(
       coins: chosen.mission.reward.coins,
     };
     const library = pick(texts.lines, random);
-    const lines = chosen.lines.length > 0 ? fillLines(chosen.lines, values) : library ? [library] : [];
+    // Who does not speak in the story only cries (spec 090), unless the mission is his own.
+    const cries = ownLines ? null : silentLines(character, chosen.lines.length || 2, random);
+    const lines =
+      cries ?? (chosen.lines.length > 0 ? fillLines(chosen.lines, values) : library ? [library] : []);
     const { lines: _old, format: _format, ...rest } = result[cellId] ?? {};
     result[cellId] = { ...rest, mission: chosen.mission, ...(lines.length > 0 ? { lines } : {}) };
     missions += 1;

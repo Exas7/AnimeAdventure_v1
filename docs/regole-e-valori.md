@@ -147,20 +147,20 @@ mappe.
 | | Inferi | Pianeta dei Kaioshin | Pianeta Nameck |
 |---|---|---|---|
 | Caselle personaggio | 40 | 40 | 42 |
-| Combattimento | 72% | 70% | 72% |
-| Quiz | 6% | 7% | 6% |
-| Batti | 10% | 10% | 9% |
+| Combattimento | 72% | 72% | 72% |
+| Quiz | 7% | 7% | 6% |
+| Batti | 9% | 10% | 10% |
 | Porta | 1% | 1% | 1% |
-| Salta turni | 2% | 2% | 2% |
+| Salta turni | 3% | 2% | 2% |
 | Ripassa | 3% | 3% | 3% |
-| Accompagnami da | 6% | 6% | 6% |
+| Accompagnami da | 6% | 5% | 5% |
 
 **I combattimenti, per formato** (quota dei combattimenti)
 
 | | Inferi | Pianeta dei Kaioshin | Pianeta Nameck |
 |---|---|---|---|
-| 1v1 | 57% | 55% | 58% |
-| 2v2 | 40% | 41% | 38% |
+| 1v1 | 55% | 54% | 57% |
+| 2v2 | 41% | 42% | 39% |
 | 3v3 | 4% | 4% | 4% |
 
 **In una puntata, in media**
@@ -168,13 +168,13 @@ mappe.
 | | Inferi | Pianeta dei Kaioshin | Pianeta Nameck |
 |---|---|---|---|
 | Negozi | 2 | 2 | 2 |
-| Personaggi della storia | 4,8 | 4,9 | 4,9 |
+| Personaggi della storia | 4,9 | 4,8 | 4,8 |
 | Catene sulle strade grigie | 6,0 | 6,0 | 7,0 |
-| Personaggi messi sulla mappa per la missione di un altro | 3,5 | 4,0 | 3,7 |
+| Personaggi messi sulla mappa per la missione di un altro | 3,5 | 3,7 | 3,7 |
 | Caselle che danno il loro personaggio | 78% | 78% | 78% |
-| Monete in palio nelle missioni | 24.400$ | 24.800$ | 26.000$ |
-| Puntate con un ospite fra i personaggi della storia | 96% | 99% | 96% |
-| Ospiti che tengono un negozio | 0,6 | 0,7 | 0,7 |
+| Monete in palio nelle missioni | 24.500$ | 24.700$ | 26.200$ |
+| Puntate con un ospite fra i personaggi della storia | 95% | 98% | 98% |
+| Ospiti che tengono un negozio | 0,7 | 0,8 | 0,7 |
 
 ## L'IA
 
