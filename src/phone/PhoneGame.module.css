@@ -139,6 +139,26 @@
   text-align: center;
 }
 
+/* The windows between two turns («Tocca a G2», what the AI did): big, a whole screen was too much (spec 087). */
+.turnDialog {
+  zoom: 1.5;
+}
+
+.turnDialog .buttons {
+  margin-top: 12px;
+}
+
+/* vh counts zoomed too: the list keeps half the screen at most. */
+.turnDialog .summary {
+  max-height: 36vh;
+}
+
+@media (min-width: 1100px) and (min-height: 650px) {
+  .turnDialog {
+    zoom: 2;
+  }
+}
+
 /* Who leaves the team after the sixth (spec 061, 2.3): one button per character, the chosen one lit. */
 .leaving {
   display: flex;

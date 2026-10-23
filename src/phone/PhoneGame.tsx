@@ -389,7 +389,7 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
 
   const traveling = activeTravel(state, travel);
   const travelTargets = travelCells(game, state, travel);
-  const targets = overlay || passTo || winner || aiTurn ? null : travelTargets ?? [...moveTargets(game, state)];
+  const targets = overlay || passTo || aiSummary || winner || aiTurn ? null : travelTargets ?? [...moveTargets(game, state)];
 
   const isShop = (nodeId: string) => game.map.nodes.find((node) => node.id === nodeId)?.type === 'shop';
 
@@ -647,7 +647,13 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
   }, [mapRatio]);
 
   // PC: the space bar presses «Inizia il turno» (spec 085).
-  useSpaceKey(passTo !== null, () => setPassTo(null));
+  useSpaceKey(passTo !== null || aiSummary !== null, () => {
+    if (passTo !== null) {
+      setPassTo(null);
+    } else {
+      setAiSummary(null);
+    }
+  });
 
   // PC: the space bar twice is «Fine turno» (spec 083).
   useDoubleSpace(
@@ -680,24 +686,6 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
             Nuova partita
           </button>
           <button onClick={() => onGameOver('menu')}>Menu iniziale</button>
-        </div>
-      </div>
-    );
-  }
-
-  if (aiSummary) {
-    return (
-      <div className={styles.full}>
-        <p className={styles.pass}>Turno dell'IA</p>
-        <ul className={styles.summary}>
-          {aiSummary.map((line, index) => (
-            <li key={index}>{line}</li>
-          ))}
-        </ul>
-        <div className={styles.buttons}>
-          <button className={styles.primary} onClick={() => setAiSummary(null)}>
-            Tocca a te
-          </button>
         </div>
       </div>
     );
@@ -851,10 +839,28 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
           </div>
         </div>
       )}
+      {aiSummary && (
+        // What the AI did, in a window over the board, not a whole screen (spec 087); the space bar presses its button.
+        <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Turno dell'IA">
+          <div className={`${styles.dialogBox} ${styles.turnDialog}`}>
+            <p className={styles.pass}>Turno dell'IA</p>
+            <ul className={styles.summary}>
+              {aiSummary.map((line, index) => (
+                <li key={index}>{line}</li>
+              ))}
+            </ul>
+            <div className={styles.buttons}>
+              <button className={styles.primary} onClick={() => setAiSummary(null)}>
+                Tocca a te
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {passTo && (
         // A small window over the board, not a whole screen (spec 085); the space bar presses its button.
         <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Cambio turno">
-          <div className={styles.dialogBox}>
+          <div className={`${styles.dialogBox} ${styles.turnDialog}`}>
             <p className={styles.pass}>
               Tocca a <strong className={styles[passTo]}>{name(passTo)}</strong>
             </p>
