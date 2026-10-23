@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { cellMission, testItems, type Character, type GameMap, type NodeType } from '../engine';
 import type { CatalogMission, QuestionEntry } from '../missions/catalog';
 import { randomize, tierRank, type Content } from './fill';
-import { questionLevel, randomizeWithMissions, type MissionSources } from './missionFill';
+import { aloneChance, questionLevel, randomizeWithMissions, type MissionSources } from './missionFill';
 import { EMPTY_TEXT_LIBRARY } from './textLibrary';
 
 /**
@@ -503,7 +503,8 @@ describe('"Randomizza" after the review of spec 034', () => {
         { id: 'f2', giver: { group: 'villains' }, mission: { type: 'fight', condition: 'win', reward: { cellCharacter: true } }, lines: [], weight: 1 },
       ],
     };
-    const alone = randomizeWithMissions(chainMap(), full, characters, [], EMPTY_TEXT_LIBRARY, ['b3'], 1, sequence(0.5), fightsOnly);
+    // 0.9: not one of the times the character fights alone (spec 069, 2.1).
+    const alone = randomizeWithMissions(chainMap(), full, characters, [], EMPTY_TEXT_LIBRARY, ['b3'], 1, sequence(0.9), fightsOnly);
     expect(alone.content.b3?.mission?.format).toBe('3v3');
 
     const goToOnly: MissionSources = {
@@ -651,5 +652,14 @@ describe('"Randomizza" by strength (spec 043, criteria 3-4; D-069)', () => {
         expect(content[id]?.mission?.quiz?.question).toBe('old?');
       }
     }
+  });
+});
+
+describe('fights alone (spec 069, 2.1)', () => {
+  it('where a team fight could come, the lower the tier the more often alone', () => {
+    expect(['C', 'B-', 'B+'].map(aloneChance)).toEqual([2 / 3, 2 / 3, 2 / 3]);
+    expect(['A-', 'A+'].map(aloneChance)).toEqual([1 / 2, 1 / 2]);
+    expect(['S-', 'S+'].map(aloneChance)).toEqual([1 / 3, 1 / 3]);
+    expect(['SS-', 'SS+'].map(aloneChance)).toEqual([1 / 4, 1 / 4]);
   });
 });

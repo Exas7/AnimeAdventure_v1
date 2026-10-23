@@ -159,14 +159,19 @@ export function MissionEditor({ mission, onChange, catalog, groups, items }: Mis
         </div>
       )}
 
-      {(mission?.type === 'goTo' || mission?.type === 'defeat' || mission?.type === 'bring') && (
+      {(mission?.type === 'goTo' ||
+        mission?.type === 'defeat' ||
+        mission?.type === 'bring' ||
+        mission?.type === 'escort') && (
         <>
           <label className={styles.field}>
             {mission.type === 'goTo'
               ? 'Da chi andare'
-              : mission.type === 'defeat'
-                ? 'Chi battere (deve stare sul tabellone)'
-                : 'Chi avere in squadra'}
+              : mission.type === 'escort'
+                ? 'Da chi accompagnarlo (deve stare sul tabellone)'
+                : mission.type === 'defeat'
+                  ? 'Chi battere (deve stare sul tabellone)'
+                  : 'Chi avere in squadra'}
             <CharacterPicker
               catalog={catalog}
               groups={groups}

@@ -4,6 +4,8 @@ import { parseGame, serializeGame } from './save';
 import {
   activeMissionParts,
   activeMissionText,
+  awayCells,
+  companionOf,
   missionsOf,
   cellMission,
   defaultMission,
@@ -304,5 +306,47 @@ describe('the reward (spec 026, criteria 6 and 8)', () => {
     expect(currentState(game).activeMissions).toEqual([]);
     expect(currentState(game).players.p1.turnsToSkip).toBe(0);
     expect(currentState(game).players.p1.coins).toBe(0);
+  });
+});
+
+describe('«Accompagnami da» (spec 069, criterion 5; D-097)', () => {
+  const escort: Mission = { type: 'escort', targetId: 'char-c', reward: { coins: 800 } };
+  // char-a gives it in c1 and asks to be taken to char-c, in c3.
+  const accepted = () =>
+    play(withMission('c1', escort), { type: 'placePawn', player: 'p1', nodeId: 'c1' }, { type: 'acceptMission', nodeId: 'c1', player: 'p1' });
+
+  it('the giver travels with the player, not in the team, and their cell is away', () => {
+    const state = currentState(accepted());
+    expect(companionOf(state, 'p1')).toBe('char-a');
+    expect(awayCells(state).get('c1')).toBe('p1');
+    expect(state.players.p1.team).not.toContain('char-a');
+    expect(missionLabel(escort, testCatalog)).toBe('Missione · Accompagnami da Personaggio C');
+    expect(activeMissionText(state.activeMissions![0]!, state, testCatalog)).toBe(
+      'Personaggio A: viaggia con te fino a Personaggio C',
+    );
+  });
+
+  it('on the cell of the one to reach the mission comes true: coins, and the companion goes', () => {
+    const arrived = act(accepted(), { type: 'placePawn', player: 'p1', nodeId: 'c3' });
+    expect(doneIds(arrived)).toEqual(['c1']);
+    const done = act(arrived, { type: 'completeMission', nodeId: 'c1', player: 'p1' });
+    const state = currentState(done);
+    expect(state.players.p1.coins).toBe(800);
+    expect(state.players.p1.team).not.toContain('char-a');
+    expect(companionOf(state, 'p1')).toBeUndefined();
+  });
+
+  it('one companion at a time; nobody meets a giver who is travelling; abandoned, the giver is back', () => {
+    const second = act(
+      act(accepted(), { type: 'setCellContent', nodeId: 'c2', content: { characterId: 'char-b', mission: escort } }),
+      { type: 'acceptMission', nodeId: 'c2', player: 'p1' },
+    );
+    expect(lastWarnings(second).map((warning) => warning.kind)).toContain('oneCompanion');
+    const other = play(accepted(), { type: 'endTurn' }, { type: 'placePawn', player: 'p2', nodeId: 'c1' }, { type: 'interact', nodeId: 'c1' });
+    expect(lastWarnings(other).map((warning) => warning.kind)).toContain('companionAway');
+    const missionId = currentState(accepted()).activeMissions![0]!.id;
+    const back = currentState(act(accepted(), { type: 'abandonMission', missionId }));
+    expect(awayCells(back).size).toBe(0);
+    expect(back.cells.c1?.characterId).toBe('char-a');
   });
 });

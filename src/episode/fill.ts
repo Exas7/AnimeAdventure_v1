@@ -1,3 +1,4 @@
+import { isHenchman } from '../catalog/henchmen';
 import { onePerPerson, personOf, personsOf } from '../catalog/person';
 import type { CellContent, Character, GameMap } from '../engine';
 import type { TextLibrary } from './textLibrary';
@@ -80,11 +81,12 @@ const LOWEST_RANK = tierRank('C-') as number;
 
 /**
  * Who "Randomizza" can put in a cell or up for sale (D-034): a recruitable
- * character, so with a tier, from C- up, that does not keep shops.
+ * character, so with a tier, from C- up, that does not keep shops. Never a
+ * henchman (Cell Jr., Saibaiman: spec 069, D-095), nor among the starters.
  */
 export function canBeDrawn(character: Character): boolean {
   const rank = tierRank(character.tier);
-  return rank !== null && rank >= LOWEST_RANK && !character.shopkeeper;
+  return rank !== null && rank >= LOWEST_RANK && !character.shopkeeper && !isHenchman(character.id);
 }
 
 /**

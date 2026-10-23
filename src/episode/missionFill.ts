@@ -161,8 +161,17 @@ export function randomizeWithMissions(
   // the draw does not use them elsewhere.
   const chained = new Map<string, CatalogMission>();
   const chainCells = new Set<string>();
-  const chainEntries = shuffle(
-    sources.catalog.filter((entry) => entry.behindId && 'characterId' in entry.giver),
+  // Heavier chains come out more often (spec 069, 2.2). Who opens is of medium-high
+  // strength, at least A-, and who is behind is stronger still (D-096).
+  const rankOf = (id: string | undefined) => tierRank(find(id)?.tier) ?? -1;
+  const chainEntries = weightedOrder(
+    sources.catalog.filter(
+      (entry) =>
+        entry.behindId &&
+        'characterId' in entry.giver &&
+        rankOf(entry.giver.characterId) >= CHAIN_OPENER_RANK &&
+        rankOf(entry.behindId) > rankOf(entry.giver.characterId),
+    ),
     random,
   );
   for (const edge of map.edges) {
@@ -285,6 +294,8 @@ export function randomizeWithMissions(
     const fits = (entry: CatalogMission) =>
       (!openers.has(cellId) || OPENER_MISSIONS.includes(entry.mission.type)) &&
       (!fightOnly.has(cellId) || entry.mission.type === 'fight') &&
+      // A chain's mission only in the cell that opens its path (spec 069, 2.2).
+      !entry.behindId &&
       !tooEasyFor(entry.mission, character);
     // Their own missions first; if none fits here, those of their group.
     const candidates = own
@@ -308,7 +319,12 @@ export function randomizeWithMissions(
     if (!chosen && character.tier) {
       // Nothing fits: a plain fight, in the format of the distance.
       chosen = {
-        mission: { type: 'fight', format: defaultFormat(place), condition: 'win', reward: { cellCharacter: true } },
+        mission: {
+          type: 'fight',
+          format: chosenFormat(place, character, random),
+          condition: 'win',
+          reward: { cellCharacter: true },
+        },
         lines: [],
       };
     }
@@ -417,7 +433,7 @@ export function randomizeWithMissions(
         if (mission.format && !formatFits(mission.format, place)) {
           return null;
         }
-        mission.format ??= defaultFormat(place);
+        mission.format ??= chosenFormat(place, giver, random);
         mission.condition ??= 'win';
         break;
       }
@@ -437,9 +453,20 @@ export function randomizeWithMissions(
         break;
       }
       case 'goTo':
+      case 'escort':
       case 'defeat': {
         const farther = (id: string) =>
-          mission.type === 'goTo' || (places.get(id)?.distance ?? 0) > place.distance;
+          mission.type !== 'defeat' || (places.get(id)?.distance ?? 0) > place.distance;
+        // One target among several (spec 069, 2.3): one already on the board, or one to put there.
+        if (!mission.targetId && entry.targetChoices?.length) {
+          const choices = entry.targetChoices.filter((id) => find(id) && !isReserved(id));
+          const there = choices.filter(onBoard);
+          const pool = there.length > 0 ? there : choices;
+          mission.targetId = pool[Math.floor(random() * pool.length)];
+          if (!mission.targetId) {
+            return null;
+          }
+        }
         if (mission.targetId) {
           const target = mission.targetId;
           if (isReserved(target)) {
@@ -487,7 +514,7 @@ export function randomizeWithMissions(
             (id) =>
               farther(id) &&
               notGiver(result[id]?.characterId) &&
-              (mission.type === 'goTo' || find(result[id]?.characterId)?.tier),
+              (mission.type !== 'defeat' || find(result[id]?.characterId)?.tier),
           );
           const cell = choices[Math.floor(random() * choices.length)];
           if (!cell) {
@@ -550,6 +577,9 @@ interface Planned {
   replace?: { cellId: string; characterId: string };
 }
 
+/** The weakest who may open a chain (spec 069, 2.2; D-096): medium-high strength. */
+const CHAIN_OPENER_RANK = tierRank('A-') as number;
+
 /**
  * Format by distance (spec 027, 2.4): 1v1 in the nearest third of each side,
  * 2v2 farther, 3v3 only in the farthest cell of a side.
@@ -559,6 +589,30 @@ function defaultFormat(place: CellPlace): ChallengeFormat {
     return '1v1';
   }
   return place.farthest ? '3v3' : '2v2';
+}
+
+/**
+ * The format of a fight without one (spec 069, 2.1): the format of the
+ * distance, but where a team fight could come the character may fight
+ * alone, the more often the lower the tier.
+ */
+function chosenFormat(place: CellPlace, character: Character | undefined, random: Random): ChallengeFormat {
+  const format = defaultFormat(place);
+  return format !== '1v1' && random() < aloneChance(character?.tier) ? '1v1' : format;
+}
+
+/** Alone 2 times out of 3 up to B+, 1 out of 2 for A, 1 out of 3 for S, 1 out of 4 for SS (spec 069, 2.1). */
+export function aloneChance(tier: string | undefined): number {
+  switch ((tier ?? '').replace(/[+-]/g, '')) {
+    case 'SS':
+      return 1 / 4;
+    case 'S':
+      return 1 / 3;
+    case 'A':
+      return 1 / 2;
+    default:
+      return 2 / 3;
+  }
 }
 
 function formatFits(format: ChallengeFormat, place: CellPlace): boolean {

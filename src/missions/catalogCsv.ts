@@ -51,6 +51,7 @@ const TYPE_NAMES: Record<MissionType, string> = {
   wait: 'attendi',
   skipTurns: 'salta turni',
   other: 'altro',
+  escort: 'accompagnami da',
 };
 
 const LIST_SEPARATOR = ' | ';
@@ -83,7 +84,7 @@ export function catalogToCsv(
       mission.format ?? '',
       mission.type === 'fight' ? (mission.condition === 'transform' ? 'trasformazione' : 'vincere') : '',
       names(mission.opponents),
-      mission.targetId ? name(mission.targetId) : '',
+      entry.targetChoices ? names(entry.targetChoices) : mission.targetId ? name(mission.targetId) : '',
       mission.returnToGiver ? 'sì' : '',
       mission.turns === undefined ? '' : String(mission.turns),
       mission.text ?? '',
@@ -168,7 +169,8 @@ export function catalogFromCsv(
     });
 
     const opponents = characterList(at(row, 'avversari'));
-    const target = at(row, 'obiettivo');
+    // One target, or several to choose from (spec 069, 2.3).
+    const targets = characterList(at(row, 'obiettivo'));
     const rewardCharacters = characterList(at(row, 'premio personaggi'));
     const behind = at(row, 'dietro');
 
@@ -199,8 +201,8 @@ export function catalogFromCsv(
     if (opponents.length > 0) {
       mission.opponents = opponents;
     }
-    if (target) {
-      mission.targetId = character(target);
+    if (targets.length === 1) {
+      mission.targetId = targets[0];
     }
     if (type === 'goTo') {
       mission.returnToGiver = YES.has(normalize(at(row, 'e torna')));
@@ -217,6 +219,7 @@ export function catalogFromCsv(
       mission,
       lines: list(at(row, 'battute')),
       ...(behind ? { behindId: character(behind) } : {}),
+      ...(targets.length > 1 ? { targetChoices: targets } : {}),
       weight: weight ? Math.max(0, number(weight)) : 1,
     });
   });

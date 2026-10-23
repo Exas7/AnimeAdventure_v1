@@ -26,6 +26,11 @@ export interface CatalogMission {
   lines: string[];
   /** Chains on locked paths: who goes behind the path this cell opens (Cooler → Metal Cooler). */
   behindId?: string;
+  /**
+   * A target among several («Batti un Majin Buu qualsiasi», spec 069, 2.3):
+   * "Randomizza" picks one on the board, or puts one there.
+   */
+  targetChoices?: string[];
   /** How often it comes out among the missions of the same giver. */
   weight: number;
 }
@@ -128,6 +133,8 @@ export function looksLikeCatalogMission(value: unknown): value is CatalogMission
     Array.isArray(entry.lines) &&
     entry.lines.every((line) => typeof line === 'string') &&
     (entry.behindId === undefined || typeof entry.behindId === 'string') &&
+    (entry.targetChoices === undefined ||
+      (Array.isArray(entry.targetChoices) && entry.targetChoices.every((id) => typeof id === 'string'))) &&
     typeof entry.weight === 'number'
   );
 }

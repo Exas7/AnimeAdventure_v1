@@ -53,8 +53,8 @@ interface LevelRules {
 
 export const LEVELS: Record<AiLevel, LevelRules> = {
   easy: { quiz: 0.5, wander: 0.6, lasting: ['wait', 'goTo'], fights: 'any', buysBest: false, usesItems: false, showdown: false },
-  normal: { quiz: 0.7, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait'], fights: 'tier', buysBest: true, usesItems: true, showdown: false },
-  hard: { quiz: 0.9, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait'], fights: 'simulate', buysBest: true, usesItems: true, showdown: true },
+  normal: { quiz: 0.7, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait', 'escort'], fights: 'tier', buysBest: true, usesItems: true, showdown: false },
+  hard: { quiz: 0.9, wander: 0, lasting: ['goTo', 'defeat', 'bring', 'wait', 'escort'], fights: 'simulate', buysBest: true, usesItems: true, showdown: true },
 };
 
 export const LEVEL_NAMES: Record<AiLevel, string> = { easy: 'Facile', normal: 'Normale', hard: 'Difficile' };
@@ -187,7 +187,7 @@ function toFighters(game: Game, state: GameState, ids: readonly string[]): Fight
 /** Who the AI sends on the field for a fight mission (spec 053, 2.3). */
 export function chooseFighters(game: Game, state: GameState, nodeId: string, level: AiLevel, random: Random): string[] {
   const player = state.currentPlayer;
-  const size = proposedMissionSides(state, nodeId, player, game.catalog, random).a.length;
+  const size = proposedMissionSides(state, nodeId, player, game.catalog).a.length;
   const candidates = myFighters(game, state, player);
   if (LEVELS[level].fights === 'any') {
     // Facile sends whoever happens to be there.
@@ -209,7 +209,7 @@ export function aiFight(
   fighters: readonly string[],
   random: Random,
 ): { record: FightRecord; team: string[] } {
-  const opponents = proposedMissionSides(state, nodeId, state.currentPlayer, game.catalog, random).b;
+  const opponents = proposedMissionSides(state, nodeId, state.currentPlayer, game.catalog).b;
   const record = recordFight(
     { a: toFighters(game, state, fighters), b: toFighters(game, state, opponents) },
     DEFAULT_SETTINGS,
@@ -224,7 +224,7 @@ function fightChance(game: Game, state: GameState, nodeId: string, level: AiLeve
   if (fighters.length === 0) {
     return 0;
   }
-  const opponents = proposedMissionSides(state, nodeId, state.currentPlayer, game.catalog, random).b;
+  const opponents = proposedMissionSides(state, nodeId, state.currentPlayer, game.catalog).b;
   const rules = LEVELS[level];
   if (rules.fights === 'any') {
     return 0.5;
@@ -688,7 +688,7 @@ function chooseMove(
     }
     const mission = cellMission(state.cells[active.nodeId]);
     const targetNode =
-      mission?.type === 'goTo' && mission.targetId
+      (mission?.type === 'goTo' || mission?.type === 'escort') && mission.targetId
         ? active.reachedTarget && mission.returnToGiver
           ? active.nodeId
           : Object.entries(state.cells).find(([, cell]) => cell.characterId === mission.targetId)?.[0]

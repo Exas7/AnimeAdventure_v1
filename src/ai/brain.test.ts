@@ -41,13 +41,16 @@ const TIERS: Record<string, string> = {
   'char-h': 'S',
 };
 
-/** The test game, the AI as player 1 so that it plays first; characters with a tier. */
+/** The test game, the AI as player 1 so that it plays first; characters with a tier, and the henchman of team fights (spec 069). */
 function aiGame(options: { coins?: number; content?: Record<string, CellContent>; tiers?: Record<string, string> } = {}): Game {
   const tiers = { ...TIERS, ...options.tiers };
   const setup = testSetup({ startingCoins: options.coins ?? 0 });
   const game = createGame({
     ...setup,
-    catalog: testCatalog.map((character) => ({ ...character, tier: tiers[character.id] })),
+    catalog: [
+      ...testCatalog.map((character) => ({ ...character, tier: tiers[character.id] })),
+      { id: 'saibaiman', name: 'Saibaiman', tier: 'D', villain: true },
+    ],
     content: { ...setup.content, ...options.content },
   });
   return { ...game, opponent: { player: 'p1', level: 'normal' } };

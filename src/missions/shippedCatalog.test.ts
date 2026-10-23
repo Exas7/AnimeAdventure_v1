@@ -106,7 +106,8 @@ describe('the rules of the catalog in docs (spec 043, criteria 5-6; D-069, D-070
       expect(entry.lines.length).toBeLessThanOrEqual(2);
       const text = entry.lines.join(' ');
       if (text.includes('{obiettivo}')) {
-        expect(entry.mission.targetId).toBeDefined();
+        // One target, or several to choose from (spec 069, 2.3).
+        expect(entry.mission.targetId ?? entry.targetChoices).toBeDefined();
       }
       if (text.includes('{n}')) {
         expect(entry.mission.turns).toBeDefined();
@@ -119,6 +120,54 @@ describe('the rules of the catalog in docs (spec 043, criteria 5-6; D-069, D-070
     expect(questions.filter((entry) => entry.level === undefined)).toEqual([]);
     for (const { level } of QUESTION_LEVELS) {
       expect(questions.filter((entry) => entry.level === level).length, level).toBeGreaterThanOrEqual(18);
+    }
+  });
+});
+
+describe('the story missions in docs (spec 069, criteria 3 and 4)', () => {
+  const list = importCatalog(characterTable);
+  const characters: Character[] = list.ok ? list.catalog : [];
+  const entries = catalogFromCsv(missionTable, characters, testItems).entries;
+  const id = (name: string) => characters.find((character) => character.name === name)?.id ?? name;
+  const ofGiver = (name: string) =>
+    entries.filter((entry) => 'characterId' in entry.giver && entry.giver.characterId === id(name));
+
+  it('no «Vai da … e torna»; «Accompagnami da» only from the special characters, without a tier', () => {
+    expect(entries.filter((entry) => entry.mission.type === 'goTo' && entry.mission.returnToGiver)).toEqual([]);
+    const escorts = entries.filter((entry) => entry.mission.type === 'escort');
+    expect(escorts).toHaveLength(8);
+    for (const entry of escorts) {
+      const giverId = 'characterId' in entry.giver ? entry.giver.characterId : '';
+      const giver = characters.find((character) => character.id === giverId);
+      expect(giver).toBeDefined();
+      expect(giver?.tier).toBeUndefined();
+      expect(entry.mission.reward).toEqual({ coins: 800 });
+    }
+  });
+
+  it('the villains of the group only fight; the story pairs of the table', () => {
+    const villains = entries.filter((entry) => 'group' in entry.giver && entry.giver.group === 'villains');
+    expect(villains.every((entry) => entry.mission.type === 'fight')).toBe(true);
+    const opponents = (name: string, format: string) =>
+      ofGiver(name).find((entry) => entry.mission.type === 'fight' && entry.mission.format === format)?.mission.opponents;
+    expect(opponents('Freeza (forma finale)', '2v2')).toEqual([id('Freeza (forma finale)'), id('Re Cold')]);
+    expect(opponents('C-17', '2v2')).toEqual([id('C-17'), id('C-18')]);
+    expect(opponents('C-18', '2v2')).toEqual([id('C-18'), id('C-17')]);
+    expect(opponents('C-16', '3v3')).toEqual([id('C-16'), id('C-17'), id('C-18')]);
+  });
+
+  it('Dabura wants a Majin Buu, any of them, beaten', () => {
+    const dabura = ofGiver('Dabura').find((entry) => entry.mission.type === 'defeat');
+    expect(dabura?.targetChoices).toEqual(
+      ['Majin Buu (buono)', 'Majin Buu (puro male)', 'Super Buu', 'Majin Buu (puro)'].map(id),
+    );
+  });
+
+  it('Cell Jr. and Saibaiman are never a target or a reward', () => {
+    const henchmen = ['cell-jr', 'saibaiman'];
+    for (const entry of entries) {
+      const asked = [entry.mission.targetId, ...(entry.targetChoices ?? []), ...(entry.mission.reward.characters ?? [])];
+      expect(asked.filter((asks) => henchmen.includes(asks ?? ''))).toEqual([]);
     }
   });
 });

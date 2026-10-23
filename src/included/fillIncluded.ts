@@ -7,11 +7,13 @@ import { includedCatalog, includedMissions, includedQuestions } from './included
 /**
  * The fingerprints of the included missions of before (codes left out): a
  * browser that still has one of those lists, never changed, gets the new one
- * with more coins (spec 063 and 066, 2.3). Any other list stays as it is.
+ * (spec 063 and 066, 2.3: more coins; spec 069, 2.6: the story missions).
+ * Any other list stays as it is.
  */
 export const MISSIONS_BEFORE_063 = '06dfb42d';
 export const MISSIONS_BEFORE_066 = '21906f4f';
-const OLD_MISSIONS = [MISSIONS_BEFORE_063, MISSIONS_BEFORE_066];
+export const MISSIONS_BEFORE_069 = 'd7074836';
+const OLD_MISSIONS = [MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069];
 
 /**
  * The fingerprint of codes and prices of the included characters before

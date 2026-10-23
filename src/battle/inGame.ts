@@ -1,7 +1,6 @@
 import {
   cellMission,
   personOf,
-  personOfId,
   PLAYER_IDS,
   TEAM_SIZE,
   type Character,
@@ -9,7 +8,7 @@ import {
   type Mission,
   type PlayerId,
 } from '../engine';
-import { tierRank, type Random } from '../episode/fill';
+import { CELL_JR, CELL_PERSON, SAIBAIMAN } from '../catalog/henchmen';
 import { transformationsOf, type FightRecord } from './fight';
 
 // The simulated fight inside the game (spec 037, 2.4-2.5, D-058): who is
@@ -46,73 +45,37 @@ function formatSize(mission: Mission | undefined): number {
 }
 
 /**
- * What "Simula" proposes for a fight mission (spec 048, D-075): the sides of
- * the mission and, when the opponents are fewer than the format asks, the
- * partners that are missing. The host can still change both sides.
+ * What "Simula" proposes for a fight mission (spec 048): the sides of the
+ * mission and, when the opponents are fewer than the format asks, the
+ * henchmen that are missing (spec 069, D-095). The host can still change
+ * both sides.
  */
 export function proposedMissionSides(
   state: GameState,
   nodeId: string,
   player: PlayerId,
   catalog: readonly Character[],
-  random: Random = Math.random,
 ): Sides {
   const sides = missionSides(state, nodeId, player);
   const missing = formatSize(cellMission(state.cells[nodeId])) - sides.b.length;
   if (missing <= 0) {
     return sides;
   }
-  return { ...sides, b: [...sides.b, ...partnersFor(state, catalog, sides.b, missing, random)] };
+  return { ...sides, b: [...sides.b, ...partnersFor(catalog, sides.b, missing)] };
 }
 
 /**
- * Partners for the opponents (spec 048, 2.2): the same saga and side
- * (villain or not) as the first opponent, then the same side, then anyone;
- * in each group the closest tier, ties at random. Never a character without
- * a tier, another form of a person already on that side, or a person of the
- * players' teams. Characters on the board may join: opponents are no place
- * (D-066).
+ * The henchmen who fill a team fight (spec 069, 2.1; D-095): Cell Jr. with
+ * Cell, in any form, Saibaiman with anyone else, as many as are missing.
+ * Without them in the list, nobody.
  */
-export function partnersFor(
-  state: GameState,
-  catalog: readonly Character[],
-  opponents: readonly string[],
-  missing: number,
-  random: Random = Math.random,
-): string[] {
+export function partnersFor(catalog: readonly Character[], opponents: readonly string[], missing: number): string[] {
   const first = catalog.find((character) => character.id === opponents[0]);
   if (!first) {
     return [];
   }
-  const firstRank = tierRank(first.tier) ?? 0;
-  const villain = (character: Character) => character.villain === true;
-  const teams = new Set(
-    PLAYER_IDS.flatMap((id) => state.players[id].team.map((member) => personOfId(catalog, member))),
-  );
-  const onSide = new Set(opponents.map((id) => personOfId(catalog, id)));
-  const groups: ((character: Character) => boolean)[] = [
-    (character) => character.saga === first.saga && villain(character) === villain(first),
-    (character) => villain(character) === villain(first),
-    () => true,
-  ];
-  const partners: string[] = [];
-  for (let count = 0; count < missing; count += 1) {
-    const free = catalog.filter(
-      (character) =>
-        tierRank(character.tier) !== null && !onSide.has(personOf(character)) && !teams.has(personOf(character)),
-    );
-    const group = groups.map((inGroup) => free.filter(inGroup)).find((candidates) => candidates.length > 0);
-    if (!group) {
-      break;
-    }
-    const distance = (character: Character) => Math.abs((tierRank(character.tier) ?? 0) - firstRank);
-    const best = Math.min(...group.map(distance));
-    const closest = group.filter((character) => distance(character) === best);
-    const partner = closest[Math.floor(random() * closest.length)] ?? (closest[0] as Character);
-    partners.push(partner.id);
-    onSide.add(personOf(partner));
-  }
-  return partners;
+  const henchman = personOf(first) === CELL_PERSON ? CELL_JR : SAIBAIMAN;
+  return catalog.some((character) => character.id === henchman) ? Array.from({ length: missing }, () => henchman) : [];
 }
 
 /** The showdown: the first five of each team, in team order. */

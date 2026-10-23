@@ -253,8 +253,9 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
 function Faces({ ids, nameOf }: { ids: readonly string[]; nameOf(id: string): string }) {
   return (
     <ul className={styles.faces}>
-      {ids.map((id) => (
-        <li key={id} className={styles.face}>
+      {/* Henchmen may come twice (spec 069): the place tells them apart. */}
+      {ids.map((id, index) => (
+        <li key={`${id}-${index}`} className={styles.face}>
           <Placeholder name={nameOf(id)} characterId={id} size="fill" />
         </li>
       ))}

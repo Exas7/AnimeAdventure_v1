@@ -23,7 +23,9 @@ export { cleanLines, nextLineIndex, upgradeCellTexts } from './lines';
 export {
   activeMissionParts,
   activeMissionText,
+  awayCells,
   cellMission,
+  companionOf,
   defaultMission,
   fightMission,
   LASTING_MISSIONS,

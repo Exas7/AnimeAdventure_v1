@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Character } from '../engine';
 import type { CatalogMission } from '../missions/catalog';
-import { MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, PRICES_BEFORE_066, withPricesOf } from './fillIncluded';
+import { MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069, PRICES_BEFORE_066, withPricesOf } from './fillIncluded';
 import { missionsFingerprint, pricesFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions } from './includedLists';
 
@@ -39,7 +39,20 @@ describe('the missions give coins (spec 063 and 066, criterion 1)', () => {
       expect(mission.reward.coins).toBe(1500);
       expect(mission.reward.characters?.length).toBe(1);
     }
-    expect(others.filter((entry) => entry.mission.type === 'fight').map((entry) => entry.mission.reward.coins)).toEqual([2000]);
+    // The other fights that do not recruit open a chain of one person (spec 069, 2.2).
+    const fights = others.filter((entry) => entry.mission.type === 'fight');
+    expect(fights.filter((entry) => !entry.behindId).map((entry) => entry.mission.reward.coins)).toEqual([2000]);
+  });
+
+  it('who opens a chain of one person gives 1,200 coins, not themselves (spec 069, 2.2; D-096)', () => {
+    const catalog = includedCatalog();
+    const person = (id: string | undefined) => catalog.find((character) => character.id === id)?.person;
+    const chains = missions().filter((entry) => entry.behindId && 'characterId' in entry.giver);
+    const samePerson = chains.filter((entry) => 'characterId' in entry.giver && person(entry.giver.characterId) === person(entry.behindId));
+    expect(samePerson.length).toBeGreaterThan(0);
+    for (const { mission } of samePerson) {
+      expect(mission.reward).toEqual({ coins: 1200 });
+    }
   });
 });
 
@@ -80,10 +93,16 @@ describe('a browser with the untouched lists of before gets the new values (spec
     return entry.mission.type === 'quiz' ? 600 : entry.mission.type === 'fight' ? 1500 : 1200;
   };
 
-  it('the mission lists of before have the fingerprints the app looks for; the new one does not', () => {
-    expect(missionsFingerprint(withCoins(missions(), before063))).toBe(MISSIONS_BEFORE_063);
-    expect(missionsFingerprint(withCoins(missions(), before066))).toBe(MISSIONS_BEFORE_066);
-    expect([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066]).not.toContain(missionsFingerprint(missions()));
+  it('the mission lists of before are known to the app; the new one is not among them', () => {
+    // Spec 069 changed which missions there are, so the lists of before can no longer be
+    // rebuilt from today's: their fingerprints were taken from the files of those versions.
+    expect(new Set([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069]).size).toBe(3);
+    expect([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069]).not.toContain(missionsFingerprint(missions()));
+  });
+
+  it('a list with other coins is a list of before only if every mission matches', () => {
+    expect(missionsFingerprint(withCoins(missions(), before063))).not.toBe(missionsFingerprint(missions()));
+    expect(missionsFingerprint(withCoins(missions(), before066))).not.toBe(missionsFingerprint(missions()));
   });
 
   it('the fingerprint leaves out the codes, and changes with any reward', () => {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  companionOf,
   rechargesStarter,
   TEAM_SIZE,
   trainingRule,
@@ -48,6 +49,8 @@ export function PhonePanel(props: PhonePanelProps) {
   const { playerId, state, catalog, items, side } = props;
   const player = state.players[playerId];
   const current = state.currentPlayer === playerId;
+  // «Accompagnami da» (spec 069, 2.5): in the column, never in the team.
+  const companion = companionOf(state, playerId);
   const active = current && !props.locked;
   const { actions } = state;
   const movesLeft = Math.max(0, actions.available - actions.used);
@@ -129,6 +132,7 @@ export function PhonePanel(props: PhonePanelProps) {
               Salta {player.turnsToSkip} {player.turnsToSkip === 1 ? 'turno' : 'turni'}
             </p>
           )}
+          {companion && <p className={styles.note}>In viaggio con {nameOf(companion)}</p>}
         </div>
       </div>
 

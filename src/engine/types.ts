@@ -83,7 +83,9 @@ export type MissionType =
   | 'bring'
   | 'wait'
   | 'skipTurns'
-  | 'other';
+  | 'other'
+  // «Accompagnami da» (spec 069, 2.5; D-097): the giver travels with the player to the target.
+  | 'escort';
 
 /** A multiple-choice question (spec 026, 2.5). */
 export interface QuizQuestion {
@@ -115,7 +117,7 @@ export interface Mission {
   format?: ChallengeFormat;
   /** Fight: 'transform' when it is enough that the opponent transforms. */
   condition?: 'win' | 'transform';
-  /** goTo, defeat, bring: the character to reach, to beat or to have in the team. */
+  /** goTo, defeat, bring, escort: the character to reach, to beat or to have in the team. */
   targetId?: string;
   /** goTo: and then back to the cell of the character who gave the mission. */
   returnToGiver?: boolean;
@@ -481,6 +483,9 @@ export type WarningKind =
   | 'nodeAlreadyConquered'
   // A cell turned off by a fusion (spec 068, 2.3).
   | 'cellOff'
+  // «Accompagnami da» (spec 069, 2.5): the giver is travelling, one companion at a time.
+  | 'companionAway'
+  | 'oneCompanion'
   | 'notAdjacent'
   | 'noActionsLeft'
   | 'noInteractionsLeft'

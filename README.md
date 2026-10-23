@@ -110,6 +110,10 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
   il potere «Ritenta una sfida persa»; una volta per partita, con la
   squadra completa, si può arruolare un sesto personaggio e poi cacciarne
   uno (mai lo starter).
+- **Missioni della storia**: i cattivi combattono con i loro compagni
+  (Freeza con Re Cold, C-17 con C-18…), dietro le strade grigie c'è chi
+  nella storia viene dopo, e i personaggi speciali (Bulma, Chichi, Kami…)
+  chiedono di accompagnarli da qualcuno, in cambio di monete.
 - **Fusioni**: Goku e Vegeta (fine di Dragon Ball) in Vegetto o Gogeta,
   Goku e Vegeta SSJ4 in Gogeta SSJ4, Goten e Trunks bambino in Gotenks:
   con la coppia in squadra il gioco ti chiede se fonderli.

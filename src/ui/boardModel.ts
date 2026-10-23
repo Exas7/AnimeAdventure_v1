@@ -8,6 +8,7 @@ import type {
   PlayerId,
   Point,
 } from '../engine';
+import { awayCells } from '../engine';
 
 /** Board drawing width in SVG units; the height follows the background (16:9 without). */
 export const BOARD_WIDTH = 1600;
@@ -163,6 +164,7 @@ export function boardView(
     ...layoutView(map, catalog, state.cells, {
       conquests: state.conquests,
       offCells: state.offCells ?? [],
+      away: awayCells(state),
       isClosed: (edge) => state.edgeLocks[edge.id]?.[viewer] ?? edge.locked,
     }),
     pawns: pawnViews(state, nodesById, toBoard),
@@ -191,6 +193,8 @@ function layoutView(
   status: {
     conquests: Partial<Record<string, PlayerId>>;
     offCells?: readonly string[];
+    /** Givers of an «Accompagnami da» travelling with a player: their cell looks empty. */
+    away?: ReadonlyMap<string, PlayerId>;
     isClosed: (edge: MapEdge) => boolean;
   },
 ): Omit<BoardView, 'pawns'> {
@@ -199,7 +203,8 @@ function layoutView(
   const toBoard = (point: Point): Point => ({ x: point.x * size.width, y: point.y * size.height });
 
   const nodes = map.nodes.map((node): NodeView => {
-    const content = cells[node.id];
+    const { characterId: _away, ...left } = cells[node.id] ?? {};
+    const content: CellContent | undefined = status.away?.has(node.id) ? left : cells[node.id];
     const role = cellRole(node, content);
     const { label, caption } = cellText(node, content, catalog);
     return {

@@ -3,6 +3,7 @@ import { rechargesStarter, travelRule } from './itemUse';
 import { hasBought, isSoldOut, rechargeablePower } from './shop';
 import { teamIsFull } from './team';
 import { isOffCell } from './fusions';
+import { awayCells } from './missions';
 import {
   type GameAction,
   type GameContext,
@@ -158,6 +159,13 @@ function boardWarnings(
       warnings.push({
         kind: 'nodeAlreadyConquered',
         message: `${state.players[conqueror].name} ha già conquistato ${label(action.nodeId)}`,
+      });
+    }
+    const travelling = awayCells(state).get(action.nodeId);
+    if (travelling !== undefined) {
+      warnings.push({
+        kind: 'companionAway',
+        message: `${label(action.nodeId)} è in viaggio con ${state.players[travelling].name}`,
       });
     }
     if (isOffCell(state, action.nodeId)) {

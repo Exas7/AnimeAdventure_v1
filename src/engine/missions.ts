@@ -23,10 +23,11 @@ export const MISSION_TYPES: { type: MissionType; label: string }[] = [
   { type: 'wait', label: 'Attendi' },
   { type: 'skipTurns', label: 'Salta turni' },
   { type: 'other', label: 'Altro' },
+  { type: 'escort', label: 'Accompagnami da' },
 ];
 
 /** Missions that last over turns: accepted in the scene, then followed by the app. */
-export const LASTING_MISSIONS: MissionType[] = ['goTo', 'defeat', 'bring', 'wait', 'skipTurns'];
+export const LASTING_MISSIONS: MissionType[] = ['goTo', 'defeat', 'bring', 'wait', 'skipTurns', 'escort'];
 
 /** A fight in this format with the cell's character, won to recruit it. */
 export function fightMission(format: ChallengeFormat): Mission {
@@ -51,6 +52,7 @@ export function defaultMission(
       return { type, returnToGiver: false, reward };
     case 'defeat':
     case 'bring':
+    case 'escort':
       return { type, reward };
     case 'wait':
       return { type, turns: 2, reward };
@@ -101,6 +103,8 @@ export function missionLabel(mission: Mission, catalog: Character[]): string {
       return `Missione · Batti ${target}`;
     case 'bring':
       return `Missione · Porta ${target}`;
+    case 'escort':
+      return `Missione · Accompagnami da ${target}`;
     case 'wait':
       return `Missione · Attendi ${turns} ${turnWord}`;
     case 'skipTurns':
@@ -178,6 +182,8 @@ function missionTask(active: ActiveMission, state: GameState, catalog: Character
       return `batti ${target}`;
     case 'bring':
       return `porta ${target} in squadra`;
+    case 'escort':
+      return `viaggia con te fino a ${target}`;
     case 'wait': {
       const left = Math.max(0, turns - (state.players[active.player].turnsPlayed - active.turnsPlayedAtStart));
       return `attendi ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
@@ -240,6 +246,8 @@ function isDone(state: GameState, active: ActiveMission): boolean {
       return targetNode !== undefined && state.conquests[targetNode] === active.player;
     case 'bring':
       return mission.targetId !== undefined && player.team.includes(mission.targetId);
+    case 'escort':
+      return targetNode !== undefined && player.position === targetNode;
     case 'wait':
       return player.turnsPlayed - active.turnsPlayedAtStart >= (mission.turns ?? 0);
     case 'skipTurns':
@@ -249,6 +257,25 @@ function isDone(state: GameState, active: ActiveMission): boolean {
     case 'other':
       return false;
   }
+}
+
+/**
+ * The cells of the givers of an «Accompagnami da» in progress (spec 069,
+ * 2.5): they travel with the player, so their cell looks empty and nobody
+ * meets them there.
+ */
+export function awayCells(state: GameState): Map<string, PlayerId> {
+  return new Map(
+    (state.activeMissions ?? [])
+      .filter((active) => cellMission(state.cells[active.nodeId])?.type === 'escort')
+      .map((active) => [active.nodeId, active.player]),
+  );
+}
+
+/** Who travels with the player, if anyone: one companion at a time (D-097). */
+export function companionOf(state: GameState, playerId: PlayerId): string | undefined {
+  const node = [...awayCells(state)].find(([, player]) => player === playerId)?.[0];
+  return node ? state.cells[node]?.characterId : undefined;
 }
 
 /** A pawn moved: a "vai da … e torna" mission remembers that the target was reached. */

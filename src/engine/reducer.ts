@@ -10,7 +10,9 @@ import {
   opponentOf,
 } from './lookup';
 import {
+  awayCells,
   cellMission,
+  companionOf,
   missionLabel,
   noteTurnSkipped,
   notePawnMoved,
@@ -351,6 +353,19 @@ function acceptMission(
   if (missions.some((active) => active.nodeId === nodeId && active.player === playerId)) {
     const giver = cellLabel(state, context.map, context.catalog, nodeId);
     warn(out, 'missionAlreadyActive', `${player.name} ha già in corso la missione di ${giver}`);
+  }
+  // «Accompagnami da» (spec 069, 2.5): one companion at a time, and a giver travels with one player only.
+  if (mission.type === 'escort') {
+    const companion = companionOf(state, playerId);
+    if (companion !== undefined) {
+      const name = context.catalog.find((character) => character.id === companion)?.name ?? companion;
+      warn(out, 'oneCompanion', `${player.name} sta già accompagnando ${name}`);
+    }
+    const travelling = awayCells(state).get(nodeId);
+    if (travelling !== undefined && travelling !== playerId) {
+      const giver = cellLabel(state, context.map, context.catalog, nodeId);
+      warn(out, 'companionAway', `${giver} è già in viaggio con ${state.players[travelling].name}`);
+    }
   }
   const id = state.nextMissionId ?? 1;
   state.nextMissionId = id + 1;

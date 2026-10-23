@@ -126,82 +126,34 @@ describe('the simulator inside the game (spec 037, 2.4-2.5 and criteria 6-8)', (
 });
 
 /**
- * The test list with sheets for the partners (spec 048): Personaggio H, in
- * cell n1, is a villain of the Saiyan saga, tier A. Personaggio A is in G1's team.
+ * The test list with the henchmen (spec 069, D-095): Personaggio H, in cell
+ * n1, is a villain; Cell and Cell Jr. are there too.
  */
-const villain = (id: string, tier: string | undefined, saga: string, more: Partial<Character> = {}): Character => ({
-  id,
-  name: id,
-  ...(tier ? { tier } : {}),
-  saga,
-  villain: true,
-  ...more,
-});
-const partnerCatalog: Character[] = [
-  ...testCatalog.map((character) =>
-    character.id === 'char-h' || character.id === 'char-a'
-      ? { ...character, tier: 'A', saga: 'Saiyan', villain: true }
-      : character,
-  ),
-  villain('same-saga', 'A-', 'Saiyan'),
-  villain('same-saga-far', 'C', 'Saiyan'),
-  villain('other-saga', 'A', 'Freezer'),
-  { id: 'hero-same-saga', name: 'hero-same-saga', tier: 'A', saga: 'Saiyan' },
-  villain('no-tier', undefined, 'Saiyan'),
-  villain('char-h-ssj', 'A', 'Saiyan', { person: 'Personaggio H' }),
+const henchmenCatalog: Character[] = [
+  ...testCatalog.map((character) => (character.id === 'char-h' ? { ...character, tier: 'A', villain: true } : character)),
+  { id: 'saibaiman', name: 'Saibaiman', tier: 'D', villain: true },
+  { id: 'cell-jr', name: 'Cell Jr.', tier: 'B', villain: true },
+  { id: 'cell-perfect', name: 'Cell (forma perfetta)', person: 'Cell (prima forma)', tier: 'A+', villain: true },
 ];
-const withPerson = partnerCatalog.map((character) =>
-  character.id === 'char-h' ? { ...character, person: 'Personaggio H' } : character,
-);
-const first = () => 0;
 
-describe('the second opponent of team fights (spec 048)', () => {
-  it('C1: a 2v2 without opponents gets the cell\'s character and a partner', () => {
-    const state = currentState(gameWith(fight('2v2')));
-    expect(proposedMissionSides(state, 'n1', 'p1', withPerson, first).b).toEqual(['char-h', 'same-saga']);
+describe('the henchmen of team fights (spec 069, criterion 1; D-095)', () => {
+  it('a 2v2 or 3v3 without opponents gets Saibaiman, as many as are missing', () => {
+    const two = currentState(gameWith(fight('2v2')));
+    expect(proposedMissionSides(two, 'n1', 'p1', henchmenCatalog).b).toEqual(['char-h', 'saibaiman']);
+    const three = currentState(gameWith(fight('3v3')));
+    expect(proposedMissionSides(three, 'n1', 'p1', henchmenCatalog).b).toEqual(['char-h', 'saibaiman', 'saibaiman']);
   });
 
-  it('C2: a 3v3 with the cell\'s character only gets two different partners', () => {
-    const state = currentState(gameWith(fight('3v3')));
-    expect(proposedMissionSides(state, 'n1', 'p1', withPerson, first).b).toEqual([
-      'char-h',
-      'same-saga',
-      'same-saga-far',
-    ]);
+  it('Cell, in any form, gets Cell Jr.', () => {
+    expect(partnersFor(henchmenCatalog, ['cell-perfect'], 2)).toEqual(['cell-jr', 'cell-jr']);
   });
 
-  it('C3: enough opponents, or a 1v1, get nobody more', () => {
+  it('enough opponents, or a 1v1, get nobody more; without henchmen in the list, nobody', () => {
     const enough = currentState(gameWith(fight('2v2', ['char-c', 'char-d'])));
-    expect(proposedMissionSides(enough, 'n1', 'p1', withPerson, first).b).toEqual(['char-c', 'char-d']);
+    expect(proposedMissionSides(enough, 'n1', 'p1', henchmenCatalog).b).toEqual(['char-c', 'char-d']);
     const single = currentState(gameWith(fight('1v1')));
-    expect(proposedMissionSides(single, 'n1', 'p1', withPerson, first).b).toEqual(['char-h']);
-  });
-
-  it('C4: same saga and side first, then the same side, then anyone; the closest tier', () => {
-    const state = currentState(gameWith(fight('2v2')));
-    const without = (...ids: string[]) => withPerson.filter((character) => !ids.includes(character.id));
-    expect(partnersFor(state, without('same-saga', 'same-saga-far'), ['char-h'], 1, first)).toEqual(['other-saga']);
-    expect(
-      partnersFor(state, without('same-saga', 'same-saga-far', 'other-saga'), ['char-h'], 1, first),
-    ).toEqual(['hero-same-saga']);
-  });
-
-  it('C5: never without a tier, another form of the cell\'s person, or a person of the teams', () => {
-    const state = currentState(gameWith(fight('2v2')));
-    const onlyForbidden = withPerson.filter(
-      (character) => !['same-saga', 'same-saga-far', 'other-saga', 'hero-same-saga'].includes(character.id),
-    );
-    for (const random of [() => 0, () => 0.5, () => 0.99]) {
-      const partners = partnersFor(state, onlyForbidden, ['char-h'], 1, random);
-      expect(partners.filter((id) => ['no-tier', 'char-h-ssj', 'char-a'].includes(id))).toEqual([]);
-    }
-  });
-
-  it('ties go at random', () => {
-    const state = currentState(gameWith(fight('2v2')));
-    const tied = [...withPerson, villain('same-saga-twin', 'A-', 'Saiyan')];
-    expect(partnersFor(state, tied, ['char-h'], 1, () => 0)).toEqual(['same-saga']);
-    expect(partnersFor(state, tied, ['char-h'], 1, () => 0.99)).toEqual(['same-saga-twin']);
+    expect(proposedMissionSides(single, 'n1', 'p1', henchmenCatalog).b).toEqual(['char-h']);
+    expect(partnersFor(testCatalog, ['char-h'], 1)).toEqual([]);
   });
 
   it('the sides of the mission itself do not change (missionSides)', () => {

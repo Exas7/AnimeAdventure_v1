@@ -12,12 +12,13 @@ import { includedCatalog, includedMissions, includedQuestions } from './included
 import { includedMapId, isIncludedMapId, listIncludedMaps, readIncludedMaps } from './includedMaps';
 
 describe('the lists that come with the app (spec 030, criterion 5)', () => {
-  it('read without errors: 166 characters, 128 missions, 60 questions', () => {
+  it('read without errors: 166 characters, 140 missions, 60 questions', () => {
     const catalog = includedCatalog();
     expect(catalog).toHaveLength(166);
     expect(catalog.filter((character) => character.possibleStarter)).toHaveLength(24);
     // Spec 043: the catalog rewritten (it was 45 after specs 031 and 034), 20 questions for each level (it was 45).
-    expect(includedMissions(catalog)).toHaveLength(128);
+    // Spec 069: 140 missions (it was 128), with the story fights, the chains and «Accompagnami da».
+    expect(includedMissions(catalog)).toHaveLength(140);
     expect(includedQuestions()).toHaveLength(60);
   });
 
@@ -80,9 +81,10 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
       });
       fights += Object.values(content).filter((cell) => cell.mission?.type === 'fight').length;
     }
-    // The conductor (spec 034): 60-65% is right, 50-70% is fine.
+    // The conductor (spec 034): 60-65% is right, 50-70% is fine. Since spec 069 the villains
+    // give almost only fights: about 74%, and up to 75% is fine (the conductor, 23 October 2026).
     const characterCells = map.nodes.filter((node) => node.type === 'character').length;
-    expect(fights / runs / characterCells).toBeLessThanOrEqual(0.7);
+    expect(fights / runs / characterCells).toBeLessThanOrEqual(0.75);
   });
 
   it('on Pianeta Nameck: who opens a grey road fights or gives "Batti", stronger than the others; no target off the board (spec 034, criterion 3)', async () => {
@@ -132,14 +134,18 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
   });
 });
 
-describe('«Batti» without chains (spec 070, criterion 1)', () => {
-  it('on every base map, who is to be beaten holds a fight', async () => {
+describe('«Batti» without chains, the story missions (spec 070, criterion 1; spec 069, criteria 1-3 and 6)', () => {
+  it('on every base map: who is to be beaten holds a fight; henchmen nowhere; chains of the story; a Majin Buu for Dabura', async () => {
     const catalog = includedCatalog();
     const random = seeded(70);
+    const rank = (id: string | undefined) => tierRank(catalog.find((character) => character.id === id)?.tier) ?? -1;
+    const buus = ['majin-buu-buono', 'majin-buu-puro-male', 'super-buu', 'majin-buu-puro'];
     let defeats = 0;
+    let chains = 0;
+    let daburas = 0;
     for (const { map } of (await listIncludedMaps()).maps) {
       for (let run = 0; run < 40; run++) {
-        const { content } = randomEpisode(map, {
+        const { content, starters, extras } = randomEpisode(map, {
           catalog,
           specialKeepers: [],
           powers: DEFAULT_READY_POWERS,
@@ -148,7 +154,21 @@ describe('«Batti» without chains (spec 070, criterion 1)', () => {
           perShop: 3,
           random,
         });
+        const placed = Object.values(content).flatMap((cell) => [...(cell.characterId ? [cell.characterId] : []), ...(cell.forSale ?? [])]);
+        const proposed = [...starters.p1, ...starters.p2].map((starter) => starter.characterId);
+        expect([...placed, ...proposed].filter((id) => id === 'cell-jr' || id === 'saibaiman')).toEqual([]);
+        for (const extra of extras) {
+          if (extra.kind === 'chain') {
+            chains += 1;
+            expect(rank(extra.giverId)).toBeGreaterThanOrEqual(tierRank('A-') as number);
+            expect(rank(extra.behindId)).toBeGreaterThan(rank(extra.giverId));
+          }
+        }
         for (const cell of Object.values(content)) {
+          if (cell.characterId === 'dabura' && cell.mission?.type === 'defeat') {
+            daburas += 1;
+            expect(buus).toContain(cell.mission.targetId);
+          }
           if (cell.mission?.type !== 'defeat') {
             continue;
           }
@@ -159,6 +179,8 @@ describe('«Batti» without chains (spec 070, criterion 1)', () => {
       }
     }
     expect(defeats).toBeGreaterThan(50);
+    expect(chains).toBeGreaterThan(20);
+    expect(daburas).toBeGreaterThan(0);
   });
 });
 
