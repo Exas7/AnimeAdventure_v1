@@ -338,6 +338,12 @@ export interface PlayerState {
    * D-091). Missing in games saved before.
    */
   sixthTaken?: boolean;
+  /**
+   * Spec 086, D-108: after a travel item, in the player's next turn the pawn
+   * does not move. `noMovesNext` is set by the trip; `noMovesTurn` holds for the turn now played.
+   */
+  noMovesNext?: boolean;
+  noMovesTurn?: boolean;
 }
 
 export interface ItemPurchase {
@@ -497,6 +503,9 @@ export type WarningKind =
   | 'notAdjacent'
   | 'noActionsLeft'
   | 'noInteractionsLeft'
+  // Spec 086, D-108: no moves the turn after a travel item; no landing on the opponent's cell.
+  | 'noMovesTurn'
+  | 'travelOnOpponent'
   // "Fine turno" with actions still available (D-033).
   | 'actionsLeft'
   // The other player's pawn dropped on a cell: asked by the director at

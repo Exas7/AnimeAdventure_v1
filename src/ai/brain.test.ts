@@ -337,8 +337,11 @@ describe('the AI uses its powers when they pay (spec 063, criterion 4)', () => {
   });
 
   it('buys a Senzu when it pays the extra starting coins again', () => {
-    // In sh2 the characters cost more than its 300 coins.
-    const game = place(withPowers([powerCatalog.extraStartingCoins(1500)], 300), 'sh2');
+    // The Senzu costs 1,000 and so many coins it has; the characters of sh2 cost more.
+    let game = place(withPowers([powerCatalog.extraStartingCoins(1500)], 1000), 'sh2');
+    for (const characterId of ['char-g', 'char-h']) {
+      game = act(game, { type: 'setCharacterPrice', characterId, price: 1500 });
+    }
     expect(nextAiStep(game, 'normal', seeded(1), newMemory())).toMatchObject({
       kind: 'act',
       action: { type: 'buyItem', itemId: 'senzu' },

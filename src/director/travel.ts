@@ -39,5 +39,8 @@ export function travelCells(
   if (!active || !rule) {
     return null;
   }
+  if (state.players[active.player].noMovesTurn && active.player === state.currentPlayer) {
+    return [];
+  }
   return [...reachableCells(context.map, state, active.player, rule.steps)].sort();
 }

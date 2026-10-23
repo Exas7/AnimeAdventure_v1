@@ -203,6 +203,9 @@ export function startTurn(state: GameState, playerId: PlayerId, out: ActionOutpu
   state.acknowledgedThisTurn = [];
   // A new turn on the same cell is a new interaction (spec 001, section 4).
   state.interactedNodeId = null;
+  // The turn after a trip by item the pawn stays (spec 086, D-108).
+  state.players[playerId].noMovesTurn = state.players[playerId].noMovesNext === true;
+  state.players[playerId].noMovesNext = false;
   firePowers(state, playerId, (trigger) => trigger.type === 'turnStart', out);
 }
 
@@ -292,6 +295,7 @@ function useItem(
   }
   findNode(context.map, action.to);
   player.inventory.splice(index, 1);
+  player.noMovesNext = true;
   movePawn(state, action.player, action.to);
   if (action.player === state.currentPlayer) {
     state.actions.used += 1;

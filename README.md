@@ -115,6 +115,11 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
   il potere «Ritenta una sfida persa»; una volta per partita, con la
   squadra completa, si può arruolare un sesto personaggio e poi cacciarne
   uno (mai lo starter).
+- **Oggetti e viaggi**: Nuvola Speedy (750 monete, fino a 7 strade) e
+  Trasmissione Istantanea (1.500, una per negozio) non portano mai sulla
+  casella dell'avversario, e nel turno dopo un viaggio non ci si muove: si
+  fanno solo interazioni. I prezzi di tutti gli oggetti sono nella pagina
+  delle regole e dei valori.
 - **Missioni della storia**: i cattivi combattono con i loro compagni
   (Freeza con Re Cold, C-17 con C-18…), dietro le strade grigie c'è chi
   nella storia viene dopo, e i personaggi speciali (Bulma, Chichi, Kami…)

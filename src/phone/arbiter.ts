@@ -37,6 +37,9 @@ import {
  */
 export function moveTargets(game: Game, state: GameState): Set<string> {
   const back = stepBackCell(game);
+  if (state.players[state.currentPlayer].noMovesTurn) {
+    return new Set<string>();
+  }
   const targets = new Set<string>(back ? [back] : []);
   if (state.actions.used >= state.actions.available) {
     return targets;

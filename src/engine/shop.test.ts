@@ -60,7 +60,7 @@ describe('shop: characters (spec 002, criteria 1-6)', () => {
     const game = play(start, buyE, buyItem('flying-nimbus'));
     const state = currentState(game);
     expect(state.actions).toEqual(currentState(start).actions);
-    expect(state.players.p1.coins).toBe(1000 - 300 - 250);
+    expect(state.players.p1.coins).toBe(1000 - 300 - 750);
     expect(state.notifications).toEqual([]);
   });
 
@@ -125,7 +125,7 @@ describe('shop: items (spec 002, criteria 7-12)', () => {
       newGame({ startingCoins: 0, p1Powers: [powerCatalog.extraStartingCoins(500)] }),
       buyItem('senzu'),
     );
-    expect(currentState(game).players.p1.coins).toBe(500 - 300 + 500);
+    expect(currentState(game).players.p1.coins).toBe(500 - 1000 + 500);
   });
 
   it('S10: a Senzu for a starter with nothing to recharge is bought with no effect and a warning', () => {
@@ -133,7 +133,7 @@ describe('shop: items (spec 002, criteria 7-12)', () => {
     expect(lastWarnings(game)).toEqual([
       { kind: 'nothingToRecharge', message: 'Lo starter di G1 non ha poteri da ricaricare' },
     ]);
-    expect(currentState(game).players.p1.coins).toBe(700);
+    expect(currentState(game).players.p1.coins).toBe(0);
     expect(currentState(game).players.p1.inventory).toEqual([]);
   });
 

@@ -1,4 +1,4 @@
-import { cellLabel, findCharacter, findItem } from './lookup';
+import { cellLabel, findCharacter, findItem, opponentOf } from './lookup';
 import { rechargesStarter, travelRule } from './itemUse';
 import { hasBought, isSoldOut, rechargeablePower } from './shop';
 import { teamIsFull } from './team';
@@ -127,6 +127,8 @@ export function reachableCells(
     }
   }
   distance.delete(start);
+  // A trip never ends on the opponent's cell (spec 086, D-108).
+  distance.delete(state.players[opponentOf(playerId)].position);
   return new Set(distance.keys());
 }
 
@@ -181,6 +183,12 @@ function boardWarnings(
       });
     }
   }
+  if (action.type === 'move' && player.noMovesTurn) {
+    warnings.push({
+      kind: 'noMovesTurn',
+      message: `${player.name} non può muoversi: nel turno dopo un viaggio con un oggetto si fanno solo interazioni`,
+    });
+  }
   if (
     action.type === 'move' &&
     !isAdjacent(context.map, state, playerId, player.position, action.to)
@@ -221,8 +229,20 @@ function itemUseWarnings(
       message: `${player.name} ha già usato tutte le azioni del turno`,
     });
   }
+  if (player.noMovesTurn && action.player === state.currentPlayer) {
+    warnings.push({
+      kind: 'noMovesTurn',
+      message: `${player.name} non può muoversi: nel turno dopo un viaggio con un oggetto si fanno solo interazioni`,
+    });
+  }
+  if (action.to === state.players[opponentOf(action.player)].position) {
+    warnings.push({
+      kind: 'travelOnOpponent',
+      message: `${item.name} non porta sulla casella di ${state.players[opponentOf(action.player)].name}`,
+    });
+  }
   const rule = travelRule(item);
-  if (rule && !reachableCells(context.map, state, action.player, rule.steps).has(action.to)) {
+  if (rule && action.to !== state.players[opponentOf(action.player)].position && !reachableCells(context.map, state, action.player, rule.steps).has(action.to)) {
     warnings.push({ kind: 'travelRange', message: `Casella fuori dalla portata della ${item.name}` });
   }
   return warnings;

@@ -14,7 +14,8 @@ describe('choosing the cell of a travel item (spec 047, 2.2)', () => {
     const state = currentState(game);
     expect(travelCells(game, state, null)).toBeNull();
     const cells = travelCells(game, state, { ...nimbus, turn: state.turn });
-    expect(cells).toHaveLength(testMap.nodes.length - 1);
+    // Not its own cell, nor the opponent's (spec 086).
+    expect(cells).toHaveLength(testMap.nodes.length - 2);
     expect(cells).not.toContain('s1');
   });
 

@@ -19,7 +19,8 @@ missioni, e una mossa fuori regola dà un avviso, ma con un secondo clic si fa l
 - Interagire con il personaggio della propria casella (la sua sfida) costa 1 azione e l'interazione.
   Riaprire la stessa scena senza lasciare la casella non costa niente.
 - Comprare, usare il Senzu o un oggetto di allenamento e fondere due personaggi non costano azioni; un
-  oggetto di viaggio costa 1 azione.
+  oggetto di viaggio costa 1 azione. Un viaggio non porta mai sulla casella dell'avversario, e nel turno dopo
+  un viaggio la pedina non si muove: si fanno solo interazioni, anche con un potere che dà azioni in più.
 - A fine turno valgono i poteri «a fine turno» e «ogni N turni»; chi deve saltare un turno lo salta, e un
   turno saltato non conta per i poteri.
 - La squadra ha **5 posti**. Una volta per partita si può prendere un sesto personaggio: allora
@@ -77,12 +78,12 @@ le monete che promettono. Il premio va a chi completa la missione per primo.
 
 | Oggetto | Prezzo | Copie per negozio | Uno per giocatore | Effetto |
 |---|---|---|---|---|
-| Senzu | 300$ | 1 | no | Si usa appena comprato: ricarica il potere dello starter (un uso in più, o di nuovo le monete in più di «Parti con…»). |
-| Vestiti pesanti da allenamento | 200$ | senza limite | sì | Allenamento: 1 personaggio sale di 1 forma. |
-| Camera Gravitazionale del Dr. Brief | 400$ | senza limite | sì | Allenamento: 1 personaggio sale di 2 forme, oppure 2 personaggi salgono di 1. |
-| Stanza dello Spirito e del Tempo | 700$ | senza limite | sì | Allenamento: 2 personaggi salgono di 2 forme. |
-| Nuvola Speedy | 250$ | senza limite | no | Viaggio: la pedina va fino a 10 strade più in là, per le strade aperte (1 azione). |
-| Trasmissione Istantanea | 600$ | senza limite | no | Viaggio: la pedina va su qualsiasi casella raggiungibile per le strade aperte (1 azione). |
+| Senzu | 1.000$ | 1 | no | Si usa appena comprato: ricarica il potere dello starter (un uso in più, o di nuovo le monete in più di «Parti con…»). |
+| Vestiti pesanti da allenamento | 500$ | senza limite | sì | Allenamento: 1 personaggio sale di 1 forma. |
+| Camera Gravitazionale del Dr. Brief | 1.000$ | senza limite | sì | Allenamento: 1 personaggio sale di 2 forme, oppure 2 personaggi salgono di 1. |
+| Stanza dello Spirito e del Tempo | 2.000$ | senza limite | sì | Allenamento: 2 personaggi salgono di 2 forme. |
+| Nuvola Speedy | 750$ | senza limite | no | Viaggio: la pedina va fino a 7 strade più in là, per le strade aperte (1 azione). |
+| Trasmissione Istantanea | 1.500$ | 1 | no | Viaggio: la pedina va su qualsiasi casella raggiungibile per le strade aperte (1 azione). |
 
 ## I poteri degli starter
 

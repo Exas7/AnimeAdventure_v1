@@ -52,14 +52,15 @@ describe('"Usa" on the Senzu (spec 047, 2.1)', () => {
 });
 
 describe('where Nuvola Speedy and Trasmissione Istantanea take the pawn (spec 047, 2.2)', () => {
-  it('C3: the Nuvola goes at most 10 paths away, the Trasmissione any distance', () => {
+  it('C3: the Nuvola goes at most 7 paths away, the Trasmissione any distance', () => {
     const items = new Map(testItems.map((item) => [item.id, item]));
-    expect(travelRule(items.get('flying-nimbus') as (typeof testItems)[number])).toEqual({ steps: 10 });
+    expect(travelRule(items.get('flying-nimbus') as (typeof testItems)[number])).toEqual({ steps: 7 });
     expect(travelRule(items.get('instant-transmission') as (typeof testItems)[number])).toEqual({ steps: null });
 
     const state = currentState(newGame());
     expect([...reachableCells(testMap, state, 'p1', 2)].sort()).toEqual(['c1', 'c2', 'n1', 'n2', 'sh1']);
-    expect(reachableCells(testMap, state, 'p1', null).size).toBe(testMap.nodes.length - 1);
+    // Neither the own cell nor the opponent's (spec 086).
+    expect(reachableCells(testMap, state, 'p1', null).size).toBe(testMap.nodes.length - 2);
     expect(reachableCells(testMap, state, 'p1', null).has('s1')).toBe(false);
   });
 
@@ -76,10 +77,10 @@ describe('where Nuvola Speedy and Trasmissione Istantanea take the pawn (spec 04
       'n2',
       'sh1',
     ]);
-    expect(reachableCells(testMap, currentState(game), 'p2', null).has('s1')).toBe(true);
+    expect(reachableCells(testMap, currentState(game), 'p2', null).has('n3')).toBe(true);
 
     game = act(game, { type: 'setEdgeLock', edgeId: 'e8', players: 'p1', locked: false });
-    expect(reachableCells(testMap, currentState(game), 'p1', null).has('s2')).toBe(true);
+    expect(reachableCells(testMap, currentState(game), 'p1', null).has('n5')).toBe(true);
   });
 });
 
@@ -106,9 +107,9 @@ describe('moving with Nuvola Speedy and Trasmissione Istantanea (spec 047, 2.2)'
       type: 'useItem',
       player: 'p1',
       itemId: 'instant-transmission',
-      to: 's2',
+      to: 'n5',
     });
-    expect(currentState(game).players.p1.position).toBe('s2');
+    expect(currentState(game).players.p1.position).toBe('n5');
     expect(lastWarnings(game)).toEqual([]);
   });
 
@@ -151,5 +152,42 @@ describe('moving with Nuvola Speedy and Trasmissione Istantanea (spec 047, 2.2)'
     expect(() => act(game, nimbusTo('n3'))).toThrow();
     expect(() => act(game, { type: 'useItem', player: 'p1', itemId: 'heavy-clothes' })).toThrow();
     expect(() => act(game, { type: 'useItem', player: 'p1', itemId: 'heavy-clothes', to: 'n3' })).toThrow();
+  });
+});
+
+describe('trips do not hunt the opponent (spec 086, D-108)', () => {
+  const warningKinds = (game: Game, action: GameAction) =>
+    turnRuleWarnings(currentState(game), action, game).map((warning) => warning.kind);
+
+  it("a trip never ends on the opponent's cell: not offered, and refused with a warning", () => {
+    const game = withItem(newGame(), 'instant-transmission');
+    const toOpponent: GameAction = { type: 'useItem', player: 'p1', itemId: 'instant-transmission', to: 's2' };
+    expect(reachableCells(testMap, currentState(game), 'p1', null).has('s2')).toBe(false);
+    expect(warningKinds(game, toOpponent)).toEqual(['travelOnOpponent']);
+  });
+
+  it('the turn after a trip only interactions: no moves, not even with an extra action', () => {
+    let game = withItem(newGame({ p1Powers: [powerCatalog.extraActionsOnDemand(2, 1, 'Doppia azione')] }), 'flying-nimbus');
+    game = act(game, nimbusTo('n1'));
+    expect(currentState(game).players.p1.noMovesNext).toBe(true);
+    // The same turn is as before: a move is still allowed.
+    expect(warningKinds(game, { type: 'move', to: 'sh1' })).not.toContain('noMovesTurn');
+    game = act(game, { type: 'endTurn' });
+    game = act(game, { type: 'endTurn' });
+    expect(currentState(game).currentPlayer).toBe('p1');
+    expect(warningKinds(game, { type: 'move', to: 'sh1' })).toContain('noMovesTurn');
+    expect(warningKinds(game, { type: 'interact', nodeId: 'n1' })).not.toContain('noMovesTurn');
+    game = act(game, { type: 'usePower', player: 'p1', powerId: 'p1-0' });
+    expect(warningKinds(game, { type: 'move', to: 'sh1' })).toContain('noMovesTurn');
+    // And the turn after that, the pawn moves again.
+    game = act(act(game, { type: 'endTurn' }), { type: 'endTurn' });
+    expect(warningKinds(game, { type: 'move', to: 'sh1' })).not.toContain('noMovesTurn');
+  });
+
+  it('a trip in the turn after a trip warns too', () => {
+    let game = withItem(withItem(newGame(), 'flying-nimbus'), 'flying-nimbus');
+    game = act(game, nimbusTo('n1'));
+    game = act(act(game, { type: 'endTurn' }), { type: 'endTurn' });
+    expect(warningKinds(game, nimbusTo('sh1'))).toContain('noMovesTurn');
   });
 });

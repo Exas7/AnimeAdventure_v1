@@ -36,7 +36,7 @@ export const testItems: ItemDefinition[] = [
   {
     id: 'senzu',
     name: 'Senzu',
-    price: 300,
+    price: 1000,
     copiesPerShop: 1,
     oncePerPlayer: false,
     onPurchase: 'rechargeStarter',
@@ -44,7 +44,7 @@ export const testItems: ItemDefinition[] = [
   {
     id: 'heavy-clothes',
     name: 'Vestiti pesanti da allenamento',
-    price: 200,
+    price: 500,
     copiesPerShop: null,
     oncePerPlayer: true,
     training: { characters: 1, formsEach: 1, formsTotal: 1 },
@@ -52,7 +52,7 @@ export const testItems: ItemDefinition[] = [
   {
     id: 'gravity-room',
     name: 'Camera Gravitazionale del Dr. Brief',
-    price: 400,
+    price: 1000,
     copiesPerShop: null,
     oncePerPlayer: true,
     training: { characters: 2, formsEach: 2, formsTotal: 2 },
@@ -60,7 +60,7 @@ export const testItems: ItemDefinition[] = [
   {
     id: 'time-chamber',
     name: 'Stanza dello Spirito e del Tempo',
-    price: 700,
+    price: 2000,
     copiesPerShop: null,
     oncePerPlayer: true,
     training: { characters: 2, formsEach: 2, formsTotal: 4 },
@@ -68,16 +68,16 @@ export const testItems: ItemDefinition[] = [
   {
     id: 'flying-nimbus',
     name: 'Nuvola Speedy',
-    price: 250,
+    price: 750,
     copiesPerShop: null,
     oncePerPlayer: false,
-    travel: { steps: 10 },
+    travel: { steps: 7 },
   },
   {
     id: 'instant-transmission',
     name: 'Trasmissione Istantanea',
-    price: 600,
-    copiesPerShop: null,
+    price: 1500,
+    copiesPerShop: 1,
     oncePerPlayer: false,
     travel: { steps: null },
   },
