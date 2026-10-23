@@ -56,7 +56,8 @@
 
 /* A · Smussata: a thick bevelled band, light top left and dark bottom right. */
 .smussata {
-  border: 8px solid transparent;
+  --frame-border: 8px;
+  border: var(--frame-border) solid transparent;
   background: linear-gradient(145deg, var(--frame-light) 0%, var(--frame-mid) 42%, var(--frame-dark) 100%) border-box;
   box-shadow:
     0 0 0 2px var(--ink),
@@ -83,9 +84,10 @@
 
 /* B · Tuta e cintura: a round band with the belt inside; the symbol is a medal on top. */
 .tuta {
+  --frame-border: 11px;
   --frame-room: 22px;
   margin-top: var(--frame-room);
-  border: 11px solid transparent;
+  border: var(--frame-border) solid transparent;
   border-radius: 22px;
   background: linear-gradient(180deg, var(--frame-light) 0%, var(--frame-mid) 38%, var(--frame-dark) 100%) border-box;
   box-shadow:
@@ -123,9 +125,22 @@
   transform: translateX(-50%);
 }
 
+/*
+ * Centred on the outer top right corner of the frame (spec 065, 6): an
+ * absolute box starts inside the border, so it moves out by the border first.
+ */
+.corner {
+  position: absolute;
+  top: calc(-1 * var(--frame-border, 0px));
+  right: calc(-1 * var(--frame-border, 0px));
+  z-index: 3;
+  transform: translate(50%, -50%);
+}
+
 /* C · Aura: a thin bright edge and a glow that breathes, with flames on top. */
 .aura {
-  border: 4px solid transparent;
+  --frame-border: 4px;
+  border: var(--frame-border) solid transparent;
   background: linear-gradient(180deg, #ffffff, var(--aura) 50%, color-mix(in srgb, var(--aura) 55%, #000000)) border-box;
   box-shadow:
     0 0 0 2px var(--ink),
@@ -190,7 +205,8 @@
 .frame.thin {
   --frame-room: 0px;
   margin-top: 0;
-  border-width: 3px;
+  --frame-border: 3px;
+  border-width: var(--frame-border);
   border-radius: 10px;
   animation: none;
 }

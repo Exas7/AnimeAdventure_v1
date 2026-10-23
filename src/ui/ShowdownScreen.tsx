@@ -11,7 +11,7 @@ interface ShowdownScreenProps {
   catalog: Character[];
   /** Director buttons; absent on the stream. */
   children?: ReactNode;
-  /** «✕ Chiudi» in the corner (spec 065); absent on the stream and on the phone. */
+  /** The red «✕» on the top right corner of the frame (spec 065, 6); absent on the stream and on the phone. */
   onClose?: () => void;
 }
 
@@ -22,8 +22,12 @@ export function ShowdownScreen({ state, catalog, children, onClose }: ShowdownSc
 
   return (
     <div className={styles.backdrop}>
-      {onClose && <CloseButton className={styles.corner} onClose={onClose} />}
-      <Frame danger className={styles.showdownFrame} contentClassName={styles.showdown}>
+      <Frame
+        danger
+        className={styles.showdownFrame}
+        contentClassName={styles.showdown}
+        corner={onClose && <CloseButton onClose={onClose} />}
+      >
         <h2 className={styles.showdownTitle}>Showdown</h2>
         <div className={styles.teams}>
           {PLAYER_IDS.map((playerId, index) => (

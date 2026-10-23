@@ -28,6 +28,7 @@ export {
   companionOf,
   defaultMission,
   fightMission,
+  isLottery,
   LASTING_MISSIONS,
   looksLikeMission,
   missionLabel,

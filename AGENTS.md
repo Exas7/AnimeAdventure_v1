@@ -175,8 +175,12 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   giro di «batti» e «porta» che si aspettano a vicenda; battute: prima
   l'apertura, poi la missione. I test in
   `src/missions/shippedCatalog.test.ts` le controllano.
-- Domande (`docs/domande.csv`): `domanda;A;B;C;D;giusta;livello`, con il
+- Domande (`docs/domande.csv`): `domanda;A;B;C;D;giusta;livello;chi`, con il
   livello `facile` (per chi arruola fino a C+), `media` (B- e B, e i
-  personaggi della storia) o `difficile` (B+).
+  personaggi della storia) o `difficile` (B+). `chi` (facoltativo, spec 074):
+  il nome del solo personaggio che fa quella domanda; il suo quiz prende
+  solo fra le sue, con le risposte mescolate a ogni partita, e nessun altro
+  le riceve. Una domanda con tutte le risposte uguali (le «Lisa» di Livio)
+  è una lotteria: la giusta si estrae a ogni nuova sfida.
 - Se modifichi un CSV, modifica allo stesso modo il file Excel con lo
   stesso nome, se la persona lo usa.

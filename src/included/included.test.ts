@@ -8,19 +8,21 @@ import { randomEpisode } from '../episode/stepRandomize';
 import { EMPTY_TEXT_LIBRARY } from '../episode/textLibrary';
 import { DEFAULT_READY_POWERS } from '../starters/readyPowers';
 import { boardSize, cellRadius, cellsOffBoard } from '../ui/boardModel';
+import { isGuest } from '../catalog/guests';
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 import { includedMapId, isIncludedMapId, listIncludedMaps, readIncludedMaps } from './includedMaps';
 
 describe('the lists that come with the app (spec 030, criterion 5)', () => {
-  it('read without errors: 166 characters, 159 missions, 60 questions', () => {
+  it('read without errors: 169 characters, 162 missions, 63 questions', () => {
     const catalog = includedCatalog();
-    expect(catalog).toHaveLength(166);
+    // Spec 074: 169 with Livio, Maggi and Meliador (it was 166).
+    expect(catalog).toHaveLength(169);
     expect(catalog.filter((character) => character.possibleStarter)).toHaveLength(24);
     // Spec 043: the catalog rewritten (it was 45 after specs 031 and 034), 20 questions for each level (it was 45).
     // Spec 069: 140 missions (it was 128), with the story fights, the chains and «Accompagnami da»;
-    // spec 071: 159, with 19 chains more.
-    expect(includedMissions(catalog)).toHaveLength(159);
-    expect(includedQuestions()).toHaveLength(60);
+    // spec 071: 159, with 19 chains more; spec 074: 162, with the quiz of each guest, and 63 questions.
+    expect(includedMissions(catalog)).toHaveLength(162);
+    expect(includedQuestions()).toHaveLength(63);
   });
 
   it('the challenge Cell + Cell Jr., given by Cell (forma perfetta) (spec 034, criterion 7)', () => {
@@ -132,7 +134,9 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
       }
     }
     const average = (list: number[]) => list.reduce((sum, value) => sum + value, 0) / list.length;
-    expect(average(ranks.openers)).toBeGreaterThan(average(ranks.others) + 2);
+    // On average the openers are 2 steps stronger: the test asks 1.5, not to depend on the draw
+    // (the host, spec 074: 2.03 without the guests and 2.04 with them, over 12 series of 100).
+    expect(average(ranks.openers)).toBeGreaterThan(average(ranks.others) + 1.5);
   });
 });
 
@@ -188,6 +192,62 @@ describe('«Batti» without chains, the story missions (spec 070, criterion 1; s
     // The host's exception comes out too (spec 071, criterion 2).
     expect(zarbonAndDodoria).toBeGreaterThan(0);
     expect(daburas).toBeGreaterThan(0);
+  });
+});
+
+describe('Livio, Maggi and Meliador (spec 074, criteria 2-4)', () => {
+  it('on Pianeta Nameck, in 300 episodes: one guest at most among the story characters, each with their own quiz', async () => {
+    const catalog = includedCatalog();
+    const map = (await listIncludedMaps()).maps.find((entry) => entry.id === 'inclusa:Pianeta_Nameck')?.map;
+    if (!map) {
+      throw new Error('Pianeta Nameck is missing');
+    }
+    const questions = includedQuestions();
+    const own = new Map(questions.flatMap((entry) => (entry.giverId ? [[entry.giverId, entry] as const] : [])));
+    const random = seeded(74);
+    let asStory = 0;
+    let asKeepers = 0;
+    const rightPlaces = new Map<string, Set<number>>();
+    for (let run = 0; run < 300; run++) {
+      const { content } = randomEpisode(map, {
+        catalog,
+        specialKeepers: [],
+        powers: DEFAULT_READY_POWERS,
+        texts: EMPTY_TEXT_LIBRARY,
+        missions: { catalog: includedMissions(catalog), questions, items: testItems },
+        perShop: 3,
+        random,
+      });
+      const guestCells = map.nodes.filter(
+        (node) => node.type === 'character' && isGuest(content[node.id]?.characterId ?? ''),
+      );
+      expect(guestCells.length).toBeLessThanOrEqual(1);
+      asStory += guestCells.length;
+      asKeepers += map.nodes.filter((node) => node.type === 'shop' && isGuest(content[node.id]?.characterId ?? '')).length;
+      for (const node of map.nodes.filter((entry) => entry.type === 'character')) {
+        const cell = content[node.id];
+        const quiz = cell?.mission?.quiz;
+        const asked = quiz ? questions.find((entry) => entry.question === quiz.question) : undefined;
+        if (!cell?.characterId || !isGuest(cell.characterId)) {
+          // Nobody else gets the guests' questions (criterion 3).
+          expect(asked?.giverId).toBeUndefined();
+          continue;
+        }
+        const question = own.get(cell.characterId);
+        expect(cell.mission?.type).toBe('quiz');
+        expect(cell.mission?.reward).toEqual({ coins: 1500 });
+        expect(quiz?.question).toBe(question?.question);
+        // The same answers in another order, the right one still right (criterion 4).
+        expect([...(quiz?.answers ?? [])].sort()).toEqual([...(question?.answers ?? [])].sort());
+        expect(quiz?.answers[quiz.correct]).toBe(question?.answers[question.correct]);
+        rightPlaces.set(cell.characterId, (rightPlaces.get(cell.characterId) ?? new Set()).add(quiz?.correct ?? -1));
+      }
+    }
+    expect(asStory).toBeGreaterThan(100);
+    expect(asKeepers).toBeGreaterThan(50);
+    for (const guest of ['maggi', 'meliador']) {
+      expect(rightPlaces.get(guest)?.size, guest).toBeGreaterThan(1);
+    }
   });
 });
 

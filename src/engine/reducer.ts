@@ -13,6 +13,8 @@ import {
   awayCells,
   cellMission,
   companionOf,
+  isLottery,
+  lotteryDraw,
   missionLabel,
   noteTurnSkipped,
   notePawnMoved,
@@ -245,6 +247,11 @@ function interact(
   state.actions.interactionsUsed += 1;
   if (state.players[state.currentPlayer].position === nodeId) {
     state.interactedNodeId = nodeId;
+  }
+  // A lottery draws its right answer at every new challenge (spec 074, 2.4; D-099).
+  const mission = state.cells[nodeId]?.mission;
+  if (mission?.type === 'quiz' && mission.quiz && isLottery(mission.quiz)) {
+    mission.quiz.correct = lotteryDraw(state, nodeId, mission.quiz.answers.length);
   }
 
   firePowers(state, state.currentPlayer, (trigger) => trigger.type === 'interaction', out);

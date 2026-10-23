@@ -1,3 +1,4 @@
+import { isGuest, oneGuestAtMost } from '../catalog/guests';
 import { onePerPerson, personsOf, samePerson } from '../catalog/person';
 import {
   cellNumber,
@@ -7,6 +8,7 @@ import {
   type GameMap,
   type ItemDefinition,
   type Mission,
+  type QuizQuestion,
 } from '../engine';
 import {
   fillLines,
@@ -208,18 +210,25 @@ export function randomizeWithMissions(
   // shopkeeper too, when not keeping a shop in this episode (D-047).
   const usedBefore = usedCharacters(working);
   const personsBefore = personsOf(usedBefore, catalog);
-  const storyPool = onePerPerson(
-    shuffle(
-      catalog.filter(
-        (character) =>
-          !character.tier &&
-          !usedBefore.has(character.id) &&
-          !isReserved(character.id) &&
-          hasOwnMissions(character.id, sources.catalog),
+  // Of the guests, one at most (spec 074, 2.5; D-100).
+  const guestOnBoard = Object.entries(working).some(
+    ([id, cell]) => types.get(id) === 'character' && cell.characterId !== undefined && isGuest(cell.characterId),
+  );
+  const storyPool = oneGuestAtMost(
+    onePerPerson(
+      shuffle(
+        catalog.filter(
+          (character) =>
+            !character.tier &&
+            !usedBefore.has(character.id) &&
+            !isReserved(character.id) &&
+            hasOwnMissions(character.id, sources.catalog),
+        ),
+        random,
       ),
-      random,
+      new Set([...personsBefore, ...reservedPersons]),
     ),
-    new Set([...personsBefore, ...reservedPersons]),
+    guestOnBoard,
   );
   const storyCells = pickStoryCells(
     new Map([...places].filter(([id]) => cellTargets.includes(id))),
@@ -432,16 +441,27 @@ export function randomizeWithMissions(
       }
       case 'quiz': {
         if (!mission.quiz?.question) {
-          // A question of the giver's level; once those are over, one without a level (D-069).
           const free = sources.questions.filter((question) => !usedQuestions.has(question.question));
+          // The giver's own questions, with the answers in a new order (spec 074, 2.2 and 2.3; D-099).
+          const own = free.filter((question) => question.giverId !== undefined && question.giverId === giver?.id);
+          // Otherwise a question of the giver's level; once those are over, one without a level (D-069).
+          const library = free.filter((question) => question.giverId === undefined);
           const wanted = questionLevel(giver?.tier);
-          const ofLevel = free.filter((question) => question.level === wanted);
-          const pool = ofLevel.length > 0 ? ofLevel : free.filter((question) => question.level === undefined);
+          const ofLevel = library.filter((question) => question.level === wanted);
+          const pool =
+            own.length > 0
+              ? own
+              : ofLevel.length > 0
+                ? ofLevel
+                : library.filter((question) => question.level === undefined);
           const question = pool[Math.floor(random() * pool.length)];
           if (!question) {
             return null;
           }
-          mission.quiz = { question: question.question, answers: [...question.answers], correct: question.correct };
+          mission.quiz =
+            own.length > 0
+              ? shuffledQuiz(question, random)
+              : { question: question.question, answers: [...question.answers], correct: question.correct };
         }
         break;
       }
@@ -698,6 +718,19 @@ function pickStoryCells(
     }
   }
   return chosen;
+}
+
+/** The question with its answers in a random order; the right one stays right (spec 074, 2.3). */
+export function shuffledQuiz(question: QuizQuestion, random: Random): QuizQuestion {
+  const order = shuffle(
+    question.answers.map((_, index) => index),
+    random,
+  );
+  return {
+    question: question.question,
+    answers: order.map((index) => question.answers[index] as string),
+    correct: order.indexOf(question.correct),
+  };
 }
 
 /** The entries in a random order where heavier ones tend to come first. */

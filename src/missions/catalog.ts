@@ -49,16 +49,21 @@ export interface QuestionEntry extends QuizQuestion {
   id: string;
   /** Without a level (saved before spec 043) a question is good for any level. */
   level?: QuestionLevel;
+  /** The code of the only character who asks it, the «chi» column (spec 074, 2.2; D-099). */
+  giverId?: string;
 }
 
 /** "60 domande: 20 facili, 20 medie, 20 difficili, 3 senza livello." */
 export function questionCount(questions: QuestionEntry[]): string {
+  // The questions of one character are counted apart (spec 074, 2.2).
+  const library = questions.filter((question) => question.giverId === undefined);
   const parts = [
     ...QUESTION_LEVELS.map((entry) => {
-      const count = questions.filter((question) => question.level === entry.level).length;
+      const count = library.filter((question) => question.level === entry.level).length;
       return { count, label: count === 1 ? entry.label : entry.plural };
     }),
-    { count: questions.filter((question) => question.level === undefined).length, label: 'senza livello' },
+    { count: library.filter((question) => question.level === undefined).length, label: 'senza livello' },
+    { count: questions.length - library.length, label: 'di un solo personaggio' },
   ].filter((part) => part.count > 0);
   return `${questions.length} ${questions.length === 1 ? 'domanda' : 'domande'}: ${parts
     .map((part) => `${part.count} ${part.label}`)
@@ -151,6 +156,7 @@ export function looksLikeQuestion(value: unknown): value is QuestionEntry {
     Array.isArray(entry.answers) &&
     entry.answers.every((answer) => typeof answer === 'string') &&
     typeof entry.correct === 'number' &&
-    (entry.level === undefined || QUESTION_LEVELS.some((level) => level.level === entry.level))
+    (entry.level === undefined || QUESTION_LEVELS.some((level) => level.level === entry.level)) &&
+    (entry.giverId === undefined || typeof entry.giverId === 'string')
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { testItems } from '../engine';
+import { testItems, type Character } from '../engine';
 import {
   fillLines,
   groupOf,
@@ -167,7 +167,8 @@ describe('the level of the questions (spec 043, 2.1 and criteria 1-2)', () => {
 
   it('exported with the column «livello» and imported again they are identical', () => {
     const text = questionsToCsv(leveled);
-    expect(text.split('\r\n')[0]).toBe('﻿domanda;A;B;C;D;giusta;livello');
+    // Spec 074: the «chi» column after the level.
+    expect(text.split('\r\n')[0]).toBe('﻿domanda;A;B;C;D;giusta;livello;chi');
     expect(text).toContain(';B;facile');
     const back = questionsFromCsv(text);
     expect(back.skipped).toEqual([]);
@@ -203,5 +204,44 @@ describe('the level of the questions (spec 043, 2.1 and criteria 1-2)', () => {
     expect(questionCount(leveled)).toBe('4 domande: 1 facile, 1 media, 1 difficile, 1 senza livello.');
     const twoEasy = [leveled[0], { ...(leveled[0] as QuestionEntry), id: 'q5' }, leveled[1]] as QuestionEntry[];
     expect(questionCount(twoEasy)).toBe('3 domande: 2 facili, 1 media.');
+  });
+});
+
+describe('who asks a question, the «chi» column (spec 074, 2.2 and criterion 7; D-099)', () => {
+  const characters: Character[] = [
+    { id: 'maggi', name: 'Maggi' },
+    { id: 'livio', name: 'Livio' },
+  ];
+  const questions: QuestionEntry[] = [
+    {
+      id: 'q1',
+      question: 'Qual è il più grande buco di trama della storia?',
+      answers: ['Cypher entra da solo nel Matrix', 'La vita di Livio', 'I poteri di Imhotep'],
+      correct: 0,
+      giverId: 'maggi',
+    },
+    { id: 'q2', question: 'Chi è il padre di Goten?', answers: ['Vegeta', 'Goku', 'Gohan'], correct: 1, level: 'easy' },
+  ];
+
+  it('exported with the name of who asks it and imported again they are identical', () => {
+    const text = questionsToCsv(questions, characters);
+    expect(text.split('\r\n')[0]).toBe('﻿domanda;A;B;C;D;giusta;livello;chi');
+    expect(text).toContain(';A;;Maggi');
+    const back = questionsFromCsv(text, characters);
+    expect(back.skipped).toEqual([]);
+    expect(back.entries.map(({ id: _id, ...rest }) => rest)).toEqual(questions.map(({ id: _id, ...rest }) => rest));
+  });
+
+  it('a name not in the list leaves the row out, with the reason', () => {
+    const text = ['domanda;A;B;C;D;giusta;livello;chi', 'Chi?;Uno;Due;Tre;;B;;Pippo', 'Cosa?;Uno;Due;Tre;;A;;livio'].join('\n');
+    const back = questionsFromCsv(text, characters);
+    expect(back.entries.map((entry) => entry.giverId)).toEqual(['livio']);
+    expect(back.skipped).toEqual(['Riga 2: «Pippo» non è nella lista dei personaggi.']);
+  });
+
+  it('the browser keeps who asks it; the count puts those questions apart', () => {
+    expect(looksLikeQuestion(questions[0])).toBe(true);
+    expect(looksLikeQuestion({ ...questions[0], giverId: 7 })).toBe(false);
+    expect(questionCount(questions)).toBe('2 domande: 1 facile, 1 di un solo personaggio.');
   });
 });

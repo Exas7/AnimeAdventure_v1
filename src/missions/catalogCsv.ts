@@ -40,7 +40,7 @@ export const CATALOG_COLUMNS = [
   'battute',
 ] as const;
 
-export const QUESTION_COLUMNS = ['domanda', 'A', 'B', 'C', 'D', 'giusta', 'livello'] as const;
+export const QUESTION_COLUMNS = ['domanda', 'A', 'B', 'C', 'D', 'giusta', 'livello', 'chi'] as const;
 
 const TYPE_NAMES: Record<MissionType, string> = {
   fight: 'combattimento',
@@ -226,22 +226,29 @@ export function catalogFromCsv(
   return { entries, skipped };
 }
 
-/** The questions as a CSV file: question, answers A to D, the letter of the right one, the level. */
-export function questionsToCsv(questions: QuestionEntry[]): string {
+/**
+ * The questions as a CSV file: question, answers A to D, the letter of the
+ * right one, the level and who asks it (spec 074, 2.2).
+ */
+export function questionsToCsv(questions: QuestionEntry[], characters: Character[] = []): string {
+  const name = (id: string) => characters.find((character) => character.id === id)?.name ?? id;
   const rows = questions.map((entry) => [
     entry.question,
     ...LETTERS.map((_, index) => entry.answers[index] ?? ''),
     LETTERS[entry.correct] ?? '',
     QUESTION_LEVELS.find((level) => level.level === entry.level)?.label ?? '',
+    entry.giverId ? name(entry.giverId) : '',
   ]);
   return toCsv([[...QUESTION_COLUMNS], ...rows]);
 }
 
 /**
  * Reads the questions back: at least three answers, and the right one among
- * them. The level may be missing (a file from before spec 043), never unknown.
+ * them. The level may be missing (a file from before spec 043), never
+ * unknown; so may who asks it (spec 074), who must be in `characters` when
+ * given.
  */
-export function questionsFromCsv(text: string): CsvImport<QuestionEntry> {
+export function questionsFromCsv(text: string, characters?: Character[]): CsvImport<QuestionEntry> {
   const rows = parseCsv(text);
   const entries: QuestionEntry[] = [];
   const skipped: string[] = [];
@@ -264,7 +271,20 @@ export function questionsFromCsv(text: string): CsvImport<QuestionEntry> {
       skipped.push(`Riga ${index + 2}: livello «${levelText}» sconosciuto: facile, media o difficile.`);
       return;
     }
-    entries.push({ id: newCatalogId(), question, answers, correct, ...(level ? { level } : {}) });
+    const who = rest[6] ?? '';
+    const giverId = who ? characterIdOf(who) : undefined;
+    if (giverId && characters && !characters.some((character) => character.id === giverId)) {
+      skipped.push(`Riga ${index + 2}: «${who}» non è nella lista dei personaggi.`);
+      return;
+    }
+    entries.push({
+      id: newCatalogId(),
+      question,
+      answers,
+      correct,
+      ...(level ? { level } : {}),
+      ...(giverId ? { giverId } : {}),
+    });
   });
   return { entries, skipped };
 }

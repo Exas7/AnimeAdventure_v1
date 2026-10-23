@@ -1,20 +1,31 @@
+import { GUESTS } from '../catalog/guests';
 import type { Character, FightMove, FightSheet } from '../engine';
 import { hasStoredCatalog, loadCatalog, saveCatalog } from '../storage/catalogStore';
 import { loadMissionCatalog, loadQuestions, saveMissionCatalog, saveQuestions } from '../storage/missionStore';
-import { missionsFingerprint, pricesFingerprint, sheetFingerprint } from './fingerprint';
+import { missionsFingerprint, pricesFingerprint, questionsFingerprint, sheetFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 
 /**
  * The fingerprints of the included missions of before (codes left out): a
  * browser that still has one of those lists, never changed, gets the new one
- * (spec 063 and 066, 2.3: more coins; spec 069, 2.6: the story missions; spec 071: more chains).
- * Any other list stays as it is.
+ * (spec 063 and 066, 2.3: more coins; spec 069, 2.6: the story missions; spec 071: more chains;
+ * spec 074, 2.7: the guests). Any other list stays as it is.
  */
 export const MISSIONS_BEFORE_063 = '06dfb42d';
 export const MISSIONS_BEFORE_066 = '21906f4f';
 export const MISSIONS_BEFORE_069 = 'd7074836';
 export const MISSIONS_BEFORE_071 = '440cbbd5';
-const OLD_MISSIONS = [MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069, MISSIONS_BEFORE_071];
+export const MISSIONS_BEFORE_074 = 'caa9fe9b';
+const OLD_MISSIONS = [
+  MISSIONS_BEFORE_063,
+  MISSIONS_BEFORE_066,
+  MISSIONS_BEFORE_069,
+  MISSIONS_BEFORE_071,
+  MISSIONS_BEFORE_074,
+];
+
+/** The included questions of before spec 074, never changed: they get the guests' ones (spec 074, 2.7). */
+export const QUESTIONS_BEFORE_074 = 'ec8759d6';
 
 /**
  * The fingerprint of codes and prices of the included characters before
@@ -33,8 +44,9 @@ export interface FilledLists {
 /**
  * At start (spec 030, D-045): what the browser does not have comes from the
  * files of the project; what it has is never touched, except the included
- * missions, prices and sheets of before, never changed, which get the new
- * values (spec 063, 066 and 073).
+ * missions, prices, sheets and questions of before, never changed, which get
+ * the new values (spec 063, 066, 073 and 074), and the guests, who come with
+ * the new missions (spec 074).
  */
 export async function fillMissingLists(): Promise<FilledLists> {
   const filled: string[] = [];
@@ -61,13 +73,24 @@ export async function fillMissingLists(): Promise<FilledLists> {
       await saveMissionCatalog(includedMissions(catalog));
       filled.push('missioni');
     } else if (OLD_MISSIONS.includes(missionsFingerprint(stored))) {
+      // The guests come with their missions, once (spec 074, 2.7).
+      const withGuests = withGuestsOf(catalog, includedCatalog());
+      if (withGuests) {
+        catalog = withGuests;
+        await saveCatalog(catalog);
+        filled.push('Livio, Maggi e Meliador');
+      }
       await saveMissionCatalog(includedMissions(catalog));
       filled.push('missioni aggiornate');
     }
   }
-  if ((await loadQuestions()).length === 0) {
+  const questions = await loadQuestions();
+  if (questions.length === 0) {
     await saveQuestions(includedQuestions());
     filled.push('domande');
+  } else if (questionsFingerprint(questions) === QUESTIONS_BEFORE_074) {
+    await saveQuestions(includedQuestions());
+    filled.push('domande aggiornate');
   }
   return { catalog, filled };
 }
@@ -105,6 +128,13 @@ function withoutDrains(sheet: FightSheet): FightSheet {
   };
   const { transformHeal: _heal, ...rest } = sheet;
   return { ...rest, move1: plain(sheet.move1), move2: plain(sheet.move2), finale: plain(sheet.finale) };
+}
+
+/** The list with the guests of `included` it lacks (spec 074, 2.7); null when it has them all. */
+export function withGuestsOf(catalog: Character[], included: Character[]): Character[] | null {
+  const known = new Set(catalog.map((character) => character.id));
+  const missing = included.filter((character) => GUESTS.includes(character.id) && !known.has(character.id));
+  return missing.length > 0 ? [...catalog, ...missing] : null;
 }
 
 /** The list with the prices of `included`, character by character; the rest as it was. */

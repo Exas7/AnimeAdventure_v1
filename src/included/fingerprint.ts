@@ -1,5 +1,5 @@
 import type { Character, FightSheet } from '../engine';
-import type { CatalogMission } from '../missions/catalog';
+import type { CatalogMission, QuestionEntry } from '../missions/catalog';
 
 // A short fingerprint of a list, to recognise in a browser the list that
 // came from the included files and was never changed (spec 063, 2.3; spec
@@ -32,6 +32,11 @@ function fnv1a(text: string): string {
 
 export function missionsFingerprint(missions: readonly CatalogMission[]): string {
   return fnv1a(canonical(missions.map(({ id: _id, ...rest }) => rest)));
+}
+
+/** The questions, codes left out as for the missions (spec 074, 2.7). */
+export function questionsFingerprint(questions: readonly QuestionEntry[]): string {
+  return fnv1a(canonical(questions.map(({ id: _id, ...rest }) => rest)));
 }
 
 /** A fight sheet of the list (spec 073, 2.8): the same values, the same fingerprint. */

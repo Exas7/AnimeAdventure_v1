@@ -1,10 +1,15 @@
-/* «✕ Chiudi» (spec 065): small, always at the top, never squeezed by the title. */
+/* The cross (spec 065, 6): a red square button, always at the top, never squeezed by the title. */
 .close {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-weight: 700;
-  white-space: nowrap;
+  justify-content: center;
+  min-width: 2.2em;
+  min-height: 2.2em;
+  padding: 4px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--button-danger);
+  text-shadow: 0 1px 0 var(--ink);
 }

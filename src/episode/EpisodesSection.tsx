@@ -137,7 +137,7 @@ export function EpisodesSection({ catalog, onBack, showError }: EpisodesSectionP
   };
 
   const importQuestions = async (file: File): Promise<string[]> => {
-    const result = questionsFromCsv(await file.text());
+    const result = questionsFromCsv(await file.text(), catalog);
     if (result.entries.length > 0) {
       changeQuestions(result.entries);
     }
@@ -361,8 +361,9 @@ export function EpisodesSection({ catalog, onBack, showError }: EpisodesSectionP
       content: (
         <QuestionsPanel
           questions={questions}
+          characters={catalog}
           onChange={changeQuestions}
-          onExport={() => downloadCsv(questionsToCsv(questions), 'domande.csv')}
+          onExport={() => downloadCsv(questionsToCsv(questions, catalog), 'domande.csv')}
           onImport={importQuestions}
         />
       ),

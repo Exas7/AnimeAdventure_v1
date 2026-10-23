@@ -115,8 +115,8 @@ describe('the rules of the catalog in docs (spec 043, criteria 5-6; D-069, D-070
     }
   });
 
-  it('every question has a level, at least 18 for each', () => {
-    const questions = questionsFromCsv(questionTable).entries;
+  it('every question has a level, at least 18 for each; those of one character need none (spec 074)', () => {
+    const questions = questionsFromCsv(questionTable).entries.filter((entry) => entry.giverId === undefined);
     expect(questions.filter((entry) => entry.level === undefined)).toEqual([]);
     for (const { level } of QUESTION_LEVELS) {
       expect(questions.filter((entry) => entry.level === level).length, level).toBeGreaterThanOrEqual(18);

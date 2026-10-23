@@ -183,6 +183,22 @@ describe('the quiz of the AI (spec 053, criterion 5)', () => {
     // Difficile is right up to 9 times in 10.
     expect(nextAiStep(game, 'hard', () => 0.85, newMemory())).toMatchObject({ kind: 'quiz', answer: 2 });
   });
+
+  it('finds the true Lisa only once in four, at any level (spec 074, 2.4)', () => {
+    const lisa: CellContent = {
+      characterId: 'char-a',
+      mission: {
+        type: 'quiz',
+        quiz: { question: 'Trova la mia vera Lisa', answers: ['Lisa', 'Lisa', 'Lisa', 'Lisa'], correct: 0 },
+        reward: { coins: 1500 },
+      },
+    };
+    const game = act(place(aiGame({ content: { c1: lisa } }), 'c1'), { type: 'interact', nodeId: 'c1' });
+    const right = currentState(game).cells.c1?.mission?.quiz?.correct;
+    expect(nextAiStep(game, 'hard', () => 0.2, newMemory())).toMatchObject({ kind: 'quiz', answer: right });
+    const wrong = nextAiStep(game, 'hard', () => 0.3, newMemory());
+    expect(wrong.kind === 'quiz' && wrong.answer).not.toBe(right);
+  });
 });
 
 describe('the fights of the AI (spec 053, criterion 6)', () => {

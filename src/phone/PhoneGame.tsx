@@ -669,6 +669,9 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   }
 
   const stageOverlay: Overlay | null = overlay;
+  // With a scene, the shop or the showdown open, the rest waits until it is closed; «i» still shows (spec 065, 6).
+  const busy = overlay !== null;
+  const mapOff = aiTurn || busy;
   const panel = (playerId: PlayerId, side: 'left' | 'right') => (
     <PhonePanel
       playerId={playerId}
@@ -678,6 +681,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
       items={game.items}
       canUndo={canUndoOnPhone(game)}
       locked={aiTurn}
+      busy={busy}
       onUsePower={(powerId) => attempt({ type: 'usePower', player: current, powerId })}
       onUseItem={useItem}
       onAbandonMission={(missionId) => attempt({ type: 'abandonMission', missionId })}
@@ -707,11 +711,11 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
           items={game.items}
           state={state}
           overlay={stageOverlay}
-          onNodeClick={aiTurn ? undefined : handleNodeClick}
+          onNodeClick={mapOff ? undefined : handleNodeClick}
           onNextLine={nextLine}
           onAnswer={aiTurn ? undefined : answer}
           hideRightAnswer
-          onPawnDrop={aiTurn ? undefined : handlePawnDrop}
+          onPawnDrop={mapOff ? undefined : handlePawnDrop}
           highlighted={targets ? new Set(targets) : undefined}
           tapRadius={TAP_RADIUS}
           hideNotifications

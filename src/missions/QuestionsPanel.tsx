@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import type { Character } from '../engine';
 import screenStyles from '../director/Screens.module.css';
 import { InfoButton } from '../ui/InfoButton';
 import { newCatalogId, QUESTION_LEVELS, questionCount, type QuestionEntry, type QuestionLevel } from './catalog';
@@ -6,6 +7,8 @@ import styles from './CatalogPanels.module.css';
 
 interface QuestionsPanelProps {
   questions: QuestionEntry[];
+  /** For the names in the «chi» column (spec 074, 2.2). */
+  characters: Character[];
   onChange(questions: QuestionEntry[]): void;
   onExport(): void;
   /** Replaces the questions; resolves with the summary to show. */
@@ -25,7 +28,7 @@ function levelName(level: QuestionLevel | undefined): string {
 }
 
 /** "Domande" in the episode library (spec 027, 2.3): the quiz questions. */
-export function QuestionsPanel({ questions, onChange, onExport, onImport }: QuestionsPanelProps) {
+export function QuestionsPanel({ questions, characters, onChange, onExport, onImport }: QuestionsPanelProps) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [deleteAsked, setDeleteAsked] = useState<string | null>(null);
@@ -42,6 +45,8 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
       answers,
       correct: Math.min(draft.correct, answers.length - 1),
       ...(draft.level ? { level: draft.level } : {}),
+      // Who asks it is written in the file only, and stays (spec 074, 2.2).
+      ...(draft.giverId ? { giverId: draft.giverId } : {}),
     };
     onChange(
       editing
@@ -180,7 +185,10 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
             <div>
               <strong>{entry.question}</strong>
               <span className={screenStyles.note}>
-                {levelName(entry.level)} ·{' '}
+                {entry.giverId
+                  ? `La fa solo ${characters.find((character) => character.id === entry.giverId)?.name ?? entry.giverId}`
+                  : levelName(entry.level)}{' '}
+                ·{' '}
                 {entry.answers
                   .map((answer, index) => `${LETTERS[index]}) ${answer}${index === entry.correct ? ' ✓' : ''}`)
                   .join('   ')}
@@ -195,6 +203,7 @@ export function QuestionsPanel({ questions, onChange, onExport, onImport }: Ques
                     answers: LETTERS.map((_, index) => entry.answers[index] ?? ''),
                     correct: entry.correct,
                     ...(entry.level ? { level: entry.level } : {}),
+                    ...(entry.giverId ? { giverId: entry.giverId } : {}),
                   });
                 }}
               >

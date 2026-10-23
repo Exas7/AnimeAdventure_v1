@@ -12,7 +12,6 @@ import {
 import type { Overlay } from '../sync/liveView';
 import { Board, type ScreenPoint } from './Board';
 import { ChallengeScreen } from './ChallengeScreen';
-import { CloseButton } from './CloseButton';
 import { NotificationStack } from './NotificationStack';
 import { ShopScreen, type ShopActions } from './ShopScreen';
 import { ShowdownScreen } from './ShowdownScreen';
@@ -51,7 +50,7 @@ interface StageProps {
   showdownControls?: ReactNode;
   shopActions?: (shopNodeId: string) => ShopActions;
   shopControls?: ReactNode;
-  /** «✕ Chiudi» in the top right corner of the shop and the showdown (spec 065). */
+  /** The red «✕» on the top right corner of the shop and the showdown frames (spec 065, 6). */
   onCloseShop?: () => void;
   onCloseShowdown?: () => void;
   /** The phone (spec 057, 2.1): the shop in one column, scrolled only up and down. */
@@ -107,13 +106,13 @@ export function Stage(props: StageProps) {
       )}
       {overlay?.kind === 'shop' && (
         <div className={overlayStyles.backdrop}>
-          {props.onCloseShop && <CloseButton className={overlayStyles.corner} onClose={props.onCloseShop} />}
           <ShopScreen
             context={{ map, catalog, items }}
             state={state}
             shopNodeId={overlay.nodeId}
             actions={props.shopActions?.(overlay.nodeId)}
             stacked={props.stackedShop}
+            onClose={props.onCloseShop}
           >
             {props.shopControls}
           </ShopScreen>

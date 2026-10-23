@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { shopListing, type GameContext, type GameState } from '../engine';
 import { Frame } from '../theme/Frame';
+import { CloseButton } from './CloseButton';
 import { NumberField } from './NumberField';
 import { ownImage } from './characterImages';
 import { itemImage } from './itemImages';
@@ -26,6 +27,8 @@ interface ShopScreenProps {
   stacked?: boolean;
   /** Extra buttons at the bottom, such as "Chiudi". */
   children?: ReactNode;
+  /** The red «✕» on the top right corner of the frame (spec 065, 6); absent on the stream. */
+  onClose?: () => void;
 }
 
 /**
@@ -33,7 +36,7 @@ interface ShopScreenProps {
  * already bought entries are grey, but stay buyable (D-015).
  */
 export function ShopScreen(props: ShopScreenProps) {
-  const { context, state, shopNodeId, actions, compact, stacked, children } = props;
+  const { context, state, shopNodeId, actions, compact, stacked, children, onClose } = props;
   const viewer = state.currentPlayer;
   const listing = shopListing(state, context, shopNodeId, viewer);
   const nameOf = (characterId: string) =>
@@ -129,6 +132,7 @@ export function ShopScreen(props: ShopScreenProps) {
     <Frame
       className={stacked ? `${styles.frame} ${styles.stacked}` : styles.frame}
       contentClassName={styles.shop}
+      corner={onClose && <CloseButton onClose={onClose} />}
     >
       {body}
     </Frame>

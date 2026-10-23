@@ -28,6 +28,11 @@ interface PhonePanelProps {
   canUndo: boolean;
   /** The AI's turn (spec 053, 2.2): the player's buttons are off, «Menu» stays. */
   locked?: boolean;
+  /**
+   * A scene, the shop or the showdown is open over the map (spec 065, 6):
+   * every button is off but «i», which only shows.
+   */
+  busy?: boolean;
   onUsePower(powerId: string): void;
   onUseItem(itemId: string): void;
   onAbandonMission(missionId: number): void;
@@ -51,7 +56,7 @@ export function PhonePanel(props: PhonePanelProps) {
   const current = state.currentPlayer === playerId;
   // «Accompagnami da» (spec 069, 2.5): in the column, never in the team.
   const companion = companionOf(state, playerId);
-  const active = current && !props.locked;
+  const active = current && !props.locked && !props.busy;
   const { actions } = state;
   const movesLeft = Math.max(0, actions.available - actions.used);
   const missions = (state.activeMissions ?? []).filter((mission) => mission.player === playerId).length;
@@ -140,18 +145,20 @@ export function PhonePanel(props: PhonePanelProps) {
         {current ? (
           <>
             <button
-              disabled={props.locked || !props.canUndo}
+              disabled={props.locked || props.busy || !props.canUndo}
               onClick={props.onUndo}
               title="Toglie l'ultima mossa, acquisto o uso del turno"
             >
               Annulla
             </button>
-            <button className={styles.primary} disabled={props.locked} onClick={props.onEndTurn}>
+            <button className={styles.primary} disabled={props.locked || props.busy} onClick={props.onEndTurn}>
               Fine turno
             </button>
           </>
         ) : (
-          <button onClick={props.onMenu}>Menu</button>
+          <button disabled={props.busy} onClick={props.onMenu}>
+            Menu
+          </button>
         )}
       </div>
 
@@ -228,7 +235,7 @@ function PlayerInfoDialog(props: PhonePanelProps & { onClose(): void; canAbandon
               <p>
                 {fusion.pair} possono fondersi in <strong>{fusion.result}</strong>.
               </p>
-              {props.onFuse && !props.locked && (
+              {props.onFuse && !props.locked && !props.busy && (
                 <button
                   onClick={() => {
                     props.onFuse?.(fusion.option);

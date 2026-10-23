@@ -270,3 +270,6 @@ Non combattono nel simulatore: personaggi della storia, per missioni e negozi.
 - Bulma
 - Baba la Veggente
 - Chichi (adulta)
+- Livio
+- Maggi
+- Meliador

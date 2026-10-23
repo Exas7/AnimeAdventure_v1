@@ -9,7 +9,9 @@ import type {
   MissionReward,
   MissionType,
   PlayerId,
+  QuizQuestion,
 } from './types';
+import { PLAYER_IDS } from './types';
 
 // Missions of the character cells (spec 026, D-039, D-040): what they ask,
 // what they give, and when a mission in progress is completed.
@@ -73,6 +75,45 @@ export function cellMission(content: CellContent | undefined): Mission | undefin
     return content.mission;
   }
   return content?.format ? fightMission(content.format) : undefined;
+}
+
+/**
+ * A quiz whose answers are all the same, as the «Lisa» of Livio (spec 074,
+ * 2.4; D-099): a lottery, whose right answer is drawn at every challenge.
+ */
+export function isLottery(quiz: QuizQuestion | undefined): boolean {
+  const first = quiz?.answers[0]?.trim().toLowerCase();
+  return (
+    quiz !== undefined &&
+    quiz.answers.length > 1 &&
+    first !== '' &&
+    quiz.answers.every((answer) => answer.trim().toLowerCase() === first)
+  );
+}
+
+/**
+ * The right answer of a lottery at a new challenge (spec 074, 2.4): drawn
+ * from the state of the game, so that the players cannot foresee it and an
+ * undo followed by the same move draws the same one.
+ */
+export function lotteryDraw(state: GameState, nodeId: string, count: number): number {
+  const players = PLAYER_IDS.map((id) => `${state.players[id].coins}:${state.players[id].team.join(',')}`);
+  return mixedHash([nodeId, state.turn, state.currentPlayer, ...players].join('|')) % count;
+}
+
+/** FNV-1a, with the final mix of MurmurHash3: the low bits change with any input. */
+function mixedHash(text: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index++) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 0x85ebca6b);
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 0xc2b2ae35);
+  hash ^= hash >>> 16;
+  return hash >>> 0;
 }
 
 /** The cell where a character stands on the board, if any. */

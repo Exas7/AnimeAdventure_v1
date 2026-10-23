@@ -14,6 +14,8 @@ interface FrameProps extends HTMLAttributes<HTMLDivElement> {
   symbol?: SymbolId;
   /** Classes of the scrolling inside: padding, gaps, layout. */
   contentClassName?: string;
+  /** On the top right corner of the frame, over the band: the red «✕» of the shop and the showdown (spec 065, 6). */
+  corner?: ReactNode;
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
 }
@@ -30,7 +32,17 @@ const FrameContext = createContext<{ frame: FrameId; symbol: SymbolId | undefine
  * big and faded on the back of the window. The outer element takes the
  * window's size (className); the content scrolls inside.
  */
-export function Frame({ danger, thin = false, frame, symbol, className, contentClassName, children, ...rest }: FrameProps) {
+export function Frame({
+  danger,
+  thin = false,
+  frame,
+  symbol,
+  className,
+  contentClassName,
+  corner,
+  children,
+  ...rest
+}: FrameProps) {
   const theme = useTheme();
   const shape = frame ?? theme.frame;
   const classes = [styles.frame, styles[shape], danger && styles.danger, thin && styles.thin, className];
@@ -38,6 +50,7 @@ export function Frame({ danger, thin = false, frame, symbol, className, contentC
     <FrameContext.Provider value={{ frame: shape, symbol, thin }}>
       <div className={classes.filter(Boolean).join(' ')} {...rest}>
         {!thin && shape === 'tuta' && <ThemeSymbol place="medal" symbol={symbol} className={styles.medal} />}
+        {corner && <div className={styles.corner}>{corner}</div>}
         <div className={styles.panel}>
           {!thin && <ThemeSymbol place="back" symbol={symbol} className={styles.back} />}
           <div className={[styles.content, contentClassName].filter(Boolean).join(' ')}>{children}</div>

@@ -1,16 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import type { Character } from '../engine';
+import { isGuest } from '../catalog/guests';
 import type { CatalogMission } from '../missions/catalog';
 import {
   MISSIONS_BEFORE_063,
   MISSIONS_BEFORE_066,
   MISSIONS_BEFORE_069,
   MISSIONS_BEFORE_071,
+  MISSIONS_BEFORE_074,
   PRICES_BEFORE_066,
+  QUESTIONS_BEFORE_074,
+  withGuestsOf,
   withPricesOf,
 } from './fillIncluded';
-import { missionsFingerprint, pricesFingerprint } from './fingerprint';
-import { includedCatalog, includedMissions } from './includedLists';
+import { missionsFingerprint, pricesFingerprint, questionsFingerprint } from './fingerprint';
+import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 
 const missions = () => includedMissions(includedCatalog());
 const isStory = (entry: CatalogMission) => 'group' in entry.giver && entry.giver.group === 'story';
@@ -124,10 +128,13 @@ describe('a browser with the untouched lists of before gets the new values (spec
   });
 
   /** The included characters with the prices of before spec 066. */
+  // The guests came later (spec 074): the list of before did not have them.
   const pricesBefore066 = (): Character[] =>
-    includedCatalog().map((character) =>
-      character.price === undefined ? character : { ...character, price: PRICES_THEN[character.price] },
-    );
+    includedCatalog()
+      .filter((character) => !isGuest(character.id))
+      .map((character) =>
+        character.price === undefined ? character : { ...character, price: PRICES_THEN[character.price] },
+      );
 
   it('the character list of before has the fingerprint the app looks for; the new one does not', () => {
     expect(pricesFingerprint(pricesBefore066())).toBe(PRICES_BEFORE_066);
@@ -145,7 +152,35 @@ describe('a browser with the untouched lists of before gets the new values (spec
   it('the list of before takes the new prices and keeps everything else', () => {
     const before = pricesBefore066().map((character) => ({ ...character, villain: !character.villain }));
     const updated = withPricesOf(before, includedCatalog());
-    expect(updated.map((character) => character.price)).toEqual(includedCatalog().map((character) => character.price));
+    const today = includedCatalog().filter((character) => !isGuest(character.id));
+    expect(updated.map((character) => character.price)).toEqual(today.map((character) => character.price));
     expect(updated.map((character) => character.villain)).toEqual(before.map((character) => character.villain));
   });
 });
+
+describe('a browser with the untouched lists of before gets the guests (spec 074, 2.7 and criterion 8)', () => {
+  const ofGuest = (entry: CatalogMission) => 'characterId' in entry.giver && isGuest(entry.giver.characterId);
+
+  it("the missions of before are today's without the guests' ones", () => {
+    expect(missionsFingerprint(missions().filter((entry) => !ofGuest(entry)))).toBe(MISSIONS_BEFORE_074);
+    expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_074);
+  });
+
+  it("the questions of before are today's without those of one character", () => {
+    const questions = includedQuestions();
+    expect(questionsFingerprint(questions.filter((entry) => entry.giverId === undefined))).toBe(QUESTIONS_BEFORE_074);
+    expect(questionsFingerprint(questions)).not.toBe(QUESTIONS_BEFORE_074);
+    const recoded = questions.map((entry, index) => ({ ...entry, id: `other-${index}` }));
+    expect(questionsFingerprint(recoded)).toBe(questionsFingerprint(questions));
+  });
+
+  it('a list without the guests gets them at the end, and its missions read; one with them is left as it is', () => {
+    const included = includedCatalog();
+    const before = included.filter((character) => !isGuest(character.id));
+    const updated = withGuestsOf(before, included);
+    expect(updated?.slice(before.length).map((character) => character.name)).toEqual(['Livio', 'Maggi', 'Meliador']);
+    expect(includedMissions(updated ?? []).filter(ofGuest)).toHaveLength(3);
+    expect(withGuestsOf(included, included)).toBeNull();
+  });
+});
+

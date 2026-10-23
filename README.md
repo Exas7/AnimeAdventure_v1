@@ -38,8 +38,9 @@ separate da quelle del browser).
 > Sparking! ZERO, Dragon Ball Legends e Budokai Tenkaichi 3 (Bandai
 > Namco) e ritagli di fan su DeviantArt di illustrazioni ufficiali
 > (Maxiuchiha22, SuperDabura, Ltxalex, PrinceofDBZGames, MonkeyOfLife,
-> Rabazza), con un contorno aggiunto; i crediti di ognuna sono in
-> `assets/characters/CREDITI.md`.
+> Rabazza), con un contorno aggiunto; i tre ospiti (Livio, Maggi e
+> Meliador) sono ritagliati da un'illustrazione «NIGHTLIVE» pubblicata su
+> Instagram. I crediti di ognuna sono in `assets/characters/CREDITI.md`.
 
 ## Cosa serve
 

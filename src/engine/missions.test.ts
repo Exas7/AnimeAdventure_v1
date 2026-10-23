@@ -10,6 +10,8 @@ import {
   cellMission,
   defaultMission,
   fightMission,
+  isLottery,
+  lotteryDraw,
   MISSION_TYPES,
   looksLikeMission,
   missionLabel,
@@ -348,5 +350,60 @@ describe('«Accompagnami da» (spec 069, criterion 5; D-097)', () => {
     const back = currentState(act(accepted(), { type: 'abandonMission', missionId }));
     expect(awayCells(back).size).toBe(0);
     expect(back.cells.c1?.characterId).toBe('char-a');
+  });
+});
+
+describe('the lottery of Livio (spec 074, 2.4; D-099)', () => {
+  const lisa = (correct = 0): Mission => ({
+    type: 'quiz',
+    quiz: { question: 'Trova la mia vera Lisa', answers: ['Lisa', 'Lisa', 'Lisa', 'Lisa'], correct },
+    reward: { coins: 1500 },
+  });
+  const meet = (game: Game) =>
+    play(game, { type: 'placePawn', player: 'p1', nodeId: 'c1' }, { type: 'interact', nodeId: 'c1' });
+  const rightAnswer = (game: Game) => currentState(game).cells.c1?.mission?.quiz?.correct;
+
+  it('a quiz with all its answers the same is a lottery; an empty or a real one is not', () => {
+    expect(isLottery(lisa().quiz)).toBe(true);
+    expect(isLottery({ question: '?', answers: ['Lisa', ' lisa ', 'LISA'], correct: 1 })).toBe(true);
+    expect(isLottery({ question: '?', answers: ['Lisa', 'Lisa', 'Monica'], correct: 0 })).toBe(false);
+    expect(isLottery(defaultMission('quiz').quiz)).toBe(false);
+    expect(isLottery({ question: '?', answers: ['Lisa'], correct: 0 })).toBe(false);
+    expect(isLottery(undefined)).toBe(false);
+  });
+
+  it('a new challenge draws the right answer from the state of the game', () => {
+    const met = meet(withMission('c1', lisa()));
+    expect(rightAnswer(met)).toBe(lotteryDraw(currentState(met), 'c1', 4));
+  });
+
+  it('reopening the scene in the same turn keeps it; undo and the same move draw the same one', () => {
+    const met = meet(withMission('c1', lisa()));
+    const reopened = act(met, { type: 'interact', nodeId: 'c1' });
+    expect(rightAnswer(reopened)).toBe(rightAnswer(met));
+    const again = act(undo(met), { type: 'interact', nodeId: 'c1' });
+    expect(rightAnswer(again)).toBe(rightAnswer(met));
+  });
+
+  it('over many challenges every Lisa is the right one about once in four', () => {
+    const counts = [0, 0, 0, 0];
+    const state = currentState(meet(withMission('c1', lisa())));
+    for (let turn = 1; turn <= 4000; turn++) {
+      const players = { ...state.players, p1: { ...state.players.p1, coins: (turn * 37) % 3000 } };
+      counts[lotteryDraw({ ...state, turn, players }, 'c1', 4)]! += 1;
+    }
+    for (const count of counts) {
+      expect(count).toBeGreaterThan(900);
+      expect(count).toBeLessThan(1100);
+    }
+  });
+
+  it('a real quiz keeps its right answer', () => {
+    const real: Mission = {
+      type: 'quiz',
+      quiz: { question: 'Chi?', answers: ['Goku', 'Vegeta', 'Gohan', 'Crilin'], correct: 2 },
+      reward: {},
+    };
+    expect(rightAnswer(meet(withMission('c1', real)))).toBe(2);
   });
 });

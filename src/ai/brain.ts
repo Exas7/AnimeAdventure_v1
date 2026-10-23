@@ -8,6 +8,7 @@ import {
   hasLostAt,
   isOffCell,
   isAdjacent,
+  isLottery,
   isRepeatInteraction,
   mustSendAway,
   nextForms,
@@ -160,6 +161,11 @@ function rewardValue(game: Game, mission: Mission, cellCharacter: string | undef
   return (reward.cellCharacter ? characterValue(find(cellCharacter)) : 0) + characters + (reward.coins ?? 0) + items;
 }
 
+/** How often the AI answers a quiz right: a lottery is luck for anyone (spec 074, 2.4; D-099). */
+function quizChance(mission: Mission, level: AiLevel): number {
+  return isLottery(mission.quiz) ? 1 / (mission.quiz?.answers.length ?? 1) : LEVELS[level].quiz;
+}
+
 function givesCharacters(mission: Mission | undefined): boolean {
   return !mission || Boolean(mission.reward.cellCharacter) || (mission.reward.characters?.length ?? 0) > 0;
 }
@@ -283,7 +289,7 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
     case 'fight':
       return reward * fightChance(game, state, nodeId, level, memory, random);
     case 'quiz':
-      return reward * LEVELS[level].quiz;
+      return reward * quizChance(mission, level);
     case 'other':
     case 'skipTurns':
       return 0;
@@ -487,7 +493,7 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
         : { kind: 'close', resolves: cellKey };
     }
     if (mission.type === 'quiz' && mission.quiz) {
-      const right = random() < rules.quiz;
+      const right = random() < quizChance(mission, level);
       const wrong = mission.quiz.answers.map((_, index) => index).filter((index) => index !== mission.quiz?.correct);
       const answer = right || wrong.length === 0 ? mission.quiz.correct : (wrong[Math.floor(random() * wrong.length)] as number);
       return { kind: 'quiz', nodeId: position, answer, text: `Risponde al quiz di ${name}`, resolves: cellKey };

@@ -1,7 +1,9 @@
 # Crediti delle immagini dei personaggi
 
 Le immagini dei personaggi (spec 051, D-081, D-082) vengono da
-illustrazioni ufficiali e da ritagli di fan di illustrazioni ufficiali.
+illustrazioni ufficiali e da ritagli di fan di illustrazioni ufficiali;
+quelle dei tre ospiti, Livio, Maggi e Meliador (spec 074, D-100), da
+un'illustrazione «NIGHTLIVE» pubblicata su Instagram, solo ritagliata.
 Nessuna è generata con l'IA. Dragon Ball e i suoi personaggi
 appartengono a Bird Studio/Shueisha e Toei Animation; le illustrazioni
 dei giochi a Bandai Namco; i ritagli ai loro autori.
@@ -178,3 +180,6 @@ fatte sono indicate nelle note.
 | Bulma | ritaglio di SuperDabura su DeviantArt | [link](https://www.deviantart.com/superdabura/art/Bulma-%5BDokkan-Battle%5D-1361644879) | bianco |  |
 | Baba la Veggente | ritaglio di Maxiuchiha22 su DeviantArt | [link](https://www.deviantart.com/maxiuchiha22/art/Fortuneteller-Baba-render-2-%5BXkeeperz%5D-764556110) | bianco |  |
 | Chichi (adulta) | ritaglio di Maxiuchiha22 su DeviantArt | [link](https://www.deviantart.com/maxiuchiha22/art/Chi-Chi-%28Android-Saga%29-render-%5BDokkan-Battle%5D-808153796) | bianco |  |
+| Livio | illustrazione «NIGHTLIVE», da un post pubblico su Instagram | — | bianco | fino alla vita |
+| Maggi | illustrazione «NIGHTLIVE», da un post pubblico su Instagram | — | bianco | fino alla vita; il fianco destro segue il braccio di Livio, che lo copriva |
+| Meliador | illustrazione «NIGHTLIVE», da un post pubblico su Instagram | — | bianco | fino alla vita; il fianco sinistro segue il braccio di Livio, che lo copriva |
