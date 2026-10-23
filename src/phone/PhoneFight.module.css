@@ -194,6 +194,12 @@
   background: var(--panel);
 }
 
+.chooseDialog .versus {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .chooseDialog .head {
   background: var(--panel);
 }
@@ -202,4 +208,9 @@
   .chooseDialog {
     zoom: 2;
   }
+}
+
+.facePicked {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }

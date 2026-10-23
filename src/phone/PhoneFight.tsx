@@ -26,6 +26,8 @@ interface PhoneFightProps {
   preset?: { record: FightRecord; team: readonly string[] };
   /** A fight of the AI: «Salta il turno» ends the AI's turn at once (spec 053, 2.2). */
   onSkip?: () => void;
+  /** The showdown: two cards of a team, touched in turn, swap places (spec 089, as in the showdown window). */
+  onSwap?: (player: PlayerId, a: number, b: number) => void;
 }
 
 /** After the end of a fight of the AI, the outcome stays on screen this long. */
@@ -38,13 +40,17 @@ const SPEEDS: Speed[] = [1, 2, 4];
  * team and in which order, then the fight animated as on the stream, then
  * the outcome, which applies by itself.
  */
-export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onSkip }: PhoneFightProps) {
+export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onSkip, onSwap }: PhoneFightProps) {
   // As they were when «Combatti» was pressed: later changes do not touch the fight.
-  const [initial] = useState(() =>
+  const [frozen] = useState(() =>
     setup.kind === 'mission'
       ? proposedMissionSides(state, setup.nodeId, setup.player, game.catalog)
       : showdownSides(state),
   );
+  // The showdown follows the teams: the order can still change before «Combatti» (spec 089).
+  const live = useMemo(() => showdownSides(state), [state]);
+  const initial = setup.kind === 'showdown' ? live : frozen;
+  const [picked, setPicked] = useState<{ player: PlayerId; slot: number } | null>(null);
   const [team] = useState(() =>
     preset ? [...preset.team] : setup.kind === 'mission' ? [...state.players[setup.player].team] : [],
   );
@@ -94,6 +100,22 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
       ? { a: state.players[setup.player].name, b: opponent || 'Avversari' }
       : { a: state.players.p1.name, b: state.players.p2.name };
 
+  /** The faces of a team of the showdown, touched in turn to swap places (spec 089). */
+  const swapProps = (player: PlayerId) =>
+    onSwap
+      ? {
+          picked: picked?.player === player ? picked.slot : null,
+          onPick: (slot: number) => {
+            if (picked?.player === player && picked.slot !== slot) {
+              onSwap(player, picked.slot, slot);
+              setPicked(null);
+            } else {
+              setPicked(picked?.player === player && picked.slot === slot ? null : { player, slot });
+            }
+          },
+        }
+      : {};
+
   const start = () => {
     const side = (ids: readonly string[]) => ids.flatMap((id) => fighters.get(id) ?? []);
     const sides: Record<Side, string[]> =
@@ -109,12 +131,14 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
           <div className={`${styles.choose} ${styles.chooseDialog}`} role="dialog" aria-modal="true" aria-label="Showdown">
             <h2 className={styles.title}>Showdown</h2>
             <p className={styles.note}>
-              Le due squadre al completo, nell'ordine in cui sono. Chi vince lo showdown vince la partita.
+              Le due squadre al completo, nell'ordine in cui sono.
+              {onSwap ? ' Tocca due personaggi della stessa squadra per scambiarli.' : ''} Chi vince lo showdown vince la
+              partita.
             </p>
             <div className={styles.versus}>
-              <Faces ids={initial.a} nameOf={nameOf} />
+              <Faces ids={initial.a} nameOf={nameOf} {...swapProps('p1')} />
               <span className={styles.vs}>VS</span>
-              <Faces ids={initial.b} nameOf={nameOf} />
+              <Faces ids={initial.b} nameOf={nameOf} {...swapProps('p2')} />
             </div>
             <div className={styles.buttons}>
               <button className={styles.primary} onClick={start}>
@@ -250,12 +274,27 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
   }
 }
 
-function Faces({ ids, nameOf }: { ids: readonly string[]; nameOf(id: string): string }) {
+function Faces({
+  ids,
+  nameOf,
+  picked,
+  onPick,
+}: {
+  ids: readonly string[];
+  nameOf(id: string): string;
+  /** The place chosen to swap, if any; `onPick` makes the faces touchable (the showdown). */
+  picked?: number | null;
+  onPick?: (slot: number) => void;
+}) {
   return (
     <ul className={styles.faces}>
       {/* Henchmen may come twice (spec 069): the place tells them apart. */}
       {ids.map((id, index) => (
-        <li key={`${id}-${index}`} className={styles.face}>
+        <li
+          key={`${id}-${index}`}
+          className={`${styles.face} ${picked === index ? styles.facePicked : ''}`}
+          onClick={onPick ? () => onPick(index) : undefined}
+        >
           <Placeholder name={nameOf(id)} characterId={id} size="fill" />
         </li>
       ))}

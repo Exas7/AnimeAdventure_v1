@@ -676,21 +676,6 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
     closeOverlay();
   };
 
-  if (winner) {
-    return (
-      <div className={styles.full}>
-        <h1 className={styles.winner}>Vince {name(winner)}!</h1>
-        <p>La partita è finita.</p>
-        <div className={styles.buttons}>
-          <button className={styles.primary} onClick={() => onGameOver('newGame')}>
-            Nuova partita
-          </button>
-          <button onClick={() => onGameOver('menu')}>Menu iniziale</button>
-        </div>
-      </div>
-    );
-  }
-
 
   const stageOverlay: Overlay | null = overlay;
   // With a scene, the shop or the showdown open, the rest waits until it is closed; «i» still shows (spec 065, 6).
@@ -839,6 +824,21 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
           </div>
         </div>
       )}
+      {winner && (
+        // The end of the game, a big window over the board as the others (spec 089).
+        <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Fine della partita">
+          <div className={`${styles.dialogBox} ${styles.turnDialog}`}>
+            <h1 className={styles.winner}>Vince {name(winner)}!</h1>
+            <p>La partita è finita.</p>
+            <div className={styles.buttons}>
+              <button className={styles.primary} onClick={() => onGameOver('newGame')}>
+                Nuova partita
+              </button>
+              <button onClick={() => onGameOver('menu')}>Menu iniziale</button>
+            </div>
+          </div>
+        </div>
+      )}
       {aiSummary && (
         // What the AI did, in a window over the board, not a whole screen (spec 087); the space bar presses its button.
         <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Turno dell'IA">
@@ -918,6 +918,7 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
           setup={fight}
           onFinish={finishFight}
           onCancel={() => setFight(null)}
+          onSwap={(player, a, b) => attempt({ type: 'swapTeam', player, a, b })}
         />
       )}
       {training && (
