@@ -55,7 +55,7 @@ interface NewGameScreenProps {
   /** The name of the episode saved with "Salva anche come puntata"; null before it. */
   savedAsEpisode: string | null;
   onSaveAsEpisode(): void;
-  /** Under the title: on the phone, the choice of the opponent (spec 053, 2.1). */
+  /** Under the title: on the PC the kind of game (spec 076, 2.1); for PvP / PvIA the opponent (spec 053, 2.1). */
   header?: ReactNode;
 }
 

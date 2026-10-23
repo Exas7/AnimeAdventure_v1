@@ -543,4 +543,6 @@ export interface Game extends GameContext {
   history: HistoryEntry[];
   /** A phone game against the AI (D-086); missing in a game between two people. */
   opponent?: Opponent;
+  /** PvP / PvIA, with the app as the arbiter (spec 076, D-101); missing in a game of the director. */
+  arbitrated?: boolean;
 }

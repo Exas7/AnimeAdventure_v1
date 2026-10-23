@@ -106,6 +106,8 @@ import { Toolbar } from './Toolbar';
 import { useGameSession } from './useGameSession';
 import { PhoneGame } from '../phone/PhoneGame';
 import { OpponentChoice } from '../phone/OpponentChoice';
+import { isArbitrated, markArbitrated, secondPlayerName, type GameKind } from '../phone/gameKind';
+import { GameKindChoice } from './GameKindChoice';
 import { aiStarterIndex } from '../ai/brain';
 import type { AiLevel } from '../engine';
 import styles from './DirectorApp.module.css';
@@ -184,11 +186,23 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
   const [preview, setPreview] = useState<DirectorPreview | null>(null);
   // On the phone: another player, or the AI at a level (spec 053, 2.1). The AI is always G2.
   const [aiLevel, setAiLevel] = useState<AiLevel | null>(null);
+  // On the PC, «Tipo di partita» in «Nuova partita» (spec 076, 2.1); the phone has only PvP / PvIA.
+  const [newGameKind, setNewGameKind] = useState<GameKind>('director');
+  const arbitratedNewGame = phone || newGameKind === 'arbitrated';
+  // PvP / PvIA is the game of the phone, also on the PC (spec 076, 2.2-2.3).
+  const arbitratedGame = phone || (game !== null && isArbitrated(game));
 
   // Any change to the game (another action, undo, end of turn) cancels a pending second click.
   useEffect(() => {
     setPending(null);
   }, [game]);
+
+  // «Nuova partita» opens with «Regia + Stream» every time (spec 076, 2.1).
+  useEffect(() => {
+    if (screen !== 'newGame' && screen !== 'starterChoice') {
+      setNewGameKind('director');
+    }
+  }, [screen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -227,8 +241,8 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
 
   const { undo, redo } = session;
   useEffect(() => {
-    // On the phone «Annulla» has its own limits (D-085): no keys.
-    if (screen !== 'play' || phone) {
+    // On the phone «Annulla» has its own limits (D-085): no keys. So in PvP / PvIA (spec 076, 2.2).
+    if (screen !== 'play' || arbitratedGame) {
       return undefined;
     }
     // The same keys as in the editors: Ctrl+Z, and Ctrl+Y or Ctrl+Shift+Z (spec 021).
@@ -249,7 +263,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [screen, phone, undo, redo]);
+  }, [screen, arbitratedGame, undo, redo]);
 
   // The cells of the travel item, on both windows (spec 047).
   const { setHighlight } = session;
@@ -296,7 +310,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
 
   // The AI chooses its starter by itself when the scene shows its proposals (spec 053, 2.1).
   const aiChoosing =
-    phone && aiLevel !== null && screen === 'starterChoice' && choice?.showing === 'p2' && choice.chosen.p2 === null;
+    arbitratedNewGame && aiLevel !== null && screen === 'starterChoice' && choice?.showing === 'p2' && choice.chosen.p2 === null;
   useEffect(() => {
     if (aiChoosing && choice && newGameForm && importedCatalog && aiLevel) {
       const catalog = [...importedCatalog, ...(newGameMap?.keepers ?? [])];
@@ -311,9 +325,8 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
   };
   const closeDiscardDialog = useCallback(() => setDiscardAsked(false), []);
 
-  // A phone game against the AI remembers it (D-086).
-  const withOpponent = (next: Game): Game =>
-    phone && aiLevel ? { ...next, opponent: { player: 'p2', level: aiLevel } } : next;
+  // A PvP / PvIA game remembers it, and the AI too (D-086, D-101).
+  const withGameKind = (next: Game): Game => (arbitratedNewGame ? markArbitrated(next, aiLevel) : next);
 
   const startGame = (setup: GameSetup) => {
     try {
@@ -328,11 +341,11 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
         );
         // Character cells left empty do not exist in a game (D-023).
         const map = withoutEmptyCharacterCells(setup.map, prepared.content);
-        startSession(withOpponent(createGame({ ...setup, map, content: prepared.content })));
+        startSession(withGameKind(createGame({ ...setup, map, content: prepared.content })));
         setStartNotice(preparationReport(prepared));
       } else {
         const map = withoutEmptyCharacterCells(setup.map, setup.content);
-        startSession(withOpponent(createGame({ ...setup, map })));
+        startSession(withGameKind(createGame({ ...setup, map })));
         setStartNotice([]);
       }
       setScreen('play');
@@ -430,7 +443,9 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
     const form = defaultNewGameForm(next.map, starters);
     // Against the AI, G2 is called «IA» again in the new form (spec 053, 2.1).
     setNewGameForm(
-      phone && aiLevel ? { ...form, players: { ...form.players, p2: { ...form.players.p2, name: 'IA' } } } : form,
+      arbitratedNewGame && aiLevel
+        ? { ...form, players: { ...form.players, p2: { ...form.players.p2, name: 'IA' } } }
+        : form,
     );
     setChoice(null);
     setRandomized(null);
@@ -650,7 +665,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
           onShowOther={() => setChoice(showOther(choice))}
           onBack={() => setScreen('newGame')}
           onStart={() => startGame(buildSetup(form, choice, newGameContext, newGameContent))}
-          onOpenStream={phone ? undefined : openStream}
+          onOpenStream={arbitratedNewGame ? undefined : openStream}
         />
       </>
     );
@@ -699,18 +714,33 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
             savedAsEpisode={randomized?.savedName ?? null}
             onSaveAsEpisode={saveRandomAsEpisode}
             header={
-              phone ? (
-                <OpponentChoice
-                  level={aiLevel}
-                  onChange={(level) => {
-                    setAiLevel(level);
-                    // The AI is called «IA» until the player gives it another name.
-                    const p2 = newGameForm.players.p2;
-                    const name = level ? (p2.name === 'G2' ? 'IA' : p2.name) : p2.name === 'IA' ? 'G2' : p2.name;
-                    setNewGameForm({ ...newGameForm, players: { ...newGameForm.players, p2: { ...p2, name } } });
-                  }}
-                />
-              ) : undefined
+              <>
+                {!phone && (
+                  <GameKindChoice
+                    kind={newGameKind}
+                    onChange={(kind) => {
+                      setNewGameKind(kind);
+                      // The AI chosen before comes back with PvP / PvIA, and goes with «Regia + Stream».
+                      const p2 = newGameForm.players.p2;
+                      const name = secondPlayerName(p2.name, kind === 'arbitrated' ? aiLevel : null);
+                      setNewGameForm({ ...newGameForm, players: { ...newGameForm.players, p2: { ...p2, name } } });
+                    }}
+                  />
+                )}
+                {arbitratedNewGame && (
+                  <OpponentChoice
+                    level={aiLevel}
+                    phone={phone}
+                    onChange={(level) => {
+                      setAiLevel(level);
+                      // The AI is called «IA» until the player gives it another name.
+                      const p2 = newGameForm.players.p2;
+                      const name = secondPlayerName(p2.name, level);
+                      setNewGameForm({ ...newGameForm, players: { ...newGameForm.players, p2: { ...p2, name } } });
+                    }}
+                  />
+                )}
+              </>
             }
           />
         ) : (
@@ -720,13 +750,14 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
     );
   }
 
-  if (phone) {
+  if (arbitratedGame) {
     return (
       <>
         {messages}
         <PhoneGame
           session={session}
           game={game}
+          phone={phone}
           onMenu={openStartMenu}
           onGameOver={(next) => {
             // The game is over (spec 052, 2.9): deleted, as «Chiudi e cancella partita».

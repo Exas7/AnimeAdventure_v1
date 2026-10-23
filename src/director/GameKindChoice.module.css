@@ -1,0 +1,38 @@
+/* «Tipo di partita» in «Nuova partita» on the PC (spec 076, 2.1), as «Avversario» on the phone. */
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.title {
+  margin: 0;
+  font-size: 1em;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.option {
+  min-height: 40px;
+  padding: 4px 14px;
+}
+
+.chosen {
+  background: var(--button-chosen);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9em;
+}

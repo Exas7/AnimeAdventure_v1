@@ -44,6 +44,8 @@ import styles from './PhoneGame.module.css';
 interface PhoneGameProps {
   session: GameSession;
   game: Game;
+  /** False in a PvP / PvIA game on the PC (spec 076, 2.2): no full screen, no phone to pass. */
+  phone: boolean;
   /** «Menu»: back to the start page; the game stays saved. */
   onMenu(): void;
   /** After the winner's screen: the game is over and deleted (spec 052, 2.9). */
@@ -98,7 +100,7 @@ const MAX_REWARD_ROUNDS = 10;
  * narrow column, one player at a time, the phone passed at every turn. The
  * referee decides what can be done; rewards and fights apply by themselves.
  */
-export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps) {
+export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGameProps) {
   const state = currentState(game);
   const current = state.currentPlayer;
   const name = (player: PlayerId) => state.players[player].name;
@@ -658,7 +660,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
         <p className={styles.pass}>
           Tocca a <strong className={styles[passTo]}>{name(passTo)}</strong>
         </p>
-        <p>Passa il telefono.</p>
+        {phone && <p>Passa il telefono.</p>}
         <div className={styles.buttons}>
           <button className={styles.primary} onClick={() => setPassTo(null)}>
             Inizia il turno
@@ -700,7 +702,9 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
       className={styles.game}
       onPointerDownCapture={() => {
         setNotice(null);
-        goFullScreen();
+        if (phone) {
+          goFullScreen();
+        }
       }}
     >
       {panel('p1', 'left')}

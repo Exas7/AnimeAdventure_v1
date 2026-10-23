@@ -17,11 +17,15 @@ Il gioco ha due finestre:
 Chrome): si apre la regia; per lo stream premi «Apri stream». Le partite
 restano salvate nel tuo browser.
 
+**Senza conduttore, dal PC:** in «Nuova partita» scegli in alto
+«PvP / PvIA» al posto di «Regia + Stream». Giocate 1 contro 1 sullo
+stesso PC, oppure contro l'IA (Facile, Normale, Difficile): l'app fa da
+arbitro e simula i combattimenti, senza stream.
+
 **Da telefono o tablet**, in orizzontale, lo stesso indirizzo apre il
 gioco senza regia: 1 contro 1 passandosi il telefono, oppure contro l'IA
 (Facile, Normale, Difficile), con i combattimenti simulati. Gli editor
-delle mappe e delle puntate si usano col dito. Da Impostazioni avanzate →
-«Versione telefono» la si può accendere anche sul PC. Su iPhone, per giocare
+delle mappe e delle puntate si usano col dito. Su iPhone, per giocare
 a schermo intero senza la barra del browser: Condividi → «Aggiungi alla
 schermata Home», e apri il gioco dall'icona (le partite salvate lì sono
 separate da quelle del browser).
