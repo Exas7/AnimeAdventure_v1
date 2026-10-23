@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useDoubleSpace } from '../ui/useDoubleSpace';
 import { aiFight, LEVEL_NAMES, newMemory, nextAiStep, type AiMemory } from '../ai/brain';
 import type { FightRecord } from '../battle/fight';
 import { proposedOutcome } from '../battle/inGame';
@@ -617,6 +618,12 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
       endTurn();
     }
   };
+
+  // PC: the space bar twice is «Fine turno» (spec 083).
+  useDoubleSpace(
+    !aiTurn && !overlay && !fight && !confirmEnd && !passTo && !winner && !aiSummary && !travel,
+    askEndTurn,
+  );
 
   const finishFight = (record: FightRecord, team: readonly string[]) => {
     const setup = fight;

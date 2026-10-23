@@ -226,3 +226,20 @@
 .mission button {
   flex: none;
 }
+
+/*
+ * On a PC (spec 082) the columns grow with the screen, as far as the map keeps its
+ * full height: there is much more room than on a phone held sideways. `zoom` scales the whole column, so the places,
+ * the buttons and the writing keep their proportions.
+ */
+@media (min-width: 1500px) and (min-height: 800px) {
+  .panel {
+    zoom: 1.2;
+  }
+}
+
+@media (min-width: 1800px) and (min-height: 950px) {
+  .panel {
+    zoom: 1.45;
+  }
+}

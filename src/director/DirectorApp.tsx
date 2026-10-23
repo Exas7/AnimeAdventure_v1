@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDoubleSpace } from '../ui/useDoubleSpace';
 import {
   canUndo,
   cellMission,
@@ -287,6 +288,13 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [travel]);
+
+  // PC: the space bar twice is «Fine turno» (spec 083); on the phone side PhoneGame has its own.
+  const endTurnRef = useRef<() => void>(() => undefined);
+  useDoubleSpace(
+    screen === 'play' && !arbitratedGame && !session.overlay && !fightSetup && !menu && !travel,
+    () => endTurnRef.current(),
+  );
 
   const closeMenu = useCallback(() => setMenu(null), []);
 
@@ -1031,6 +1039,8 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
         session.setOverlay({ kind: 'showdown' });
       }
     });
+
+  endTurnRef.current = endTurn;
 
   const toggleEditMode = () => {
     setEditMode((on) => !on);
