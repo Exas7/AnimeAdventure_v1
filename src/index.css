@@ -15,6 +15,23 @@
   src: url('./fonts/PermanentMarker.woff2') format('woff2');
 }
 
+/* The player columns (spec 085): Luckiest Guy for names and the power, Russo One for the numbers. */
+@font-face {
+  font-family: 'Luckiest Guy';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/LuckiestGuy.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Russo One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/RussoOne.woff2') format('woff2');
+}
+
 /* The four kanji of the gi symbols, and only them (spec 050, D-079). */
 @font-face {
   font-family: 'Potta One';
@@ -30,6 +47,8 @@
   --font-card: 'Bangers', Impact, sans-serif;
   --font-team: 'Permanent Marker', 'Comic Sans MS', cursive;
   --font-display: 'Bangers', Impact, sans-serif;
+  --font-panel-name: 'Luckiest Guy', Impact, sans-serif;
+  --font-panel: 'Russo One', system-ui, sans-serif;
   --font-kanji: 'Potta One', 'Yu Gothic', 'MS Gothic', serif;
 
   /* The same in every theme: the players' colours, danger and warnings (spec 050, 2.1). */

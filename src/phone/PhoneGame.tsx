@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { useDoubleSpace } from '../ui/useDoubleSpace';
+import { boardSize } from '../ui/boardModel';
+import { useDoubleSpace, useSpaceKey } from '../ui/useDoubleSpace';
+import { sideColumns } from './sideColumns';
 import { aiFight, LEVEL_NAMES, newMemory, nextAiStep, type AiMemory } from '../ai/brain';
 import type { FightRecord } from '../battle/fight';
 import { proposedOutcome } from '../battle/inGame';
@@ -619,6 +621,34 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
     }
   };
 
+  // PC (spec 085): the columns fill what the map leaves free at its sides.
+  const areaRef = useRef<HTMLDivElement>(null);
+  const mapSize = boardSize(game.map);
+  const mapRatio = mapSize.width / mapSize.height;
+  useEffect(() => {
+    const element = areaRef.current;
+    if (!element) {
+      return undefined;
+    }
+    const resize = () => {
+      const columns = sideColumns({ width: element.clientWidth, height: element.clientHeight }, mapRatio);
+      if (columns) {
+        element.style.setProperty('--panel-zoom', String(columns.zoom));
+        element.style.setProperty('--panel-width', `${columns.width}px`);
+      } else {
+        element.style.removeProperty('--panel-zoom');
+        element.style.removeProperty('--panel-width');
+      }
+    };
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [mapRatio]);
+
+  // PC: the space bar presses «Inizia il turno» (spec 085).
+  useSpaceKey(passTo !== null, () => setPassTo(null));
+
   // PC: the space bar twice is «Fine turno» (spec 083).
   useDoubleSpace(
     !aiTurn && !overlay && !fight && !confirmEnd && !passTo && !winner && !aiSummary && !travel,
@@ -673,21 +703,6 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
     );
   }
 
-  if (passTo) {
-    return (
-      <div className={styles.full}>
-        <p className={styles.pass}>
-          Tocca a <strong className={styles[passTo]}>{name(passTo)}</strong>
-        </p>
-        {phone && <p>Passa il telefono.</p>}
-        <div className={styles.buttons}>
-          <button className={styles.primary} onClick={() => setPassTo(null)}>
-            Inizia il turno
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const stageOverlay: Overlay | null = overlay;
   // With a scene, the shop or the showdown open, the rest waits until it is closed; «i» still shows (spec 065, 6).
@@ -718,6 +733,7 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
   return (
     // The first touch anywhere closes the alert (spec 055, 2.2) and asks for the full screen (spec 064, 2.2).
     <div
+      ref={areaRef}
       className={styles.game}
       onPointerDownCapture={() => {
         setNotice(null);
@@ -830,6 +846,22 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
             <div className={styles.buttons}>
               <button className={styles.primary} disabled={!leaving} onClick={sendAway}>
                 Conferma
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {passTo && (
+        // A small window over the board, not a whole screen (spec 085); the space bar presses its button.
+        <div className={styles.dialog} role="dialog" aria-modal="true" aria-label="Cambio turno">
+          <div className={styles.dialogBox}>
+            <p className={styles.pass}>
+              Tocca a <strong className={styles[passTo]}>{name(passTo)}</strong>
+            </p>
+            {phone && <p>Passa il telefono.</p>}
+            <div className={styles.buttons}>
+              <button className={styles.primary} onClick={() => setPassTo(null)}>
+                Inizia il turno
               </button>
             </div>
           </div>

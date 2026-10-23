@@ -8,7 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: clamp(124px, 19vw, 196px);
+  /* On a big screen the game sets the scale and the width (spec 085, sideColumns.ts). */
+  zoom: var(--panel-zoom, 1);
+  width: var(--panel-width, clamp(124px, 19vw, 196px));
   min-height: 0;
   padding: 6px;
   overflow: hidden;
@@ -34,8 +36,11 @@
 }
 
 .name {
-  font-weight: 800;
-  font-size: 1.25em;
+  font-family: var(--font-panel-name);
+  font-weight: 400;
+  font-size: 1.9em;
+  line-height: 1;
+  letter-spacing: 0.02em;
 }
 
 .p1 .name {
@@ -78,12 +83,15 @@
 }
 
 .coins {
+  font-family: var(--font-panel);
+  font-size: 1.1em;
   white-space: nowrap;
 }
 
 .turn {
+  font-family: var(--font-panel);
   color: var(--muted);
-  font-size: 0.92em;
+  font-size: 0.95em;
 }
 
 /* The team on the outer edge, the powers and the items inside. */
@@ -133,6 +141,10 @@
 
 /* «Usa potere» with the uses left (spec 064, 2.1). */
 .power {
+  font-family: var(--font-panel-name);
+  font-weight: 400;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -145,8 +157,10 @@
 }
 
 .power small {
-  font-size: 0.85em;
+  font-family: var(--font-panel);
+  font-size: 0.75em;
   font-weight: 400;
+  letter-spacing: 0;
 }
 
 .power:disabled {
@@ -225,21 +239,4 @@
 
 .mission button {
   flex: none;
-}
-
-/*
- * On a PC (spec 082) the columns grow with the screen, as far as the map keeps its
- * full height: there is much more room than on a phone held sideways. `zoom` scales the whole column, so the places,
- * the buttons and the writing keep their proportions.
- */
-@media (min-width: 1500px) and (min-height: 800px) {
-  .panel {
-    zoom: 1.2;
-  }
-}
-
-@media (min-width: 1800px) and (min-height: 950px) {
-  .panel {
-    zoom: 1.45;
-  }
 }
