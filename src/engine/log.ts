@@ -64,6 +64,10 @@ function describeAction(action: RecordedAction, before: GameState, context: Game
       const changes = action.changes.map((change) => `${character(change.from)} → ${character(change.to)}`);
       return `Squadra di ${name(action.player)} aggiornata: ${changes.join(', ')}`;
     }
+    case 'swapTeam': {
+      const team = before.players[action.player].team;
+      return `${name(action.player)} scambia ${character(team[action.a] ?? '')} e ${character(team[action.b] ?? '')} nella squadra`;
+    }
     case 'loseChallenge':
       return `${name(action.player)} perde la sfida di ${cell(action.nodeId)}`;
     case 'fuse':

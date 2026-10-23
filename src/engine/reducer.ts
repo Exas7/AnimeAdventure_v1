@@ -26,7 +26,7 @@ import { hasLostAt, isRepeatInteraction, turnRuleWarnings } from './rules';
 import { setCellContent, warnIfElsewhere } from './cells';
 import { travelRule, rechargesStarter } from './itemUse';
 import { buyCharacter, buyItem, rechargeStarter } from './shop';
-import { joinTeam, addToTeam, removeFromTeam, transformInTeam } from './team';
+import { joinTeam, addToTeam, removeFromTeam, swapInTeam, transformInTeam } from './team';
 import { useTraining } from './training';
 import { fuse } from './fusions';
 import {
@@ -89,6 +89,9 @@ export function applyAction(
       break;
     case 'transformCharacters':
       transformInTeam(draft, context, action.player, action.changes, out);
+      break;
+    case 'swapTeam':
+      swapInTeam(draft, action.player, action.a, action.b);
       break;
     case 'useTraining':
       useTraining(draft, context, action.player, action.itemId, action.choices, out);

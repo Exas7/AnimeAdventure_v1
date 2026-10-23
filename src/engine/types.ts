@@ -465,6 +465,8 @@ export type GameAction =
   // "Usa" on a Senzu (no `to`) or on a travel item, whose pawn goes `to` a cell (spec 047).
   // A Senzu may name the power it recharges (spec 061, 2.1); otherwise the first rechargeable one.
   | { type: 'useItem'; player: PlayerId; itemId: string; to?: string; powerId?: string }
+  // Two characters of the team swap places: the order of the showdown (spec 081).
+  | { type: 'swapTeam'; player: PlayerId; a: number; b: number }
   // Two of the team fuse into one (spec 068).
   | { type: 'fuse'; player: PlayerId; members: [string, string]; resultId: string };
 

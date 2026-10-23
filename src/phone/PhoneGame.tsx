@@ -736,6 +736,7 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
           tapRadius={TAP_RADIUS}
           hideNotifications
           challengeControls={aiTurn ? () => <span>Turno dell'IA</span> : challengeControls}
+          onSwapShowdown={(player, a, b) => attempt({ type: 'swapTeam', player, a, b })}
           showdownControls={<button onClick={() => setFight({ kind: 'showdown' })}>Combatti</button>}
           shopActions={
             aiTurn

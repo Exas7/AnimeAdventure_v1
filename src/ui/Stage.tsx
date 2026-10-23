@@ -53,6 +53,8 @@ interface StageProps {
   /** The red «✕» on the top right corner of the shop and the showdown frames (spec 065, 6). */
   onCloseShop?: () => void;
   onCloseShowdown?: () => void;
+  /** Two characters of a team swap places in the showdown (spec 081). */
+  onSwapShowdown?: (player: PlayerId, a: number, b: number) => void;
   /** The phone (spec 057, 2.1): the shop in one column, scrolled only up and down. */
   stackedShop?: boolean;
 }
@@ -119,7 +121,7 @@ export function Stage(props: StageProps) {
         </div>
       )}
       {overlay?.kind === 'showdown' && (
-        <ShowdownScreen state={state} catalog={catalog} onClose={props.onCloseShowdown}>
+        <ShowdownScreen state={state} catalog={catalog} onClose={props.onCloseShowdown} onSwap={props.onSwapShowdown}>
           {props.showdownControls}
         </ShowdownScreen>
       )}

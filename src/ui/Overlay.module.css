@@ -39,6 +39,11 @@
   font-size: 0.85em;
 }
 
+.showdownPicked {
+  outline: 3px solid var(--danger);
+  outline-offset: 2px;
+}
+
 .showdownTitle {
   margin: 0;
   color: var(--danger);

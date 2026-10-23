@@ -109,6 +109,16 @@ export function transformInTeam(
   }
 }
 
+/** Spec 081: two places of the team swap; the starter stays the same character. */
+export function swapInTeam(state: GameState, playerId: PlayerId, a: number, b: number): void {
+  const player = state.players[playerId];
+  const valid = (slot: number) => Number.isInteger(slot) && slot >= 0 && slot < player.team.length;
+  if (!valid(a) || !valid(b) || a === b) {
+    throw new EngineError(`Places ${a} and ${b} cannot be swapped in the team of ${player.name}`);
+  }
+  [player.team[a], player.team[b]] = [player.team[b] as string, player.team[a] as string];
+}
+
 /** The new form takes the place of the old one in the team, and the starter follows it (D-060). */
 export function replaceInTeam(state: GameState, playerId: PlayerId, from: string, to: string): void {
   const player = state.players[playerId];

@@ -1183,6 +1183,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
             shopControls={exploreButton}
             onCloseShop={() => session.setOverlay(null)}
             onCloseShowdown={() => session.setOverlay(null)}
+            onSwapShowdown={(player, a, b) => session.perform({ type: 'swapTeam', player, a, b })}
           />
           {traveling && travelingItem && (
             <div className={styles.traveling} role="status">
