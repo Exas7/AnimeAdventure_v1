@@ -105,8 +105,8 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
   if (!record) {
     if (setup.kind === 'showdown') {
       return (
-        <div className={styles.screen}>
-          <div className={styles.choose}>
+        <div className={styles.chooseBackdrop}>
+          <div className={`${styles.choose} ${styles.chooseDialog}`} role="dialog" aria-modal="true" aria-label="Showdown">
             <h2 className={styles.title}>Showdown</h2>
             <p className={styles.note}>
               Le due squadre al completo, nell'ordine in cui sono. Chi vince lo showdown vince la partita.
@@ -134,8 +134,8 @@ export function PhoneFight({ game, state, setup, onFinish, onCancel, preset, onS
             : current,
       );
     return (
-      <div className={styles.screen}>
-        <div className={styles.choose}>
+      <div className={styles.chooseBackdrop}>
+        <div className={`${styles.choose} ${styles.chooseDialog}`} role="dialog" aria-modal="true" aria-label="Scelta dei combattenti">
           <div className={styles.head}>
             <button onClick={onCancel}>← Indietro</button>
             <h2 className={styles.title}>

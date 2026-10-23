@@ -167,3 +167,39 @@
 .outcome {
   font-weight: 700;
 }
+
+/*
+ * Before the fight (spec 088): the choice of who fights is a window over the game, as
+ * «Tocca a G2», not a whole screen; twice as big on a PC. Percentages, not vw or vh:
+ * `zoom` counts those zoomed too.
+ */
+.chooseBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: var(--backdrop);
+}
+
+.chooseDialog {
+  zoom: 1;
+  width: min(100%, 560px);
+  max-height: 92%;
+  margin: 0;
+  border: 3px solid var(--frame-mid);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.chooseDialog .head {
+  background: var(--panel);
+}
+
+@media (min-width: 1100px) and (min-height: 650px) {
+  .chooseDialog {
+    zoom: 2;
+  }
+}
