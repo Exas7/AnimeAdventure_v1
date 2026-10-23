@@ -35,7 +35,7 @@ import type { StarterProposal } from '../starters/proposals';
 // The AI opponent of the phone (spec 053, D-086). It plays with the same
 // referee as the player: every step is an action the phone allows.
 
-interface LevelRules {
+export interface LevelRules {
   /** How often the quiz answer is right. */
   quiz: number;
   /** How often Facile moves at random instead of towards something useful. */
@@ -61,9 +61,9 @@ export const LEVELS: Record<AiLevel, LevelRules> = {
 export const LEVEL_NAMES: Record<AiLevel, string> = { easy: 'Facile', normal: 'Normale', hard: 'Difficile' };
 
 /** Simulated fights for a chance (Difficile): enough to tell a good fight from a bad one. */
-const SIMULATIONS = 40;
+export const SIMULATIONS = 40;
 /** Below this chance Difficile does not fight. */
-const HARD_MIN_CHANCE = 0.45;
+export const HARD_MIN_CHANCE = 0.45;
 
 /** One step of the AI's turn, shown to the player one after the other (spec 053, 2.2). */
 export type AiStep =
@@ -601,7 +601,7 @@ function rechargeValue(state: GameState, player: PlayerId): number {
 }
 
 /** From this turn on the AI uses «Salta turno» anyway: the game is near its end. */
-const LATE_TURN = 40;
+export const LATE_TURN = 40;
 
 /**
  * «Fai saltare un turno» when it slows the opponent at the right time (spec

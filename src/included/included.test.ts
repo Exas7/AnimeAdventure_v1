@@ -248,7 +248,8 @@ describe('Livio, Maggi and Meliador (spec 074, criteria 2-4)', () => {
     for (const guest of ['maggi', 'meliador']) {
       expect(rightPlaces.get(guest)?.size, guest).toBeGreaterThan(1);
     }
-  });
+    // 300 episodes take about 2 s alone, much more beside the other tests: 30 s, not the default 5.
+  }, 30_000);
 });
 
 describe('the maps that come with the app (spec 030, criterion 6)', () => {

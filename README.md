@@ -128,6 +128,19 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
   un po' di vita anche trasformandosi.
 - **Apri stream** (in regia): apre la finestra per gli spettatori.
 
+## Regole, valori e statistiche
+
+Due pagine, generate dal gioco stesso: i numeri sono quelli della versione
+che hai.
+
+- [Regole e valori](docs/regole-e-valori.md): il turno, i prezzi dei
+  personaggi, i premi delle missioni, gli oggetti, i poteri degli starter,
+  l'IA, e quello che «Randomizza» mette davvero sulle mappe base
+  (misurato su molte puntate tirate a caso).
+- [Schede dei personaggi](docs/schede-personaggi.md): le schede di ogni
+  personaggio, come funziona lo scontro simulato e le probabilità di
+  vittoria secondo il tier.
+
 ## I tuoi dati
 
 Mappe, puntate e partite restano **nel tuo Chrome**, sull'indirizzo

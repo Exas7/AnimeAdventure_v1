@@ -13,7 +13,9 @@ gira sul computer di chi gioca, in Chrome, e salva i dati nell'archivio di
 Chrome (IndexedDB) dell'indirizzo `http://localhost:5173`.
 
 Due finestre dello stesso Chrome: la **regia** (`/`) e lo **stream**
-(`/?view=stream`), che si parlano tra loro.
+(`/?view=stream`), che si parlano tra loro. Sul telefono, e sul PC
+scegliendo «PvP / PvIA» in «Nuova partita», si gioca senza regia né
+stream: l'app fa da arbitro, contro un'altra persona o contro l'IA.
 
 ## Comandi
 
@@ -36,12 +38,17 @@ Due finestre dello stesso Chrome: la **regia** (`/`) e lo **stream**
 | `src/stream/` | la finestra dello stream |
 | `src/editor/` | l'editor delle mappe; `mapEdit.ts` ha `checkMap`, il controllo delle regole delle mappe |
 | `src/episode/` | le puntate e «Randomizza» |
-| `src/included/` | i dati che vengono con l'app |
+| `src/phone/` | la partita senza regia (telefono, PvP / PvIA) e l'arbitro |
+| `src/ai/` | l'IA avversaria |
+| `src/battle/` | lo scontro simulato e la pagina delle schede dei personaggi |
+| `src/included/` | i dati che vengono con l'app, e la pagina delle regole e dei valori |
 | `assets/maps/*.jpg` | gli **sfondi**: immagini, scelte dal menu «Sfondi…» dell'editor |
 | `assets/maps/incluse/*.json` | le **mappe base**: sfondo più caselle e percorsi |
 | `assets/characters/` | le **immagini dei personaggi**, col nome del personaggio: la figura intera qui, il volto in `volti/`; fonti in `CREDITI.md` |
 | `docs/*.csv` | le liste: personaggi, missioni, domande |
 | `docs/*.xlsx` | le stesse liste in Excel, per modificarle a mano |
+| `docs/schede-personaggi.md` | schede dei personaggi, regole dello scontro, probabilità di vittoria (generata) |
+| `docs/regole-e-valori.md` | regole del turno, prezzi, premi, oggetti, poteri, IA, statistiche di «Randomizza» (generata) |
 
 Uno **sfondo** è solo l'immagine; una **mappa** è lo sfondo più caselle e
 percorsi. Una **puntata** è una mappa con i personaggi, le missioni e i
@@ -145,8 +152,8 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   il negoziante), `lines` (le battute), `mission`, e per i negozi
   `forSale` (personaggi in vendita).
 - Una missione (`Mission` in `src/engine/types.ts`) ha `type` (`fight`,
-  `quiz`, `goTo`, `defeat`, `bring`, `wait`, `skipTurns`, `other`), i
-  campi del suo tipo e `reward` (premio: `cellCharacter`, `characters`,
+  `quiz`, `goTo`, `defeat`, `bring`, `wait`, `skipTurns`, `other`,
+  `escort` per «Accompagnami da»), i campi del suo tipo e `reward` (premio: `cellCharacter`, `characters`,
   `coins`, `items`).
 - Il codice di un personaggio nasce dal nome (`characterIdOf` in
   `src/catalog/importCatalog.ts`).
@@ -165,11 +172,14 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   (con + e −); i personaggi senza tier non si reclutano.
 - Missioni (`docs/missioni-bt3.csv`): chi la dà (un personaggio o un
   gruppo: `cattivi`, `arruolabili`, `storia`), tipo, valori del tipo,
-  premio, peso e battute (separate da ` | `; `{obiettivo}`, `{premio}`,
-  `{n}` diventano i valori veri). Vedi `src/missions/catalogCsv.ts`.
+  premio, `dietro` (nelle catene, chi sta dietro la strada grigia che la
+  missione apre), peso e battute (separate da ` | `; `{obiettivo}`,
+  `{premio}`, `{n}`, `{monete}` diventano i valori veri). Vedi
+  `src/missions/catalogCsv.ts`.
   Regole del catalogo (D-069, D-070): i gruppi hanno solo combattimenti,
-  quiz, «attendi» e «salta turni»; «batti», «porta» e «vai da» sono
-  missioni personali con l'obiettivo scritto secondo la storia; chi è fino
+  quiz, «attendi» e «salta turni»; «batti», «porta», «vai da» e
+  «accompagnami da» (solo dei personaggi speciali) sono missioni personali
+  con l'obiettivo scritto secondo la storia; chi è fino
   a B+ non chiede obiettivi o avversari più forti di lui di oltre un
   gradino; quiz, attese e turni saltati arruolano solo fino a B+; nessun
   giro di «batti» e «porta» che si aspettano a vicenda; battute: prima
@@ -184,3 +194,18 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   è una lotteria: la giusta si estrae a ogni nuova sfida.
 - Se modifichi un CSV, modifica allo stesso modo il file Excel con lo
   stesso nome, se la persona lo usa.
+
+## Le pagine generate
+
+`docs/schede-personaggi.md` e `docs/regole-e-valori.md` non si scrivono a
+mano: si generano dal codice e dalle liste, e un test controlla che siano
+allineate. Dopo aver cambiato una lista, una mappa base o un valore del
+gioco, `npm test` fallisce finché non le rigeneri:
+
+- `npx vitest run src/battle/sheetsPage.test.ts -u` per le schede;
+- `npx vitest run src/included/rulesPage.test.ts -u` per le regole e i
+  valori.
+
+Poi guarda cosa è cambiato nella pagina e spiegalo alla persona. Il testo
+delle pagine sta nei generatori (`src/battle/sheetsPage.ts` e
+`src/included/rulesPage.ts`).

@@ -42,7 +42,7 @@ export const CATALOG_COLUMNS = [
 
 export const QUESTION_COLUMNS = ['domanda', 'A', 'B', 'C', 'D', 'giusta', 'livello', 'chi'] as const;
 
-const TYPE_NAMES: Record<MissionType, string> = {
+export const TYPE_NAMES: Record<MissionType, string> = {
   fight: 'combattimento',
   quiz: 'quiz',
   goTo: 'vai da',

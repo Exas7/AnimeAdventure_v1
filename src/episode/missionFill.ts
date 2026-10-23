@@ -68,11 +68,11 @@ export interface MissionRandomizeResult extends RandomizeResult {
 export const CELLS_PER_STORY_CHARACTER = 8;
 
 /** The only missions of a cell that opens a locked path: hard ones (D-052). */
-const OPENER_MISSIONS: readonly Mission['type'][] = ['fight', 'defeat'];
+export const OPENER_MISSIONS: readonly Mission['type'][] = ['fight', 'defeat'];
 
 /** Easy missions: they recruit only characters up to B+ (D-069). */
-const EASY_MISSIONS: readonly Mission['type'][] = ['quiz', 'wait', 'skipTurns'];
-const STRONGEST_FOR_EASY = tierRank('B+') as number;
+export const EASY_MISSIONS: readonly Mission['type'][] = ['quiz', 'wait', 'skipTurns'];
+export const STRONGEST_FOR_EASY = tierRank('B+') as number;
 
 /**
  * The level of the quiz question for a character (spec 043, 2.3): easy up
