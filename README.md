@@ -126,6 +126,16 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
   seconda forma) si riprendono energia con Drain Life e con la presa, e
   compare «CIUCCIAAAAA»; androidi e robot non si risucchiano. Cell recupera
   un po' di vita anche trasformandosi.
+- **Missioni «Attendi» e «Ripassa»**: con «Attendi» e «Salta turni» il gioco
+  salta da solo i turni di chi accetta (più turni, più monete); con
+  «Ripassa» si gioca nel frattempo, ma passati 5 o 6 turni bisogna tornare
+  sulla casella per il premio. Il pannello del giocatore dice quanti turni
+  mancano.
+- **Ordine nello showdown**: nella schermata dello showdown tocca due
+  personaggi della stessa squadra per scambiarli di posto.
+- **Scorciatoie dal PC** (partita PvP / PvIA e regia): la barra
+  spaziatrice due volte di seguito è «Fine turno»; nella finestra «Tocca a
+  G2», una pressione preme «Inizia il turno».
 - **Apri stream** (in regia): apre la finestra per gli spettatori.
 
 ## Regole, valori e statistiche

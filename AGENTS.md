@@ -177,7 +177,7 @@ Aggiungendo una mappa base, aggiorna l'elenco delle mappe nel test
   `{premio}`, `{n}`, `{monete}` diventano i valori veri). Vedi
   `src/missions/catalogCsv.ts`.
   Regole del catalogo (D-069, D-070): i gruppi hanno solo combattimenti,
-  quiz, «attendi» e «salta turni»; «batti», «porta», «vai da» e
+  quiz, «attendi», «ripassa» e «salta turni»; «batti», «porta», «vai da» e
   «accompagnami da» (solo dei personaggi speciali) sono missioni personali
   con l'obiettivo scritto secondo la storia; chi è fino
   a B+ non chiede obiettivi o avversari più forti di lui di oltre un
