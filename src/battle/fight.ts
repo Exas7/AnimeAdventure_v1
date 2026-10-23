@@ -1,7 +1,7 @@
 import { TEAM_SIZE, type Character } from '../engine';
 import { tierRank, type Random } from '../episode/fill';
 import { gaussian, seededRandom } from './random';
-import { NORMAL_SHEET, sheetOf, type Move, type Sheet } from './sheets';
+import { drainsWithGrab, NORMAL_SHEET, sheetOf, type Move, type Sheet } from './sheets';
 
 // The simulated fight (spec 035, D-053): a series of exchanges between the two
 // fighters on the field, teams of 1 to 5 in the order chosen by the player.
@@ -28,7 +28,12 @@ export interface Fighter {
   sheet: Sheet;
   /** The form it can transform into during the fight (spec 037, 2.3). */
   next?: Fighter;
+  /** Androids and robots: there is no life in them to drain (spec 073, 2.3). */
+  drainImmune?: boolean;
 }
+
+/** The races without life to drain (spec 073, 2.3): C-8, Arale and the Robot di Pilaf too. */
+export const DRAIN_IMMUNE_RACES: readonly string[] = ['Androide', 'Robot'];
 
 /**
  * The fighter of a character of the list; null without a tier. Given the
@@ -60,6 +65,9 @@ function withForms(
     rank,
     sheet: sheetOf(character),
   };
+  if (character.race !== undefined && DRAIN_IMMUNE_RACES.includes(character.race)) {
+    fighter.drainImmune = true;
+  }
   seen.add(character.id);
   const nextId = character.fight?.transformsInto;
   const nextCharacter =
@@ -104,7 +112,7 @@ export const DEFAULT_SETTINGS: FightSettings = {
   finaleChance: 1 / 50,
   counterChance: 0.3,
   switchRecharge: 15,
-  transformChance: 1 / 40,
+  transformChance: 1 / 60,
 };
 
 /** The chance to transform in an exchange (spec 037, 2.3): the worse off, the likelier. */
@@ -128,6 +136,13 @@ const SWITCH_WILL = 0.5;
 /** A guard against endless loops: real fights last a few hundred exchanges. */
 const MAX_EXCHANGES = 20_000;
 
+/** A blow of who drains is a grab this often (spec 073, 2.2). */
+export const GRAB_CHANCE = 1 / 15;
+/** What a grab takes from the opponent and gives to who grabs: a quarter of a bar, as in Sparking! ZERO. */
+export const GRAB_DRAIN = 2500;
+/** The share of its damage that a move that drains gives back to who lands it (spec 073, 2.1). */
+export const DRAIN_SHARE = 2 / 3;
+
 /** The waves clash pays 150% to the winner (2.4). */
 export const CLASH_DAMAGE: Record<ClashKind, number> = { waves: 1.5, rushes: 1, rushVsWave: 1 };
 
@@ -149,12 +164,15 @@ export function worksOn(move: Move, target: Sheet): boolean {
 }
 
 /** What matters of a move to the engine: its name does not. */
-const moveStyle = (move: Move) => `${move.kind}${move.hitsGiants ? '+giants' : ''}`;
+const moveStyle = (move: Move) => `${move.kind}${move.hitsGiants ? '+giants' : ''}${move.drains ? '+drain' : ''}`;
 
 // In every event `side` is the side that acts: the attacker, or the team
-// that switches, loses a fighter, sends one in.
+// that switches, loses a fighter, sends one in. `drained` is there only when
+// energy was drained (spec 073): the HP who drained won back, 0 at full health.
 export type FightEvent =
   | { type: 'blow'; exchange: number; side: Side; damage: number }
+  /** A blow of who drains (spec 073, 2.2): `damage` taken, `drained` won back. */
+  | { type: 'grab'; exchange: number; side: Side; damage: number; drained: number }
   | {
       type: 'move';
       exchange: number;
@@ -163,6 +181,7 @@ export type FightEvent =
       finale: boolean;
       outcome: MoveOutcome;
       damage: number;
+      drained?: number;
     }
   | {
       type: 'clash';
@@ -175,6 +194,8 @@ export type FightEvent =
       kind: ClashKind;
       winner: Side;
       damage: number;
+      /** Won back by the winner, when its move drains. */
+      drained?: number;
     }
   | {
       type: 'switch';
@@ -189,8 +210,8 @@ export type FightEvent =
     }
   | { type: 'ko'; exchange: number; side: Side; fighter: number }
   | { type: 'enter'; exchange: number; side: Side; fighter: number }
-  /** The fighter on the field of `side` goes to its next form (spec 037, 2.3). */
-  | { type: 'transform'; exchange: number; side: Side; fighter: number }
+  /** The fighter on the field of `side` goes to its next form (spec 037, 2.3); `healed` with «cura trasformandosi» (spec 073). */
+  | { type: 'transform'; exchange: number; side: Side; fighter: number; healed?: number }
   | { type: 'end'; exchange: number; winner: Side };
 
 export interface FightSnapshot {
@@ -534,12 +555,15 @@ function simulate(
     }
     member.fighter = next;
     member.form += 1;
-    // As in BT3, transforming does not heal: the health stays, within the new bars.
+    // As in BT3, transforming does not heal: the health stays, within the new
+    // bars. Only a form with «cura trasformandosi» gives some back (spec 073, 2.4).
     member.maxHp = next.sheet.bars * BAR_HP;
     member.hp = Math.min(member.hp, member.maxHp);
+    const healed = Math.min(next.sheet.transformHeal ?? 0, member.maxHp - member.hp);
+    member.hp += healed;
     member.strength = TIER_STEP ** next.rank * form[side];
     member.factor = factorOf(next.sheet);
-    emit({ type: 'transform', exchange, side, fighter: state[side].active });
+    emit({ type: 'transform', exchange, side, fighter: state[side].active, ...(healed > 0 ? { healed } : {}) });
   };
 
   const damage = (attacker: FighterState, defender: FighterState, base: number): number =>
@@ -556,6 +580,25 @@ function simulate(
   const hurt = (fighter: FighterState, amount: number) => {
     fighter.hp = Math.max(0, fighter.hp - amount);
   };
+  /**
+   * Energy drained (spec 073): what the drainer wins back, never beyond its
+   * bars; undefined against androids and robots, who have none to give.
+   */
+  const drain = (drainer: FighterState, drained: FighterState, amount: number): number | undefined => {
+    if (drained.fighter.drainImmune) {
+      return undefined;
+    }
+    const won = Math.min(amount, drainer.maxHp - drainer.hp);
+    drainer.hp += won;
+    return won;
+  };
+  /** A move that drains gives back a share of the HP it actually took. */
+  const moveDrain = (drainer: FighterState, drained: FighterState, move: Move, taken: number) =>
+    move.drains ? drain(drainer, drained, Math.round(taken * DRAIN_SHARE)) : undefined;
+  // Only who drains rolls for a grab, so every other fight stays the same
+  // (spec 073, criterion 5); a giant is not grabbed, an android has nothing to give.
+  const canGrab = (attacker: FighterState, defender: FighterState) =>
+    drainsWithGrab(attacker.fighter.sheet) && !defender.fighter.sheet.giant && !defender.fighter.drainImmune;
   /** Tier and power decide clashes, with luck (2.4). */
   const winsClash = (one: FighterState, other: FighterState): boolean => {
     const oneWeight = one.strength * one.fighter.sheet.power;
@@ -578,8 +621,19 @@ function simulate(
     const defender = onField(otherSide(side));
     const base = (isFinale: boolean) => (isFinale ? FINALE_DAMAGE : MOVE_DAMAGE);
     const plain = (outcome: MoveOutcome, amount: number) => {
+      const taken = Math.min(amount, defender.hp);
       hurt(defender, amount);
-      emit({ type: 'move', exchange, side, move, finale, outcome, damage: amount });
+      const drained = outcome === 'hit' ? moveDrain(attacker, defender, move, taken) : undefined;
+      emit({
+        type: 'move',
+        exchange,
+        side,
+        move,
+        finale,
+        outcome,
+        damage: amount,
+        ...(drained === undefined ? {} : { drained }),
+      });
     };
     if (!worksOn(move, defender.fighter.sheet)) {
       plain('giant', 0);
@@ -608,7 +662,9 @@ function simulate(
     const [winner, loser] = attackerWins ? [attacker, defender] : [defender, attacker];
     const winnerFinale = attackerWins ? finale : counter.finale;
     const amount = Math.round(damage(winner, loser, base(winnerFinale)) * CLASH_DAMAGE[kind]);
+    const taken = Math.min(amount, loser.hp);
     hurt(loser, amount);
+    const drained = moveDrain(winner, loser, attackerWins ? move : counter.move, taken);
     emit({
       type: 'clash',
       exchange,
@@ -620,6 +676,7 @@ function simulate(
       kind,
       winner: attackerWins ? side : otherSide(side),
       damage: amount,
+      ...(drained === undefined ? {} : { drained }),
     });
   };
 
@@ -633,6 +690,11 @@ function simulate(
     } else if (roll < settings.finaleChance + settings.moveChance) {
       const move = attacker.fighter.sheet.moves[random() < 0.5 ? 0 : 1];
       special(side, exchange, move, false);
+    } else if (canGrab(attacker, onField(otherSide(side))) && random() < GRAB_CHANCE) {
+      const defender = onField(otherSide(side));
+      const taken = Math.min(GRAB_DRAIN, defender.hp);
+      hurt(defender, GRAB_DRAIN);
+      emit({ type: 'grab', exchange, side, damage: GRAB_DRAIN, drained: drain(attacker, defender, taken) as number });
     } else {
       const amount = damage(attacker, onField(otherSide(side)), BLOW_DAMAGE);
       hurt(onField(otherSide(side)), amount);

@@ -1,4 +1,4 @@
-import { formOf, type FightEvent, type FightRecord, type FightSnapshot, type Fighter, type Side } from './fight';
+import { formOf, otherSide, type FightEvent, type FightRecord, type FightSnapshot, type Fighter, type Side } from './fight';
 
 // Telling a recorded fight (spec 035, 2.9-2.11): the texts of the log and of
 // the stream, how long each event stays on screen, and where "Avanti di uno
@@ -19,18 +19,48 @@ export function formatHp(hp: number): string {
   return String(hp).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
+/** The shout of a drain that lands (spec 073, 2.6). */
+export const DRAIN_SHOUT = 'CIUCCIAAAAA';
+
+/** A second more on screen for a drain, so «CIUCCIAAAAA» can be read (spec 073, 2.6). */
+const DRAIN_TIME = 1000;
+
+/**
+ * The drain of an event (spec 073): the side that drained and the HP it won
+ * back; null when nothing was drained, against androids too.
+ */
+export function drainOf(event: FightEvent): { side: Side; won: number } | null {
+  switch (event.type) {
+    case 'grab':
+    case 'move':
+      return event.drained === undefined ? null : { side: event.side, won: event.drained };
+    case 'clash':
+      return event.drained === undefined ? null : { side: event.winner, won: event.drained };
+    default:
+      return null;
+  }
+}
+
+/** "+2.500 HP", or that the health was already full. */
+function wonText(won: number): string {
+  return won > 0 ? `+${formatHp(won)} HP` : 'la vita era già piena';
+}
+
 /**
  * Milliseconds an event stays on screen at speed 1× (2.11): blows run in
  * half a second, moves, clashes, switches and KOs take 2 or 3 seconds.
  */
 export function eventDuration(event: FightEvent): number {
+  const drain = drainOf(event) ? DRAIN_TIME : 0;
   switch (event.type) {
     case 'blow':
       return 500;
+    case 'grab':
+      return 500 + drain;
     case 'move':
-      return event.finale ? 2500 : 2000;
+      return (event.finale ? 2500 : 2000) + drain;
     case 'clash':
-      return event.kind === 'waves' ? 3000 : 2500;
+      return (event.kind === 'waves' ? 3000 : 2500) + drain;
     case 'switch':
     case 'ko':
       return 2000;
@@ -86,11 +116,14 @@ export function describeStep(record: FightRecord, index: number, names: SideName
   switch (event.type) {
     case 'blow':
       return `${onField(event.side)} colpisce ${onField(other(event.side))}: −${formatHp(event.damage)}`;
+    case 'grab':
+      return `${onField(event.side)} afferra ${onField(other(event.side))}: −${formatHp(event.damage)}, ${DRAIN_SHOUT}! ${wonText(event.drained)}`;
     case 'move': {
       const opening = `${onField(event.side)}${event.finale ? ', mossa finale' : ''}: ${event.move.name}!`;
       const target = onField(other(event.side));
+      const drained = event.drained === undefined ? '' : `, ${DRAIN_SHOUT}! ${wonText(event.drained)}`;
       const outcomes = {
-        hit: `A segno: −${formatHp(event.damage)}`,
+        hit: `A segno: −${formatHp(event.damage)}${drained}`,
         dodged: `${target} la schiva`,
         failed: 'Fallita',
         giant: 'Non funziona sui giganti',
@@ -107,7 +140,8 @@ export function describeStep(record: FightRecord, index: number, names: SideName
         rushes: `scontro di impeti, vince ${winner}: −${formatHp(event.damage)} a ${loser}`,
         rushVsWave: `l'onda travolge l'impeto, −${formatHp(event.damage)} a ${loser}`,
       };
-      return `${opening} ${answer}: ${result[event.kind]}`;
+      const drained = event.drained === undefined ? '' : `, ${DRAIN_SHOUT}! ${winner}: ${wonText(event.drained)}`;
+      return `${opening} ${answer}: ${result[event.kind]}${drained}`;
     }
     case 'switch': {
       const hp = step.after.hp[event.side][event.out] as number;
@@ -117,8 +151,10 @@ export function describeStep(record: FightRecord, index: number, names: SideName
       return `KO! ${fighter(event.side, event.fighter)} è a terra`;
     case 'enter':
       return `Entra ${fighter(event.side, event.fighter)}`;
-    case 'transform':
-      return `${fighter(event.side, event.fighter)} si trasforma: ${fighterAt(record, step.after, event.side, event.fighter).name}!`;
+    case 'transform': {
+      const healed = event.healed ? ` (+${formatHp(event.healed)} HP)` : '';
+      return `${fighter(event.side, event.fighter)} si trasforma: ${fighterAt(record, step.after, event.side, event.fighter).name}!${healed}`;
+    }
     case 'end':
       return `${winsText(names, event.winner)}!`;
   }
@@ -158,9 +194,15 @@ export function captionOf(record: FightRecord, index: number, names: SideNames =
   switch (event.type) {
     case 'blow':
       return null;
+    case 'grab':
+      return {
+        title: 'PRESA!',
+        detail: `${onField(event.side)} afferra ${onField(otherSide(event.side))} · −${formatHp(event.damage)}, ${wonText(event.drained)}`,
+      };
     case 'move': {
+      const drained = event.drained === undefined ? '' : `, ${wonText(event.drained)}`;
       const outcomes = {
-        hit: `A segno: −${formatHp(event.damage)}`,
+        hit: `A segno: −${formatHp(event.damage)}${drained}`,
         dodged: 'Schivata!',
         failed: 'Fallita!',
         giant: 'Non funziona sui giganti!',
@@ -175,9 +217,10 @@ export function captionOf(record: FightRecord, index: number, names: SideNames =
         rushVsWave: "L'ONDA TRAVOLGE L'IMPETO!",
       };
       const bonus = event.kind === 'waves' ? ' (150%)' : '';
+      const drained = event.drained === undefined ? '' : `, ${wonText(event.drained)}`;
       return {
         title: titles[event.kind],
-        detail: `${event.move.name} contro ${event.counter.name} · vince ${onField(event.winner)}: −${formatHp(event.damage)}${bonus}`,
+        detail: `${event.move.name} contro ${event.counter.name} · vince ${onField(event.winner)}: −${formatHp(event.damage)}${bonus}${drained}`,
       };
     }
     case 'switch':
@@ -192,7 +235,7 @@ export function captionOf(record: FightRecord, index: number, names: SideNames =
     case 'transform':
       return {
         title: 'TRASFORMAZIONE!',
-        detail: `${fighter(event.side, event.fighter)} → ${fighterAt(record, step.after, event.side, event.fighter).name}`,
+        detail: `${fighter(event.side, event.fighter)} → ${fighterAt(record, step.after, event.side, event.fighter).name}${event.healed ? ` · +${formatHp(event.healed)} HP` : ''}`,
       };
     case 'end':
       return { title: `${winsText(names, event.winner).toUpperCase()}!`, detail: '' };

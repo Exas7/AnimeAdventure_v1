@@ -117,6 +117,10 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
 - **Fusioni**: Goku e Vegeta (fine di Dragon Ball) in Vegetto o Gogeta,
   Goku e Vegeta SSJ4 in Gogeta SSJ4, Goten e Trunks bambino in Gotenks:
   con la coppia in squadra il gioco ti chiede se fonderli.
+- **Risucchi**: nei combattimenti simulati C-19, C-20 e Cell (prima e
+  seconda forma) si riprendono energia con Drain Life e con la presa, e
+  compare «CIUCCIAAAAA»; androidi e robot non si risucchiano. Cell recupera
+  un po' di vita anche trasformandosi.
 - **Apri stream** (in regia): apre la finestra per gli spettatori.
 
 ## I tuoi dati

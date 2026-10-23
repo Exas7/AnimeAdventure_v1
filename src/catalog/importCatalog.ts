@@ -39,7 +39,8 @@ type Column =
   | 'move1'
   | 'move2'
   | 'finale'
-  | 'transformsInto';
+  | 'transformsInto'
+  | 'transformHeal';
 
 /**
  * Header names of the optional columns (spec 005, 2.1), already normalized.
@@ -65,6 +66,7 @@ const COLUMNS: Record<string, Exclude<Column, 'name'>> = {
   'mossa 2': 'move2',
   'mossa finale': 'finale',
   'si trasforma in': 'transformsInto',
+  'cura trasformandosi': 'transformHeal',
 };
 
 const YES = new Set(['si', 'x', 'yes', 'true', '1']);
@@ -188,6 +190,15 @@ function readSheet(
   if (YES.has(normalize(value('giant')))) {
     sheet.giant = true;
   }
+  const heal = value('transformHeal');
+  if (heal) {
+    const hp = parsePrice(heal);
+    if (typeof hp === 'number' && hp > 0) {
+      sheet.transformHeal = hp;
+    } else {
+      problem(`cura trasformandosi «${heal}», va un numero di HP, es. «2.500»`);
+    }
+  }
   for (const [column, label] of MOVE_COLUMNS) {
     const text = value(column);
     if (!text) {
@@ -203,16 +214,23 @@ function readSheet(
   return Object.keys(sheet).length > 0 ? sheet : undefined;
 }
 
-/** "Kamehameha (onda)", "Meteor Smash (impeto)", "Penetrate! (impeto, giganti)"; null without a type. */
+/**
+ * "Kamehameha (onda)", "Meteor Smash (impeto)", "Penetrate! (impeto, giganti)",
+ * "Drain Life 19 (impeto, risucchio)" (spec 073); null without a type.
+ */
 export function parseMove(text: string): FightMove | null {
-  const match = /^(.+?)\s*\(\s*(onda|impeto)\s*(,\s*giganti\s*)?\)$/i.exec(text.trim());
+  const match = /^(.+?)\s*\(\s*(onda|impeto)((?:\s*,\s*(?:giganti|risucchio))*)\s*\)$/i.exec(text.trim());
   if (!match) {
     return null;
   }
   const kind = (match[2] as string).toLowerCase() === 'onda' ? 'wave' : 'rush';
+  const flags = (match[3] as string).toLowerCase();
   const move: FightMove = { name: (match[1] as string).trim(), kind };
-  if (kind === 'rush' && match[3]) {
+  if (kind === 'rush' && flags.includes('giganti')) {
     move.hitsGiants = true;
+  }
+  if (flags.includes('risucchio')) {
+    move.drains = true;
   }
   return move;
 }

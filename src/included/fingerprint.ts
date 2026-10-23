@@ -1,4 +1,4 @@
-import type { Character } from '../engine';
+import type { Character, FightSheet } from '../engine';
 import type { CatalogMission } from '../missions/catalog';
 
 // A short fingerprint of a list, to recognise in a browser the list that
@@ -32,6 +32,11 @@ function fnv1a(text: string): string {
 
 export function missionsFingerprint(missions: readonly CatalogMission[]): string {
   return fnv1a(canonical(missions.map(({ id: _id, ...rest }) => rest)));
+}
+
+/** A fight sheet of the list (spec 073, 2.8): the same values, the same fingerprint. */
+export function sheetFingerprint(sheet: FightSheet | undefined): string {
+  return fnv1a(canonical(sheet ?? null));
 }
 
 /** Only codes and prices: the other columns of the list grew over time. */

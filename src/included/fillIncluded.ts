@@ -1,7 +1,7 @@
-import type { Character } from '../engine';
+import type { Character, FightMove, FightSheet } from '../engine';
 import { hasStoredCatalog, loadCatalog, saveCatalog } from '../storage/catalogStore';
 import { loadMissionCatalog, loadQuestions, saveMissionCatalog, saveQuestions } from '../storage/missionStore';
-import { missionsFingerprint, pricesFingerprint } from './fingerprint';
+import { missionsFingerprint, pricesFingerprint, sheetFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions, includedQuestions } from './includedLists';
 
 /**
@@ -33,8 +33,8 @@ export interface FilledLists {
 /**
  * At start (spec 030, D-045): what the browser does not have comes from the
  * files of the project; what it has is never touched, except the included
- * missions and prices of before, never changed, which get the new values
- * (spec 063 and 066).
+ * missions, prices and sheets of before, never changed, which get the new
+ * values (spec 063, 066 and 073).
  */
 export async function fillMissingLists(): Promise<FilledLists> {
   const filled: string[] = [];
@@ -47,6 +47,12 @@ export async function fillMissingLists(): Promise<FilledLists> {
     catalog = withPricesOf(catalog, includedCatalog());
     await saveCatalog(catalog);
     filled.push('prezzi aggiornati');
+  }
+  const drains = catalog ? withDrainsOf(catalog, includedCatalog()) : null;
+  if (drains) {
+    catalog = drains;
+    await saveCatalog(catalog);
+    filled.push('schede aggiornate');
   }
   // The names of the missions refer to the list: without a readable one they cannot be read.
   if (catalog) {
@@ -64,6 +70,41 @@ export async function fillMissingLists(): Promise<FilledLists> {
     filled.push('domande');
   }
   return { catalog, filled };
+}
+
+/**
+ * Spec 073, 2.8: a character whose sheet is still the included one of
+ * before, without drains and «cura trasformandosi», gets the new one; any
+ * sheet changed by the host stays as it is. Null when nothing changes.
+ */
+export function withDrainsOf(catalog: Character[], included: Character[]): Character[] | null {
+  const sheets = new Map(included.map((character) => [character.id, character.fight]));
+  let changed = false;
+  const result = catalog.map((character) => {
+    const sheet = sheets.get(character.id);
+    if (!sheet || sheetFingerprint(character.fight) === sheetFingerprint(sheet)) {
+      return character;
+    }
+    if (sheetFingerprint(character.fight) !== sheetFingerprint(withoutDrains(sheet))) {
+      return character;
+    }
+    changed = true;
+    return { ...character, fight: sheet };
+  });
+  return changed ? result : null;
+}
+
+/** The sheet as it was before spec 073: no drains, no «cura trasformandosi». */
+function withoutDrains(sheet: FightSheet): FightSheet {
+  const plain = (move: FightMove | undefined): FightMove | undefined => {
+    if (!move) {
+      return undefined;
+    }
+    const { drains: _drains, ...rest } = move;
+    return rest;
+  };
+  const { transformHeal: _heal, ...rest } = sheet;
+  return { ...rest, move1: plain(sheet.move1), move2: plain(sheet.move2), finale: plain(sheet.finale) };
 }
 
 /** The list with the prices of `included`, character by character; the rest as it was. */

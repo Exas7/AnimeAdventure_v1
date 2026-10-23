@@ -561,6 +561,60 @@
   animation-fill-mode: both;
 }
 
+/* The HP a drain wins back, over who drained (spec 073, 2.6). */
+.heal {
+  text-shadow:
+    0 0 0.6cqw #22c55e,
+    0 0.3cqw 0 #000000;
+}
+
+/*
+ * «CIUCCIAAAAA» (spec 073, 2.6): red, in the font and with the comic outline
+ * of the start screen's title; it pops up when the drain lands and stays to
+ * the end of the event.
+ */
+.shout {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  z-index: 4;
+  translate: -50% 0;
+  font-family: var(--font-display);
+  font-size: 8cqw;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #ff5a4a 20%, #c40000 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0.3cqw var(--ink);
+  filter: drop-shadow(0.06em 0.06em 0 var(--ink));
+  pointer-events: none;
+  animation: shout var(--shout) ease-out both;
+}
+
+@keyframes shout {
+  0% {
+    transform: rotate(-8deg) scale(0.3);
+    opacity: 0;
+  }
+  18% {
+    transform: rotate(-8deg) scale(1.2);
+    opacity: 1;
+  }
+  32% {
+    transform: rotate(-6deg) scale(1);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-6deg) scale(1.05);
+    opacity: 0;
+  }
+}
+
 /* Over the fighter hit: the fighters' middles are at 17% and 83%. */
 .onA {
   left: 17%;

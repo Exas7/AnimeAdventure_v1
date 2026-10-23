@@ -1,167 +1,167 @@
-﻿nome;possibile starter;prezzo;tier;saga;razza;negoziante;cattivo;persona;barre;potenza;velocità;gigante;mossa 1;mossa 2;mossa finale;si trasforma in
-Son Goku (inizio);sì;;C+;Saiyan;Saiyan;-;-;Son Goku (inizio);4;3;3;-;Kamehameha (onda);Kaio-ken Attack (impeto);Spirit Bomb (onda);
-Son Goku (metà);-;1200;B+;Freezer;Saiyan;-;-;Son Goku (metà);4;3;3;-;x20 Kaio-ken Kamehameha (onda);Meteor Combination (impeto);Spirit Bomb (onda);Son Goku (metà) SSJ
-Son Goku (metà) SSJ;-;1600;A;Freezer;Saiyan;-;-;Son Goku (metà);4;3;3;-;Super Kamehameha (onda);Meteor Smash (impeto);Angry Kamehameha (onda);
-Son Goku (fine);-;1600;A;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Kamehameha (onda);Meteor Smash (impeto);Super Spirit Bomb (onda);Son Goku (fine) SSJ
-Son Goku (fine) SSJ;-;1800;A+;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Super Kamehameha (onda);Super Energy Wave Volley (impeto);Instant Kamehameha (onda);Son Goku (fine) SSJ2
-Son Goku (fine) SSJ2;-;2500;S;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Kamehameha (onda);Meteor Crash (impeto);Super Kamehameha (onda);Son Goku (fine) SSJ3
-Son Goku (fine) SSJ3;-;2700;S+;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Super Kamehameha (onda);Super Explosive Wave (onda);Dragon Fist (impeto, giganti);
-Son Goku (GT);-;1200;B+;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Kamehameha (onda);Dragon Fist (impeto, giganti);Spirit Bomb (onda);Son Goku (GT) SSJ
-Son Goku (GT) SSJ;-;1800;A+;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Super Kamehameha (onda);Full Power Energy Blast Volley (impeto);Super Explosive Wave (onda);Son Goku (GT) SSJ3
-Son Goku (GT) SSJ3;-;2500;S;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Super Kamehameha (onda);Full Power Energy Blast Volley (onda);Dragon Fist (impeto, giganti);Son Goku SSJ4
-Son Goku SSJ4;-;3600;SS;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;10x Kamehameha (onda);Meteor Crash (impeto);Dragon Fist (impeto, giganti);
-Son Goku (bambino);sì;;C;Dragon Ball;Saiyan;-;-;Son Goku (bambino);3;2;4;-;Kamehameha (onda);Counterattack! (impeto);Penetrate! (impeto, giganti);Son Goku (bambino) Oozaru
-Son Goku (bambino) Oozaru;-;1400;A-;Dragon Ball;Saiyan;-;-;Son Goku (bambino);5;5;1;sì;Chou Makouhou (onda);Gigant Rock Throw (onda);Chou Makouhou Barrage (onda);
-Son Gohan (bambino);sì;;C;Saiyan;Ibrido Saiyan-terrestre;-;-;Son Gohan (bambino);3;2;4;-;Masenko (onda);Gekiretsu Madan (onda);Bakuretsu Ranma (impeto);
-Son Gohan (ragazzo);-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Masenko (onda);Gekiretsu Madan (onda);Super Kamehameha (onda);Son Gohan (ragazzo) SSJ
-Son Gohan (ragazzo) SSJ;-;1800;A+;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Masenko (onda);Chou Maretsugeki (impeto);Super Kamehameha (onda);Son Gohan (ragazzo) SSJ2
-Son Gohan (ragazzo) SSJ2;-;2500;S;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Kamehameha (onda);Gekiretsu Madan (onda);Father-Son Kamehameha (onda);
-Son Gohan;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Explosive Madan (onda);Full Power Energy Blast Volley (onda);Super Kamehameha (onda);Son Gohan SSJ
-Son Gohan SSJ;-;1800;A+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Explosive Madan (onda);Full Power Energy Blast Volley (onda);Bros. Kamehameha (onda);Son Gohan SSJ2
-Son Gohan SSJ2;-;2500;S;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Super Explosive Madan (onda);Full Power Energy Barrage Wave (onda);Super Kamehameha (onda);
-Great Saiyaman;-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Great Saiyaman;4;3;3;-;Super Explosive Wave (onda);Justice Slash (impeto);Justice Judgment (impeto);
-Son Gohan (Ultimate);-;2700;S+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan (Ultimate);4;3;3;-;Super Kamehameha (onda);Super Explosive Wave (onda);Burst Rush (impeto);
-Son Gohan (futuro);-;1200;B+;Film e speciali;Ibrido Saiyan-terrestre;-;-;Son Gohan (futuro);4;3;3;-;Masenko (onda);Super Explosive Wave (onda);Super Kamehameha (onda);Son Gohan (futuro) SSJ
-Son Gohan (futuro) SSJ;-;1600;A;Film e speciali;Ibrido Saiyan-terrestre;-;-;Son Gohan (futuro);4;3;3;-;Gekiretsu Madan (onda);Special Beam Cannon (onda);Gekiretsu Ranbu (impeto);
-Son Goten;-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Goten;3;2;4;-;Full Power Energy Blast Volley (onda);Assault! (impeto);Super Kamehameha (onda);Son Goten SSJ
-Son Goten SSJ;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Goten;3;2;4;-;Kamehameha (onda);Assault! (impeto);Bros. Kamehameha (onda);
-Vegeta (scouter);-;1100;B;Saiyan;Saiyan;-;sì;Vegeta (scouter);4;3;3;-;Galick Gun (onda);Final Galick Cannon (impeto);Dirty Fireworks (impeto);Vegeta (scouter) Oozaru
-Vegeta (scouter) Oozaru;-;1600;A;Saiyan;Saiyan;-;sì;Vegeta (scouter);5;5;1;sì;Chou Makouhou (onda);Chou Makouhou Barrage (onda);Super Galick Gun (onda);
-Vegeta;-;1200;B+;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Galick Gun (onda);Super Energy Wave Volley (onda);Super Explosive Wave (onda);Vegeta SSJ
-Vegeta SSJ;-;1600;A;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Maximum Flasher (onda);Amazing Impact (impeto);Big Bang Attack (onda);Super Vegeta
-Super Vegeta;-;1800;A+;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Big Bang Attack (onda);Spirit Breaking Cannon (impeto);Final Flash (onda);
-Vegeta (seconda forma);-;1600;A;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Galick Gun (onda);Super Energy Wave Volley (onda);Big Bang Attack (onda);Vegeta (seconda forma) SSJ
-Vegeta (seconda forma) SSJ;-;1800;A+;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Final Flash (onda);Super Energy Wave Volley (onda);Super Explosive Wave (onda);Vegeta (seconda forma) SSJ2
-Vegeta (seconda forma) SSJ2;-;2500;S;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Big Bang Attack (onda);Super Energy Wave Volley (onda);Final Flash (onda);
-Majin Vegeta;-;2500;S;Majin Bu;Saiyan;-;sì;Majin Vegeta;4;3;3;-;Final Impact (onda);Big Bang Attack (onda);Final Explosion (onda);
-Vegeta SSJ4;-;3600;SS;GT;Saiyan;-;-;Vegeta SSJ4;4;3;3;-;Final Flash (onda);Spirit Breaking Cannon (impeto);Final Shine Attack (onda);
-Trunks (spada);-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks (spada);4;3;3;-;Finish Buster (onda);Burning Storm (onda);Lightning Sword Slash (onda);Trunks (spada) SSJ
-Trunks (spada) SSJ;-;1600;A;Cell;Ibrido Saiyan-terrestre;-;-;Trunks (spada);4;3;3;-;Burning Attack (onda);Burning Storm (onda);Shining Sword Attack (impeto);
-Trunks;-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;3;3;-;Burning Attack (onda);High Speed Rush (impeto);Finish Buster (onda);Trunks SSJ
-Trunks SSJ;-;1600;A;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;3;3;-;Burning Attack (onda);Burning Breaker (impeto);Heat Dome Attack (impeto, giganti);Super Trunks
-Super Trunks;-;1800;A+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;4;2;-;Finish Buster (onda);Burning Attack (onda);Super Explosive Wave (onda);
-Trunks (bambino);-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Trunks (bambino);3;2;4;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Finish Buster (onda);Trunks (bambino) SSJ
-Trunks (bambino) SSJ;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Trunks (bambino);3;2;4;-;Full Power Energy Barrage Wave (onda);High Speed Rush (impeto);Big Tree Cannon (onda);
-Gotenks;-;1800;A+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Big Tree Cannon (onda);Gotenks SSJ
-Gotenks SSJ;-;2200;S-;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Big Tree Cannon (onda);Galactic Donuts (onda);Super Ghost Kamikaze Attack (onda);Gotenks SSJ3
-Gotenks SSJ3;-;2700;S+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Big Tree Cannon (onda);DIE DIE Missile Barrage (onda);Charging Ultra Buu Buu Volleyball (impeto);
-Vegetto;-;3200;SS-;Majin Bu;Saiyan;-;-;Vegetto;5;3;3;-;Big Bang Attack (onda);Scatter Finger Beam (onda);Super Kamehameha (onda);Super Vegetto
-Super Vegetto;-;3900;SS+;Majin Bu;Saiyan;-;-;Vegetto;5;3;3;-;Super Kamehameha (onda);Beam Sword Slash (impeto);Final Kamehameha (onda);
-Super Gogeta;-;3900;SS+;Film e speciali;Saiyan;-;-;Super Gogeta;5;3;3;-;Big Bang Kamehameha (onda);Super Explosive Wave (onda);Stardust Breaker (impeto);
-Gogeta SSJ4;-;3900;SS+;GT;Saiyan;-;-;Gogeta SSJ4;5;3;3;-;Big Bang Kamehameha (onda);Ultimate Impact (impeto);100x Big Bang Kamehameha (onda);
-Piccolo (inizio);sì;;C+;Saiyan;Namecciano;-;-;Piccolo (inizio);4;3;3;-;Explosive Demon Wave (onda);Bakuretsu Mahoko (impeto);Special Beam Cannon (onda);
-Piccolo (fine);-;1600;A;Cell;Namecciano;-;-;Piccolo (fine);4;3;3;-;Special Beam Cannon (onda);Light Grenade (onda);Hellzone Grenade (onda);
-Krilin;sì;;C;Saiyan;Terrestre;-;-;Krilin;4;3;3;-;Kamehameha (onda);Expanding Energy Wave (onda);Destructo Disc (onda);
-Yamcha;sì;;C;Saiyan;Terrestre;-;-;Yamcha;4;3;3;-;Kamehameha (onda);Wolf Fang Fist (impeto);Soukidan (onda);
-Tenshinhan;sì;;C+;Saiyan;Terrestre;-;-;Tenshinhan;4;3;3;-;Dodon Ray (onda);Ki Blast Cannon (onda);Neo Tri-Beam (onda);
-Jiaozi;-;;D+;Saiyan;Terrestre;-;-;Jiaozi;3;2;4;-;Dodon Ray (onda);Psychic Rock Throw (impeto);Farewell, Mr. Tien (onda);
-Yajirobe;-;;D+;Saiyan;Terrestre;-;-;Yajirobe;4;3;3;-;Ka-Blam Slicer (onda);Flash and Kill (impeto);Miracle Ka-Blam Slash (impeto, giganti);
-Muten Roshi;-;;D+;Dragon Ball;Terrestre;sì;-;Muten Roshi;4;3;3;-;The Original Kamehameha (onda);High Speed Rush (impeto);Mankoku Kyoutenshou (onda);Muten Roshi (massima potenza)
-Muten Roshi (massima potenza);-;1600;A;Dragon Ball;Terrestre;-;-;Muten Roshi;4;3;3;-;The Original Kamehameha (onda);Turtle School Ultimate Fist (impeto);MAX Power Kamehameha (onda);
-Videl;-;;C-;Majin Bu;Terrestre;-;-;Videl;4;3;3;-;High Speed Rush (impeto);Desperado Rush (impeto);Videl Rush (impeto);Great Saiyaman 2-go
-Great Saiyaman 2-go;sì;;C;Majin Bu;Terrestre;-;-;Videl;4;3;3;-;Justice Countdown (impeto);Justice Rush 2 (impeto);Justice Judgment (impeto);
-Mr. Satan;-;;E;Cell;Terrestre;-;-;Mr. Satan;4;3;3;-;Dynamic Mess Em Up Punch (impeto);Present Bomb (onda);Mister Buu Arrives! (impeto);
-Kaioshin;-;1200;B+;Majin Bu;Kaioshin;-;-;Kaioshin;4;3;3;-;Energy's Last (onda);Crazy Rush (impeto);Gekiretsu Shin'ou'hou (onda);Kibitoshin
-Kibitoshin;-;1600;A;Majin Bu;Kaioshin;-;-;Kaioshin;4;3;3;-;Full Power Energy Wave (onda);Crazy Combination (impeto);Shin Gekiretsu Shin'ou'hou (onda);
-Uub;-;1600;A;Majin Bu;Terrestre;-;-;Uub;4;3;3;-;Super Kamehameha (onda);Blazing Barrage Palm (impeto);Super Explosive Wave (onda);Super Uub
-Super Uub;-;2200;S-;GT;Terrestre;-;-;Uub;4;3;3;-;Super Energy Wave Volley (onda);Chocolate Beam (onda);Lightning Arrow (onda);
-Pan;-;1100;B;GT;Ibrido Saiyan-terrestre;-;-;Pan;3;2;4;-;Kamehameha (onda);Gill Missile (impeto);Maiden's Rage! (impeto);
-Nail;-;1100;B;Freezer;Namecciano;-;-;Nail;4;3;3;-;Full Power Energy Wave (onda);Super Explosive Wave (onda);Mystic Flasher (impeto);
-Bardock;sì;1000;B-;Film e speciali;Saiyan;-;-;Bardock;4;3;3;-;Full Power Energy Wave (onda);Final Revenger (impeto);Final Spirit Cannon (onda);Bardock Oozaru
-Bardock Oozaru;-;1400;A-;Film e speciali;Saiyan;-;-;Bardock;5;5;1;sì;Chou Makouhou (onda);Super Explosive Wave (onda);Giga Meteor Storm (onda);
-Selypa;sì;;C;Film e speciali;Saiyan;-;-;Selypa;4;3;3;-;Full Power Energy Wave (onda);Energy Ballet (onda);Hysteric Saiyan Lady (impeto);Selypa Oozaru
-Selypa Oozaru;-;1400;A-;Film e speciali;Saiyan;-;-;Selypa;5;5;1;sì;Chou Makouhou Barrage (impeto);Gigant Rock Throw (onda);Gigantic Saiyan Lady (impeto);
-Re Vegeta;sì;1000;B-;Saiyan;Saiyan;-;-;Re Vegeta;4;3;3;-;Execution Beam (onda);Super Energy Wave Volley (onda);Orga Blaster (impeto);Re Vegeta Oozaru
-Re Vegeta Oozaru;-;1400;A-;Saiyan;Saiyan;-;-;Re Vegeta;5;5;1;sì;Super Galick Gun (onda);Super Explosive Wave (onda);Chou Makouhou Barrage (onda);
-Raditz;sì;;C+;Saiyan;Saiyan;-;sì;Raditz;4;3;3;-;Here's a present! (onda);I'm A Top-class Warrior! (impeto);Begone! (onda);Raditz Oozaru
-Raditz Oozaru;-;1400;A-;Saiyan;Saiyan;-;sì;Raditz;5;5;1;sì;Chou Makouhou (onda);Gigant Rock Throw (onda);Chou Makousen (onda);
-Nappa;-;1400;A-;Saiyan;Saiyan;-;sì;Nappa;4;3;3;-;Volcano Explosion (onda);Blazing Storm (impeto);Kapa (onda);Nappa Oozaru
-Nappa Oozaru;-;1400;A-;Saiyan;Saiyan;-;sì;Nappa;5;5;1;sì;Gigant Rock Throw (onda);Super Explosive Wave (onda);Chou Makouhou (onda);
-Saibaiman;-;;D;Saiyan;Saibaiman;-;sì;Saibaiman;3;3;3;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Saibaman Bomb (impeto);
-Zarbon;sì;;C+;Freezer;Alieno;-;sì;Zarbon;4;3;3;-;Shooting Star Arrow (onda);Bloody Dance (impeto);Elegant Blaster (onda);Zarbon (trasformato)
-Zarbon (trasformato);sì;1000;B-;Freezer;Alieno;-;sì;Zarbon;4;3;3;-;Elegant Blaster (onda);Wild Pressure (impeto);Monster Crush (impeto);
-Dodoria;sì;;C+;Freezer;Alieno;-;sì;Dodoria;4;3;3;-;Chou Makouhou (onda);Dodoria Head Breaker (impeto);Maximum Buster (onda);
-Kyui;sì;;C;Freezer;Alieno;-;sì;Kyui;4;3;3;-;Full Power Energy Wave (onda);Full Power Energy Barrage Wave (impeto);Ah! Lord Frieza! (impeto);
-Appule;-;;D;Freezer;Alieno;-;sì;Appule;4;3;3;-;Energy Wave (onda);High Speed Rush (impeto);Full Power Energy Ball (onda);
-Soldato di Freeza;-;;D;Freezer;Alieno;-;sì;Soldato di Freeza;4;3;3;-;Energy Wave (onda);Energy Wave (onda);Life-Risking Blow! (impeto);
-Ginyu;-;1200;B+;Freezer;Alieno;-;sì;Ginyu;4;3;3;-;Full Power Energy Wave (onda);Galaxy Dynamite (onda);Body Change (impeto, giganti);
-Recoome;-;1100;B;Freezer;Alieno;-;sì;Recoome;4;4;2;-;Recoome Eraser Gun (onda);Recoome Renegade Bomber (onda);Recoome Fighting Bomber (onda);
-Butter;-;1800;A+;Freezer;Alieno;-;sì;Butter;4;1;5;-;Space Mach Attack (impeto);Full Power Energy Ball (onda);Purple Comet Attack (impeto);
-Jeeth;-;1400;A-;Freezer;Alieno;-;sì;Jeeth;4;3;3;-;Full Power Energy Wave (onda);Crusher Ball (onda);Purple Comet Attack (impeto);
-Guldo;sì;;C;Freezer;Alieno;-;sì;Guldo;3;2;4;-;Psychic Rock Throw (impeto);Full Power Energy Blast Volley (onda);Guldo Special (impeto);
-Freeza (prima forma);-;1100;B;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Beam (onda);Punishing Rush (impeto);Death Ball (onda);Freeza (seconda forma)
-Freeza (seconda forma);-;1200;B+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Punishing Blaster (onda);Death Storm (onda);HAIL Frieza (impeto);Freeza (terza forma)
-Freeza (terza forma);-;1200;B+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Beam (onda);High Speed Rush (impeto);Crazy Finger Beam (onda);Freeza (forma finale)
-Freeza (forma finale);-;2700;S+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Barrage Death Beam (onda);I Might Die This Time. (onda);Destroy The Planet! (onda);Freeza (massima potenza)
-Freeza (massima potenza);-;2700;S+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Saucer (onda);Nova Strike (impeto);You Will Die By My Hand! (onda);
-Mecha Freeza;-;1600;A;Cell;Cyborg;-;sì;Mecha Freeza;4;3;3;-;Death Beam (onda);Fissure Slash (onda);Supernova (onda);
-Re Cold;-;1600;A;Cell;Razza di Freezer;-;sì;Re Cold;4;3;3;-;Full Power Death Beam (onda);Super Explosive Wave (onda);Cold Family Power (impeto);
-C-16;-;1600;A;Cell;Androide;-;-;C-16;4;3;3;-;Hell's Impact (impeto);Hell's Flash (impeto);Self Destruct Device (impeto);
-C-17;-;1600;A;Cell;Androide;-;sì;C-17;4;3;3;-;Full Power Energy Ball (onda);Photon Flash (onda);Sadistic Dance (impeto);
-C-18;-;1800;A+;Cell;Androide;-;sì;C-18;4;3;3;-;Infinity Bullet (onda);Destructo Disc (onda);Sadistic 18 (impeto);
-C-19;-;3200;SS-;Cell;Androide;-;sì;C-19;4;3;3;-;Full Power Energy Wave (onda);High Power Rush (impeto);Drain Life 19 (impeto);
-Dr. Gero (C-20);-;3200;SS-;Cell;Androide;-;sì;Dr. Gero (C-20);4;3;3;-;Full Power Energy Wave (onda);Bionic Punisher (onda);Drain Life 20 (impeto);
-Cell (prima forma);-;2500;S;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Kamehameha (onda);Special Beam Cannon (onda);Drain Life Cell (impeto);Cell (seconda forma)
-Cell (seconda forma);-;2500;S;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Big Bang Crash (onda);Drain Life Cell (impeto);Unforgivable! (impeto);Cell (forma perfetta)
-Cell (forma perfetta);-;1800;A+;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Super Kamehameha (onda);Barrage Death Beam (onda);Perfect Barrier (onda);Cell (perfetto, massima potenza)
-Cell (perfetto, massima potenza);-;3600;SS;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Full Power Death Beam (onda);Perfect Combination (impeto);Solar Kamehameha (onda);
-Cell Jr.;-;1100;B;Cell;Bio-androide;-;sì;Cell Jr.;3;2;4;-;Special Beam Cannon (onda);Innocence Rush (impeto);Super Kamehameha (onda);
-Majin Buu (buono);-;1800;A+;Majin Bu;Majin;-;-;Majin Buu (buono);4;3;3;-;Flame Shower Breath (onda);Super Kamehameha (onda);Angry Explosion (onda);
-Majin Buu (puro male);-;1800;A+;Majin Bu;Majin;-;sì;Majin Buu (puro male);4;3;3;-;Super Kamehameha (onda);Flame Shower Breath (onda);Super Explosive Wave (onda);
-Super Buu;-;2500;S;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Genocide Blast (onda);Chocolate Beam (onda);Revenge Death Bomber (onda);Super Buu (Gotenks assorbito)
-Super Buu (Gotenks assorbito);-;2700;S+;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Galactic Donut Volley (onda);Special Beam Cannon (onda);Super Kamehameha (onda);Super Buu (Son Gohan assorbito)
-Super Buu (Son Gohan assorbito);-;3600;SS;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Super Kamehameha (onda);Chocolate Beam (onda);Super Ghost Buu Attack (onda);
-Majin Buu (puro);-;3600;SS;Majin Bu;Majin;-;sì;Majin Buu (puro);4;3;3;-;Super Kamehameha (onda);Mystic Combination (impeto);Planet Burst (onda);
-Dabura;-;1800;A+;Majin Bu;Demone;-;sì;Dabura;4;3;3;-;Evil Impulse (onda);Evil Flame (onda);Darkness Sword Attack (impeto);
-Bobbidi;-;;D-;Majin Bu;Alieno;-;sì;Bobbidi;3;2;4;-;Pui Pui Nice Shot (impeto);Yakon Is Next! (impeto);Babidi's Ultimate Power (onda);
-Spopovitch;sì;;C;Majin Bu;Terrestre;-;sì;Spopovitch;4;3;3;-;Berserker Crash (impeto);Mad Banquet (impeto);Majin Buu Resurrection (impeto);
-Paikuhan;-;2700;S+;Film e speciali;Alieno;-;-;Paikuhan;4;3;3;-;Hyper Tornado (impeto);Burning Shoot (impeto);Thunder Flash (onda);
-Garlic Jr.;sì;;C;Film e speciali;Demone;-;sì;Garlic Jr.;4;3;3;-;Darkness Eye Beam (onda);High Speed Rush (impeto);Full Power Energy Ball (onda);Super Garlic Jr.
-Super Garlic Jr.;-;1100;B;Film e speciali;Demone;-;sì;Garlic Jr.;4;4;2;-;Death Impact (onda);Darkness Illusion (impeto);Dead Zone (onda);
-Dr. Uiro;-;1100;B;Film e speciali;Terrestre (cyborg);-;sì;Dr. Uiro;4;3;3;-;Photon Strike (onda);Gigantic Bomber (impeto);Planet Geyser (onda);
-Turles;-;1100;B;Film e speciali;Saiyan;-;sì;Turles;4;3;3;-;Kill Driver (onda);Full Power Energy Barrage Wave (onda);Meteor Burst (impeto);Turles Oozaru
-Turles Oozaru;-;1400;A-;Film e speciali;Saiyan;-;sì;Turles;5;5;1;sì;Chou Makouhou (onda);Chou Makouhou Barrage (onda);Chou Makousen (onda);
-Slug;-;1400;A-;Film e speciali;Namecciano;-;sì;Slug;4;3;3;-;Finger Beam (onda);Darkness Eye Beam (onda);Power of Darkness (impeto);Slug (gigante)
-Slug (gigante);-;2200;S-;Film e speciali;Namecciano;-;sì;Slug;5;5;1;sì;Darkness Eye Beam (onda);Super Explosive Wave (onda);Darkness Blaster (onda);
-Sauzer;sì;1000;B-;Film e speciali;Alieno;-;sì;Sauzer;4;3;3;-;Full Power Energy Wave (onda);Scatter Finger Beam (onda);Salza Blade Rush (impeto);
-Cooler;-;1600;A;Film e speciali;Razza di Freezer;-;sì;Cooler;4;3;3;-;Full Power Energy Wave (onda);Darkness Eye Beam (onda);Death Ball (onda);Cooler (forma finale)
-Cooler (forma finale);-;2200;S-;Film e speciali;Razza di Freezer;-;sì;Cooler;4;3;3;-;Death Beam (onda);Death Chaser (impeto);Supernova (onda);
-Metal Cooler;-;2200;S-;Film e speciali;Cyborg;-;sì;Metal Cooler;4;3;3;-;Lock-On Buster (onda);Finger Blitz Barrage (onda);Supernova (onda);
-C-13;-;1600;A;Film e speciali;Androide;-;sì;C-13;4;3;3;-;Full Power Energy Wave (onda);Silent Assassin 13 (impeto);S.S. Deadly Bomber (onda);Super C-13
-Super C-13;-;2200;S-;Film e speciali;Androide;-;sì;C-13;4;3;3;-;S.S. Deadly Bomber (onda);Super Explosive Wave (onda);S.S. Deadly Hammer (impeto);
-Broli;-;1800;A+;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Full Power Energy Wave (onda);Bloody Smash (impeto);Eraser Cannon (onda);Broli SSJ
-Broli SSJ;-;2500;S;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Eraser Cannon (onda);Trap Shooter (onda);Super Explosive Wave (onda);Broli Super Saiyan Leggendario
-Broli Super Saiyan Leggendario;-;3600;SS;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Eraser Cannon (onda);Gigantic Hammer (impeto);Omega Blaster (onda);
-Zangya;-;1100;B;Film e speciali;Alieno;-;sì;Zangya;4;3;3;-;Shoot Blaster (onda);Trap Shooter (impeto);Sky Zapper (impeto);
-Bojack;-;1600;A;Film e speciali;Alieno;-;sì;Bojack;4;3;3;-;Full Power Energy Ball (onda);Trap Shooter (onda);Grand Smasher (onda);Bojack (massima potenza)
-Bojack (massima potenza);-;2200;S-;Film e speciali;Alieno;-;sì;Bojack;4;3;3;-;Grand Smasher (onda);Galactic Tyrant (impeto);Galactic Buster (onda);
-Janemba;-;2500;S;Film e speciali;Demone;-;sì;Janemba;4;3;3;-;Chou Makouhou (onda);Rapid Cannon (onda);Illusion Smash (impeto);Super Janemba
-Super Janemba;-;3600;SS;Film e speciali;Demone;-;sì;Janemba;4;3;3;-;Chou Makouhou (onda);Lightning Shower Rain (impeto);Dimension Sword Attack (impeto);
-Hildegarn;-;3900;SS+;Film e speciali;Mostro;-;sì;Hildegarn;5;5;1;sì;Chou Makousen (onda);Super Explosive Wave (onda);Gigantic Flame (onda);
-Tapion;-;2200;S-;Film e speciali;Alieno;-;-;Tapion;4;3;3;-;Brave Cannon (onda);Brave Slash (onda);Brave Sword Attack (impeto, giganti);
-Baby Vegeta;-;1800;A+;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Galick Gun (onda);Finger Blitz Barrage (onda);Final Flash (onda);Super Baby 1
-Super Baby 1;-;2500;S;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Galick Gun (onda);Finger Blitz Barrage (onda);Final Flash (onda);Super Baby 2
-Super Baby 2;-;2700;S+;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Final Flash (onda);Full Power Energy Blast Volley (onda);Revenge Death Ball (onda);Baby Oozaru
-Baby Oozaru;-;3200;SS-;GT;Tsufuru;-;sì;Baby Vegeta;5;5;1;sì;Super Galick Gun (onda);Gigantic Flame (onda);Revenge Death Ball Final (onda);
-Super C-17;-;2700;S+;GT;Androide;-;sì;Super C-17;4;3;3;-;Full Power Energy Wave (onda);Hell's Storm (onda);Shocking Death Ball (onda);
-Su Shenron;-;2500;S;GT;Drago malvagio;-;sì;Su Shenron;4;3;3;-;Burst Attack (onda);Burning Tornado (impeto);Blaster Meteor (onda);
-Ii Shenron;-;2700;S+;GT;Drago malvagio;-;sì;Ii Shenron;4;3;3;-;Trap Shooter (onda);Blazing Storm (onda);Gigantic Blaze (onda);Super Ii Shenron
-Super Ii Shenron;-;3900;SS+;GT;Drago malvagio;-;sì;Ii Shenron;4;3;3;-;Gigantic Blaze (onda);Dragon Thunder (impeto);Minus Energy Power Ball (onda);
-Son Gohan (nonno);-;;D+;Dragon Ball;Terrestre;sì;-;Son Gohan (nonno);4;3;3;-;Kamehameha (onda);Turtle School Four Virtues (impeto);Turtle School Tranquility (impeto);
-Tao Pai Pai;sì;;C;Dragon Ball;Terrestre;-;sì;Tao Pai Pai;4;3;3;-;The Original Dodon-Pa (onda);Crane Style Assassin Strike (impeto);Ultimate Final Plan (impeto);
-Tao Pai Pai (cyborg);sì;;C+;Dragon Ball;Terrestre (cyborg);-;sì;Tao Pai Pai (cyborg);4;3;3;-;Dodon Ray (onda);Hidden Blade (impeto);Super Dodon Wave (onda);
-Piccolo Daimao;sì;;C+;Dragon Ball;Namecciano;-;sì;Piccolo Daimao;4;3;3;-;Soumasen (onda);Your name is Drum (impeto);Explosive Demon Wave (onda);
-Tambourine;sì;;C;Dragon Ball;Namecciano;-;sì;Tambourine;4;3;3;-;Chou Makouhou (onda);Soumasen (onda);Super Marengeki (impeto);
-C-8;-;;C-;Dragon Ball;Androide;-;-;C-8;4;3;3;-;Eighter Attack (impeto);Eighter's Anger (onda);You Hurt Goku! (impeto);
-Generale Blue;-;;E;Dragon Ball;Terrestre;-;sì;Generale Blue;4;3;3;-;I'll Shoot You! (onda);Skewer! (impeto);Rocket Engine Spark (impeto);
-Namu;-;;D+;Dragon Ball;Terrestre;-;-;Namu;4;3;3;-;Shura Gekiretsuken (impeto);Cross Arm Attack (impeto);Cross Arm Dive (impeto);
-Akkuman;-;;D;Dragon Ball;Demone;-;-;Akkuman;4;3;3;-;Fork Attack (onda);Demon Fork Rush (impeto);Devilmite Beam (onda);
-Chichi (bambina);-;;D-;Dragon Ball;Terrestre;-;-;Chichi (bambina);3;2;4;-;Stay Away From Me! (impeto);That Won't Work (onda);Save Goku! (impeto);
-Robot di Pilaf;-;;D;Dragon Ball;Robot;-;sì;Robot di Pilaf;4;3;3;-;Gigant Rock Throw (onda);Rolling Smash (impeto);Great Pilaf Operation (impeto);Robot di Pilaf (combinato)
-Robot di Pilaf (combinato);-;;C-;Dragon Ball;Robot;-;sì;Robot di Pilaf;5;5;1;sì;Double Buster (onda);Gatling Gun (impeto);Launch Missiles! (onda);
-Arale;-;3600;SS;Extra;Androide;-;-;Arale;4;3;3;-;Woohoo! (onda);Ping! (impeto, giganti);Playing Pro-Wrestling (impeto, giganti);
-Kami;-;;;Dragon Ball;Namecciano;sì;-;Kami;;;;;;;;
-Karin;-;;;Dragon Ball;Gatto;sì;-;Karin;;;;;;;;
-Bulma;-;;;Dragon Ball;Terrestre;sì;-;Bulma;;;;;;;;
-Baba la Veggente;-;;;Dragon Ball;Terrestre;sì;-;Baba la Veggente;;;;;;;;
-Chichi (adulta);-;;;Dragon Ball;Terrestre;-;-;Chichi (adulta);;;;;;;;
+﻿nome;possibile starter;prezzo;tier;saga;razza;negoziante;cattivo;persona;barre;potenza;velocità;gigante;mossa 1;mossa 2;mossa finale;si trasforma in;cura trasformandosi
+Son Goku (inizio);sì;;C+;Saiyan;Saiyan;-;-;Son Goku (inizio);4;3;3;-;Kamehameha (onda);Kaio-ken Attack (impeto);Spirit Bomb (onda);;
+Son Goku (metà);-;1200;B+;Freezer;Saiyan;-;-;Son Goku (metà);4;3;3;-;x20 Kaio-ken Kamehameha (onda);Meteor Combination (impeto);Spirit Bomb (onda);Son Goku (metà) SSJ;
+Son Goku (metà) SSJ;-;1600;A;Freezer;Saiyan;-;-;Son Goku (metà);4;3;3;-;Super Kamehameha (onda);Meteor Smash (impeto);Angry Kamehameha (onda);;
+Son Goku (fine);-;1600;A;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Kamehameha (onda);Meteor Smash (impeto);Super Spirit Bomb (onda);Son Goku (fine) SSJ;
+Son Goku (fine) SSJ;-;1800;A+;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Super Kamehameha (onda);Super Energy Wave Volley (impeto);Instant Kamehameha (onda);Son Goku (fine) SSJ2;
+Son Goku (fine) SSJ2;-;2500;S;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Kamehameha (onda);Meteor Crash (impeto);Super Kamehameha (onda);Son Goku (fine) SSJ3;
+Son Goku (fine) SSJ3;-;2700;S+;Majin Bu;Saiyan;-;-;Son Goku (fine);4;3;3;-;Super Kamehameha (onda);Super Explosive Wave (onda);Dragon Fist (impeto, giganti);;
+Son Goku (GT);-;1200;B+;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Kamehameha (onda);Dragon Fist (impeto, giganti);Spirit Bomb (onda);Son Goku (GT) SSJ;
+Son Goku (GT) SSJ;-;1800;A+;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Super Kamehameha (onda);Full Power Energy Blast Volley (impeto);Super Explosive Wave (onda);Son Goku (GT) SSJ3;
+Son Goku (GT) SSJ3;-;2500;S;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;Super Kamehameha (onda);Full Power Energy Blast Volley (onda);Dragon Fist (impeto, giganti);Son Goku SSJ4;
+Son Goku SSJ4;-;3600;SS;GT;Saiyan;-;-;Son Goku (GT);4;3;3;-;10x Kamehameha (onda);Meteor Crash (impeto);Dragon Fist (impeto, giganti);;
+Son Goku (bambino);sì;;C;Dragon Ball;Saiyan;-;-;Son Goku (bambino);3;2;4;-;Kamehameha (onda);Counterattack! (impeto);Penetrate! (impeto, giganti);Son Goku (bambino) Oozaru;
+Son Goku (bambino) Oozaru;-;1400;A-;Dragon Ball;Saiyan;-;-;Son Goku (bambino);5;5;1;sì;Chou Makouhou (onda);Gigant Rock Throw (onda);Chou Makouhou Barrage (onda);;
+Son Gohan (bambino);sì;;C;Saiyan;Ibrido Saiyan-terrestre;-;-;Son Gohan (bambino);3;2;4;-;Masenko (onda);Gekiretsu Madan (onda);Bakuretsu Ranma (impeto);;
+Son Gohan (ragazzo);-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Masenko (onda);Gekiretsu Madan (onda);Super Kamehameha (onda);Son Gohan (ragazzo) SSJ;
+Son Gohan (ragazzo) SSJ;-;1800;A+;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Masenko (onda);Chou Maretsugeki (impeto);Super Kamehameha (onda);Son Gohan (ragazzo) SSJ2;
+Son Gohan (ragazzo) SSJ2;-;2500;S;Cell;Ibrido Saiyan-terrestre;-;-;Son Gohan (ragazzo);4;3;3;-;Super Kamehameha (onda);Gekiretsu Madan (onda);Father-Son Kamehameha (onda);;
+Son Gohan;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Explosive Madan (onda);Full Power Energy Blast Volley (onda);Super Kamehameha (onda);Son Gohan SSJ;
+Son Gohan SSJ;-;1800;A+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Explosive Madan (onda);Full Power Energy Blast Volley (onda);Bros. Kamehameha (onda);Son Gohan SSJ2;
+Son Gohan SSJ2;-;2500;S;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan;4;3;3;-;Super Explosive Madan (onda);Full Power Energy Barrage Wave (onda);Super Kamehameha (onda);;
+Great Saiyaman;-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Great Saiyaman;4;3;3;-;Super Explosive Wave (onda);Justice Slash (impeto);Justice Judgment (impeto);;
+Son Gohan (Ultimate);-;2700;S+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Gohan (Ultimate);4;3;3;-;Super Kamehameha (onda);Super Explosive Wave (onda);Burst Rush (impeto);;
+Son Gohan (futuro);-;1200;B+;Film e speciali;Ibrido Saiyan-terrestre;-;-;Son Gohan (futuro);4;3;3;-;Masenko (onda);Super Explosive Wave (onda);Super Kamehameha (onda);Son Gohan (futuro) SSJ;
+Son Gohan (futuro) SSJ;-;1600;A;Film e speciali;Ibrido Saiyan-terrestre;-;-;Son Gohan (futuro);4;3;3;-;Gekiretsu Madan (onda);Special Beam Cannon (onda);Gekiretsu Ranbu (impeto);;
+Son Goten;-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Goten;3;2;4;-;Full Power Energy Blast Volley (onda);Assault! (impeto);Super Kamehameha (onda);Son Goten SSJ;
+Son Goten SSJ;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Son Goten;3;2;4;-;Kamehameha (onda);Assault! (impeto);Bros. Kamehameha (onda);;
+Vegeta (scouter);-;1100;B;Saiyan;Saiyan;-;sì;Vegeta (scouter);4;3;3;-;Galick Gun (onda);Final Galick Cannon (impeto);Dirty Fireworks (impeto);Vegeta (scouter) Oozaru;
+Vegeta (scouter) Oozaru;-;1600;A;Saiyan;Saiyan;-;sì;Vegeta (scouter);5;5;1;sì;Chou Makouhou (onda);Chou Makouhou Barrage (onda);Super Galick Gun (onda);;
+Vegeta;-;1200;B+;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Galick Gun (onda);Super Energy Wave Volley (onda);Super Explosive Wave (onda);Vegeta SSJ;
+Vegeta SSJ;-;1600;A;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Maximum Flasher (onda);Amazing Impact (impeto);Big Bang Attack (onda);Super Vegeta;
+Super Vegeta;-;1800;A+;Cell;Saiyan;-;-;Vegeta;4;3;3;-;Big Bang Attack (onda);Spirit Breaking Cannon (impeto);Final Flash (onda);;
+Vegeta (seconda forma);-;1600;A;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Galick Gun (onda);Super Energy Wave Volley (onda);Big Bang Attack (onda);Vegeta (seconda forma) SSJ;
+Vegeta (seconda forma) SSJ;-;1800;A+;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Final Flash (onda);Super Energy Wave Volley (onda);Super Explosive Wave (onda);Vegeta (seconda forma) SSJ2;
+Vegeta (seconda forma) SSJ2;-;2500;S;Majin Bu;Saiyan;-;-;Vegeta (seconda forma);4;3;3;-;Big Bang Attack (onda);Super Energy Wave Volley (onda);Final Flash (onda);;
+Majin Vegeta;-;2500;S;Majin Bu;Saiyan;-;sì;Majin Vegeta;4;3;3;-;Final Impact (onda);Big Bang Attack (onda);Final Explosion (onda);;
+Vegeta SSJ4;-;3600;SS;GT;Saiyan;-;-;Vegeta SSJ4;4;3;3;-;Final Flash (onda);Spirit Breaking Cannon (impeto);Final Shine Attack (onda);;
+Trunks (spada);-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks (spada);4;3;3;-;Finish Buster (onda);Burning Storm (onda);Lightning Sword Slash (onda);Trunks (spada) SSJ;
+Trunks (spada) SSJ;-;1600;A;Cell;Ibrido Saiyan-terrestre;-;-;Trunks (spada);4;3;3;-;Burning Attack (onda);Burning Storm (onda);Shining Sword Attack (impeto);;
+Trunks;-;1200;B+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;3;3;-;Burning Attack (onda);High Speed Rush (impeto);Finish Buster (onda);Trunks SSJ;
+Trunks SSJ;-;1600;A;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;3;3;-;Burning Attack (onda);Burning Breaker (impeto);Heat Dome Attack (impeto, giganti);Super Trunks;
+Super Trunks;-;1800;A+;Cell;Ibrido Saiyan-terrestre;-;-;Trunks;4;4;2;-;Finish Buster (onda);Burning Attack (onda);Super Explosive Wave (onda);;
+Trunks (bambino);-;1100;B;Majin Bu;Ibrido Saiyan-terrestre;-;-;Trunks (bambino);3;2;4;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Finish Buster (onda);Trunks (bambino) SSJ;
+Trunks (bambino) SSJ;-;1600;A;Majin Bu;Ibrido Saiyan-terrestre;-;-;Trunks (bambino);3;2;4;-;Full Power Energy Barrage Wave (onda);High Speed Rush (impeto);Big Tree Cannon (onda);;
+Gotenks;-;1800;A+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Big Tree Cannon (onda);Gotenks SSJ;
+Gotenks SSJ;-;2200;S-;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Big Tree Cannon (onda);Galactic Donuts (onda);Super Ghost Kamikaze Attack (onda);Gotenks SSJ3;
+Gotenks SSJ3;-;2700;S+;Majin Bu;Ibrido Saiyan-terrestre;-;-;Gotenks;4;3;3;-;Big Tree Cannon (onda);DIE DIE Missile Barrage (onda);Charging Ultra Buu Buu Volleyball (impeto);;
+Vegetto;-;3200;SS-;Majin Bu;Saiyan;-;-;Vegetto;5;3;3;-;Big Bang Attack (onda);Scatter Finger Beam (onda);Super Kamehameha (onda);Super Vegetto;
+Super Vegetto;-;3900;SS+;Majin Bu;Saiyan;-;-;Vegetto;5;3;3;-;Super Kamehameha (onda);Beam Sword Slash (impeto);Final Kamehameha (onda);;
+Super Gogeta;-;3900;SS+;Film e speciali;Saiyan;-;-;Super Gogeta;5;3;3;-;Big Bang Kamehameha (onda);Super Explosive Wave (onda);Stardust Breaker (impeto);;
+Gogeta SSJ4;-;3900;SS+;GT;Saiyan;-;-;Gogeta SSJ4;5;3;3;-;Big Bang Kamehameha (onda);Ultimate Impact (impeto);100x Big Bang Kamehameha (onda);;
+Piccolo (inizio);sì;;C+;Saiyan;Namecciano;-;-;Piccolo (inizio);4;3;3;-;Explosive Demon Wave (onda);Bakuretsu Mahoko (impeto);Special Beam Cannon (onda);;
+Piccolo (fine);-;1600;A;Cell;Namecciano;-;-;Piccolo (fine);4;3;3;-;Special Beam Cannon (onda);Light Grenade (onda);Hellzone Grenade (onda);;
+Krilin;sì;;C;Saiyan;Terrestre;-;-;Krilin;4;3;3;-;Kamehameha (onda);Expanding Energy Wave (onda);Destructo Disc (onda);;
+Yamcha;sì;;C;Saiyan;Terrestre;-;-;Yamcha;4;3;3;-;Kamehameha (onda);Wolf Fang Fist (impeto);Soukidan (onda);;
+Tenshinhan;sì;;C+;Saiyan;Terrestre;-;-;Tenshinhan;4;3;3;-;Dodon Ray (onda);Ki Blast Cannon (onda);Neo Tri-Beam (onda);;
+Jiaozi;-;;D+;Saiyan;Terrestre;-;-;Jiaozi;3;2;4;-;Dodon Ray (onda);Psychic Rock Throw (impeto);Farewell, Mr. Tien (onda);;
+Yajirobe;-;;D+;Saiyan;Terrestre;-;-;Yajirobe;4;3;3;-;Ka-Blam Slicer (onda);Flash and Kill (impeto);Miracle Ka-Blam Slash (impeto, giganti);;
+Muten Roshi;-;;D+;Dragon Ball;Terrestre;sì;-;Muten Roshi;4;3;3;-;The Original Kamehameha (onda);High Speed Rush (impeto);Mankoku Kyoutenshou (onda);Muten Roshi (massima potenza);
+Muten Roshi (massima potenza);-;1600;A;Dragon Ball;Terrestre;-;-;Muten Roshi;4;3;3;-;The Original Kamehameha (onda);Turtle School Ultimate Fist (impeto);MAX Power Kamehameha (onda);;
+Videl;-;;C-;Majin Bu;Terrestre;-;-;Videl;4;3;3;-;High Speed Rush (impeto);Desperado Rush (impeto);Videl Rush (impeto);Great Saiyaman 2-go;
+Great Saiyaman 2-go;sì;;C;Majin Bu;Terrestre;-;-;Videl;4;3;3;-;Justice Countdown (impeto);Justice Rush 2 (impeto);Justice Judgment (impeto);;
+Mr. Satan;-;;E;Cell;Terrestre;-;-;Mr. Satan;4;3;3;-;Dynamic Mess Em Up Punch (impeto);Present Bomb (onda);Mister Buu Arrives! (impeto);;
+Kaioshin;-;1200;B+;Majin Bu;Kaioshin;-;-;Kaioshin;4;3;3;-;Energy's Last (onda);Crazy Rush (impeto);Gekiretsu Shin'ou'hou (onda);Kibitoshin;
+Kibitoshin;-;1600;A;Majin Bu;Kaioshin;-;-;Kaioshin;4;3;3;-;Full Power Energy Wave (onda);Crazy Combination (impeto);Shin Gekiretsu Shin'ou'hou (onda);;
+Uub;-;1600;A;Majin Bu;Terrestre;-;-;Uub;4;3;3;-;Super Kamehameha (onda);Blazing Barrage Palm (impeto);Super Explosive Wave (onda);Super Uub;
+Super Uub;-;2200;S-;GT;Terrestre;-;-;Uub;4;3;3;-;Super Energy Wave Volley (onda);Chocolate Beam (onda);Lightning Arrow (onda);;
+Pan;-;1100;B;GT;Ibrido Saiyan-terrestre;-;-;Pan;3;2;4;-;Kamehameha (onda);Gill Missile (impeto);Maiden's Rage! (impeto);;
+Nail;-;1100;B;Freezer;Namecciano;-;-;Nail;4;3;3;-;Full Power Energy Wave (onda);Super Explosive Wave (onda);Mystic Flasher (impeto);;
+Bardock;sì;1000;B-;Film e speciali;Saiyan;-;-;Bardock;4;3;3;-;Full Power Energy Wave (onda);Final Revenger (impeto);Final Spirit Cannon (onda);Bardock Oozaru;
+Bardock Oozaru;-;1400;A-;Film e speciali;Saiyan;-;-;Bardock;5;5;1;sì;Chou Makouhou (onda);Super Explosive Wave (onda);Giga Meteor Storm (onda);;
+Selypa;sì;;C;Film e speciali;Saiyan;-;-;Selypa;4;3;3;-;Full Power Energy Wave (onda);Energy Ballet (onda);Hysteric Saiyan Lady (impeto);Selypa Oozaru;
+Selypa Oozaru;-;1400;A-;Film e speciali;Saiyan;-;-;Selypa;5;5;1;sì;Chou Makouhou Barrage (impeto);Gigant Rock Throw (onda);Gigantic Saiyan Lady (impeto);;
+Re Vegeta;sì;1000;B-;Saiyan;Saiyan;-;-;Re Vegeta;4;3;3;-;Execution Beam (onda);Super Energy Wave Volley (onda);Orga Blaster (impeto);Re Vegeta Oozaru;
+Re Vegeta Oozaru;-;1400;A-;Saiyan;Saiyan;-;-;Re Vegeta;5;5;1;sì;Super Galick Gun (onda);Super Explosive Wave (onda);Chou Makouhou Barrage (onda);;
+Raditz;sì;;C+;Saiyan;Saiyan;-;sì;Raditz;4;3;3;-;Here's a present! (onda);I'm A Top-class Warrior! (impeto);Begone! (onda);Raditz Oozaru;
+Raditz Oozaru;-;1400;A-;Saiyan;Saiyan;-;sì;Raditz;5;5;1;sì;Chou Makouhou (onda);Gigant Rock Throw (onda);Chou Makousen (onda);;
+Nappa;-;1400;A-;Saiyan;Saiyan;-;sì;Nappa;4;3;3;-;Volcano Explosion (onda);Blazing Storm (impeto);Kapa (onda);Nappa Oozaru;
+Nappa Oozaru;-;1400;A-;Saiyan;Saiyan;-;sì;Nappa;5;5;1;sì;Gigant Rock Throw (onda);Super Explosive Wave (onda);Chou Makouhou (onda);;
+Saibaiman;-;;D;Saiyan;Saibaiman;-;sì;Saibaiman;3;3;3;-;Full Power Energy Wave (onda);High Speed Rush (impeto);Saibaman Bomb (impeto);;
+Zarbon;sì;;C+;Freezer;Alieno;-;sì;Zarbon;4;3;3;-;Shooting Star Arrow (onda);Bloody Dance (impeto);Elegant Blaster (onda);Zarbon (trasformato);
+Zarbon (trasformato);sì;1000;B-;Freezer;Alieno;-;sì;Zarbon;4;3;3;-;Elegant Blaster (onda);Wild Pressure (impeto);Monster Crush (impeto);;
+Dodoria;sì;;C+;Freezer;Alieno;-;sì;Dodoria;4;3;3;-;Chou Makouhou (onda);Dodoria Head Breaker (impeto);Maximum Buster (onda);;
+Kyui;sì;;C;Freezer;Alieno;-;sì;Kyui;4;3;3;-;Full Power Energy Wave (onda);Full Power Energy Barrage Wave (impeto);Ah! Lord Frieza! (impeto);;
+Appule;-;;D;Freezer;Alieno;-;sì;Appule;4;3;3;-;Energy Wave (onda);High Speed Rush (impeto);Full Power Energy Ball (onda);;
+Soldato di Freeza;-;;D;Freezer;Alieno;-;sì;Soldato di Freeza;4;3;3;-;Energy Wave (onda);Energy Wave (onda);Life-Risking Blow! (impeto);;
+Ginyu;-;1200;B+;Freezer;Alieno;-;sì;Ginyu;4;3;3;-;Full Power Energy Wave (onda);Galaxy Dynamite (onda);Body Change (impeto, giganti);;
+Recoome;-;1100;B;Freezer;Alieno;-;sì;Recoome;4;4;2;-;Recoome Eraser Gun (onda);Recoome Renegade Bomber (onda);Recoome Fighting Bomber (onda);;
+Butter;-;1800;A+;Freezer;Alieno;-;sì;Butter;4;1;5;-;Space Mach Attack (impeto);Full Power Energy Ball (onda);Purple Comet Attack (impeto);;
+Jeeth;-;1400;A-;Freezer;Alieno;-;sì;Jeeth;4;3;3;-;Full Power Energy Wave (onda);Crusher Ball (onda);Purple Comet Attack (impeto);;
+Guldo;sì;;C;Freezer;Alieno;-;sì;Guldo;3;2;4;-;Psychic Rock Throw (impeto);Full Power Energy Blast Volley (onda);Guldo Special (impeto);;
+Freeza (prima forma);-;1100;B;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Beam (onda);Punishing Rush (impeto);Death Ball (onda);Freeza (seconda forma);
+Freeza (seconda forma);-;1200;B+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Punishing Blaster (onda);Death Storm (onda);HAIL Frieza (impeto);Freeza (terza forma);
+Freeza (terza forma);-;1200;B+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Beam (onda);High Speed Rush (impeto);Crazy Finger Beam (onda);Freeza (forma finale);
+Freeza (forma finale);-;2700;S+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Barrage Death Beam (onda);I Might Die This Time. (onda);Destroy The Planet! (onda);Freeza (massima potenza);
+Freeza (massima potenza);-;2700;S+;Freezer;Razza di Freezer;-;sì;Freeza (prima forma);4;3;3;-;Death Saucer (onda);Nova Strike (impeto);You Will Die By My Hand! (onda);;
+Mecha Freeza;-;1600;A;Cell;Cyborg;-;sì;Mecha Freeza;4;3;3;-;Death Beam (onda);Fissure Slash (onda);Supernova (onda);;
+Re Cold;-;1600;A;Cell;Razza di Freezer;-;sì;Re Cold;4;3;3;-;Full Power Death Beam (onda);Super Explosive Wave (onda);Cold Family Power (impeto);;
+C-16;-;1600;A;Cell;Androide;-;-;C-16;4;3;3;-;Hell's Impact (impeto);Hell's Flash (impeto);Self Destruct Device (impeto);;
+C-17;-;1600;A;Cell;Androide;-;sì;C-17;4;3;3;-;Full Power Energy Ball (onda);Photon Flash (onda);Sadistic Dance (impeto);;
+C-18;-;1800;A+;Cell;Androide;-;sì;C-18;4;3;3;-;Infinity Bullet (onda);Destructo Disc (onda);Sadistic 18 (impeto);;
+C-19;-;3200;SS-;Cell;Androide;-;sì;C-19;4;3;3;-;Full Power Energy Wave (onda);High Power Rush (impeto);Drain Life 19 (impeto, risucchio);;
+Dr. Gero (C-20);-;3200;SS-;Cell;Androide;-;sì;Dr. Gero (C-20);4;3;3;-;Full Power Energy Wave (onda);Bionic Punisher (onda);Drain Life 20 (impeto, risucchio);;
+Cell (prima forma);-;2500;S;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Kamehameha (onda);Special Beam Cannon (onda);Drain Life Cell (impeto, risucchio);Cell (seconda forma);
+Cell (seconda forma);-;2500;S;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Big Bang Crash (onda);Drain Life Cell (impeto, risucchio);Unforgivable! (impeto);Cell (forma perfetta);2500
+Cell (forma perfetta);-;1800;A+;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Super Kamehameha (onda);Barrage Death Beam (onda);Perfect Barrier (onda);Cell (perfetto, massima potenza);2500
+Cell (perfetto, massima potenza);-;3600;SS;Cell;Bio-androide;-;sì;Cell (prima forma);4;3;3;-;Full Power Death Beam (onda);Perfect Combination (impeto);Solar Kamehameha (onda);;
+Cell Jr.;-;1100;B;Cell;Bio-androide;-;sì;Cell Jr.;3;2;4;-;Special Beam Cannon (onda);Innocence Rush (impeto);Super Kamehameha (onda);;
+Majin Buu (buono);-;1800;A+;Majin Bu;Majin;-;-;Majin Buu (buono);4;3;3;-;Flame Shower Breath (onda);Super Kamehameha (onda);Angry Explosion (onda);;
+Majin Buu (puro male);-;1800;A+;Majin Bu;Majin;-;sì;Majin Buu (puro male);4;3;3;-;Super Kamehameha (onda);Flame Shower Breath (onda);Super Explosive Wave (onda);;
+Super Buu;-;2500;S;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Genocide Blast (onda);Chocolate Beam (onda);Revenge Death Bomber (onda);Super Buu (Gotenks assorbito);
+Super Buu (Gotenks assorbito);-;2700;S+;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Galactic Donut Volley (onda);Special Beam Cannon (onda);Super Kamehameha (onda);Super Buu (Son Gohan assorbito);
+Super Buu (Son Gohan assorbito);-;3600;SS;Majin Bu;Majin;-;sì;Super Buu;4;3;3;-;Super Kamehameha (onda);Chocolate Beam (onda);Super Ghost Buu Attack (onda);;
+Majin Buu (puro);-;3600;SS;Majin Bu;Majin;-;sì;Majin Buu (puro);4;3;3;-;Super Kamehameha (onda);Mystic Combination (impeto);Planet Burst (onda);;
+Dabura;-;1800;A+;Majin Bu;Demone;-;sì;Dabura;4;3;3;-;Evil Impulse (onda);Evil Flame (onda);Darkness Sword Attack (impeto);;
+Bobbidi;-;;D-;Majin Bu;Alieno;-;sì;Bobbidi;3;2;4;-;Pui Pui Nice Shot (impeto);Yakon Is Next! (impeto);Babidi's Ultimate Power (onda);;
+Spopovitch;sì;;C;Majin Bu;Terrestre;-;sì;Spopovitch;4;3;3;-;Berserker Crash (impeto);Mad Banquet (impeto);Majin Buu Resurrection (impeto);;
+Paikuhan;-;2700;S+;Film e speciali;Alieno;-;-;Paikuhan;4;3;3;-;Hyper Tornado (impeto);Burning Shoot (impeto);Thunder Flash (onda);;
+Garlic Jr.;sì;;C;Film e speciali;Demone;-;sì;Garlic Jr.;4;3;3;-;Darkness Eye Beam (onda);High Speed Rush (impeto);Full Power Energy Ball (onda);Super Garlic Jr.;
+Super Garlic Jr.;-;1100;B;Film e speciali;Demone;-;sì;Garlic Jr.;4;4;2;-;Death Impact (onda);Darkness Illusion (impeto);Dead Zone (onda);;
+Dr. Uiro;-;1100;B;Film e speciali;Terrestre (cyborg);-;sì;Dr. Uiro;4;3;3;-;Photon Strike (onda);Gigantic Bomber (impeto);Planet Geyser (onda);;
+Turles;-;1100;B;Film e speciali;Saiyan;-;sì;Turles;4;3;3;-;Kill Driver (onda);Full Power Energy Barrage Wave (onda);Meteor Burst (impeto);Turles Oozaru;
+Turles Oozaru;-;1400;A-;Film e speciali;Saiyan;-;sì;Turles;5;5;1;sì;Chou Makouhou (onda);Chou Makouhou Barrage (onda);Chou Makousen (onda);;
+Slug;-;1400;A-;Film e speciali;Namecciano;-;sì;Slug;4;3;3;-;Finger Beam (onda);Darkness Eye Beam (onda);Power of Darkness (impeto);Slug (gigante);
+Slug (gigante);-;2200;S-;Film e speciali;Namecciano;-;sì;Slug;5;5;1;sì;Darkness Eye Beam (onda);Super Explosive Wave (onda);Darkness Blaster (onda);;
+Sauzer;sì;1000;B-;Film e speciali;Alieno;-;sì;Sauzer;4;3;3;-;Full Power Energy Wave (onda);Scatter Finger Beam (onda);Salza Blade Rush (impeto);;
+Cooler;-;1600;A;Film e speciali;Razza di Freezer;-;sì;Cooler;4;3;3;-;Full Power Energy Wave (onda);Darkness Eye Beam (onda);Death Ball (onda);Cooler (forma finale);
+Cooler (forma finale);-;2200;S-;Film e speciali;Razza di Freezer;-;sì;Cooler;4;3;3;-;Death Beam (onda);Death Chaser (impeto);Supernova (onda);;
+Metal Cooler;-;2200;S-;Film e speciali;Cyborg;-;sì;Metal Cooler;4;3;3;-;Lock-On Buster (onda);Finger Blitz Barrage (onda);Supernova (onda);;
+C-13;-;1600;A;Film e speciali;Androide;-;sì;C-13;4;3;3;-;Full Power Energy Wave (onda);Silent Assassin 13 (impeto);S.S. Deadly Bomber (onda);Super C-13;
+Super C-13;-;2200;S-;Film e speciali;Androide;-;sì;C-13;4;3;3;-;S.S. Deadly Bomber (onda);Super Explosive Wave (onda);S.S. Deadly Hammer (impeto);;
+Broli;-;1800;A+;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Full Power Energy Wave (onda);Bloody Smash (impeto);Eraser Cannon (onda);Broli SSJ;
+Broli SSJ;-;2500;S;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Eraser Cannon (onda);Trap Shooter (onda);Super Explosive Wave (onda);Broli Super Saiyan Leggendario;
+Broli Super Saiyan Leggendario;-;3600;SS;Film e speciali;Saiyan;-;sì;Broli;5;4;2;-;Eraser Cannon (onda);Gigantic Hammer (impeto);Omega Blaster (onda);;
+Zangya;-;1100;B;Film e speciali;Alieno;-;sì;Zangya;4;3;3;-;Shoot Blaster (onda);Trap Shooter (impeto);Sky Zapper (impeto);;
+Bojack;-;1600;A;Film e speciali;Alieno;-;sì;Bojack;4;3;3;-;Full Power Energy Ball (onda);Trap Shooter (onda);Grand Smasher (onda);Bojack (massima potenza);
+Bojack (massima potenza);-;2200;S-;Film e speciali;Alieno;-;sì;Bojack;4;3;3;-;Grand Smasher (onda);Galactic Tyrant (impeto);Galactic Buster (onda);;
+Janemba;-;2500;S;Film e speciali;Demone;-;sì;Janemba;4;3;3;-;Chou Makouhou (onda);Rapid Cannon (onda);Illusion Smash (impeto);Super Janemba;
+Super Janemba;-;3600;SS;Film e speciali;Demone;-;sì;Janemba;4;3;3;-;Chou Makouhou (onda);Lightning Shower Rain (impeto);Dimension Sword Attack (impeto);;
+Hildegarn;-;3900;SS+;Film e speciali;Mostro;-;sì;Hildegarn;5;5;1;sì;Chou Makousen (onda);Super Explosive Wave (onda);Gigantic Flame (onda);;
+Tapion;-;2200;S-;Film e speciali;Alieno;-;-;Tapion;4;3;3;-;Brave Cannon (onda);Brave Slash (onda);Brave Sword Attack (impeto, giganti);;
+Baby Vegeta;-;1800;A+;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Galick Gun (onda);Finger Blitz Barrage (onda);Final Flash (onda);Super Baby 1;
+Super Baby 1;-;2500;S;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Galick Gun (onda);Finger Blitz Barrage (onda);Final Flash (onda);Super Baby 2;
+Super Baby 2;-;2700;S+;GT;Tsufuru;-;sì;Baby Vegeta;4;3;3;-;Final Flash (onda);Full Power Energy Blast Volley (onda);Revenge Death Ball (onda);Baby Oozaru;
+Baby Oozaru;-;3200;SS-;GT;Tsufuru;-;sì;Baby Vegeta;5;5;1;sì;Super Galick Gun (onda);Gigantic Flame (onda);Revenge Death Ball Final (onda);;
+Super C-17;-;2700;S+;GT;Androide;-;sì;Super C-17;4;3;3;-;Full Power Energy Wave (onda);Hell's Storm (onda);Shocking Death Ball (onda);;
+Su Shenron;-;2500;S;GT;Drago malvagio;-;sì;Su Shenron;4;3;3;-;Burst Attack (onda);Burning Tornado (impeto);Blaster Meteor (onda);;
+Ii Shenron;-;2700;S+;GT;Drago malvagio;-;sì;Ii Shenron;4;3;3;-;Trap Shooter (onda);Blazing Storm (onda);Gigantic Blaze (onda);Super Ii Shenron;
+Super Ii Shenron;-;3900;SS+;GT;Drago malvagio;-;sì;Ii Shenron;4;3;3;-;Gigantic Blaze (onda);Dragon Thunder (impeto);Minus Energy Power Ball (onda);;
+Son Gohan (nonno);-;;D+;Dragon Ball;Terrestre;sì;-;Son Gohan (nonno);4;3;3;-;Kamehameha (onda);Turtle School Four Virtues (impeto);Turtle School Tranquility (impeto);;
+Tao Pai Pai;sì;;C;Dragon Ball;Terrestre;-;sì;Tao Pai Pai;4;3;3;-;The Original Dodon-Pa (onda);Crane Style Assassin Strike (impeto);Ultimate Final Plan (impeto);;
+Tao Pai Pai (cyborg);sì;;C+;Dragon Ball;Terrestre (cyborg);-;sì;Tao Pai Pai (cyborg);4;3;3;-;Dodon Ray (onda);Hidden Blade (impeto);Super Dodon Wave (onda);;
+Piccolo Daimao;sì;;C+;Dragon Ball;Namecciano;-;sì;Piccolo Daimao;4;3;3;-;Soumasen (onda);Your name is Drum (impeto);Explosive Demon Wave (onda);;
+Tambourine;sì;;C;Dragon Ball;Namecciano;-;sì;Tambourine;4;3;3;-;Chou Makouhou (onda);Soumasen (onda);Super Marengeki (impeto);;
+C-8;-;;C-;Dragon Ball;Androide;-;-;C-8;4;3;3;-;Eighter Attack (impeto);Eighter's Anger (onda);You Hurt Goku! (impeto);;
+Generale Blue;-;;E;Dragon Ball;Terrestre;-;sì;Generale Blue;4;3;3;-;I'll Shoot You! (onda);Skewer! (impeto);Rocket Engine Spark (impeto);;
+Namu;-;;D+;Dragon Ball;Terrestre;-;-;Namu;4;3;3;-;Shura Gekiretsuken (impeto);Cross Arm Attack (impeto);Cross Arm Dive (impeto);;
+Akkuman;-;;D;Dragon Ball;Demone;-;-;Akkuman;4;3;3;-;Fork Attack (onda);Demon Fork Rush (impeto);Devilmite Beam (onda);;
+Chichi (bambina);-;;D-;Dragon Ball;Terrestre;-;-;Chichi (bambina);3;2;4;-;Stay Away From Me! (impeto);That Won't Work (onda);Save Goku! (impeto);;
+Robot di Pilaf;-;;D;Dragon Ball;Robot;-;sì;Robot di Pilaf;4;3;3;-;Gigant Rock Throw (onda);Rolling Smash (impeto);Great Pilaf Operation (impeto);Robot di Pilaf (combinato);
+Robot di Pilaf (combinato);-;;C-;Dragon Ball;Robot;-;sì;Robot di Pilaf;5;5;1;sì;Double Buster (onda);Gatling Gun (impeto);Launch Missiles! (onda);;
+Arale;-;3600;SS;Extra;Androide;-;-;Arale;4;3;3;-;Woohoo! (onda);Ping! (impeto, giganti);Playing Pro-Wrestling (impeto, giganti);;
+Kami;-;;;Dragon Ball;Namecciano;sì;-;Kami;;;;;;;;;
+Karin;-;;;Dragon Ball;Gatto;sì;-;Karin;;;;;;;;;
+Bulma;-;;;Dragon Ball;Terrestre;sì;-;Bulma;;;;;;;;;
+Baba la Veggente;-;;;Dragon Ball;Terrestre;sì;-;Baba la Veggente;;;;;;;;;
+Chichi (adulta);-;;;Dragon Ball;Terrestre;-;-;Chichi (adulta);;;;;;;;;

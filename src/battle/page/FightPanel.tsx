@@ -2,6 +2,7 @@ import { BAR_HP, SIDES, type FightRecord, type FightSettings, type Side } from '
 import {
   afterNextExchange,
   describeStep,
+  DRAIN_SHOUT,
   fighterAt,
   formatHp,
   SIDE_NAMES,
@@ -35,6 +36,21 @@ function formText(form: number): string {
   }
   const change = Math.round(Math.abs(form - 1) * 100);
   return form > 1 ? `giornata buona (+${change}%)` : `giornata storta (−${change}%)`;
+}
+
+/** A log line with «CIUCCIAAAAA» in red, as on the stream (spec 073, 2.6). */
+function withShout(text: string) {
+  const at = text.indexOf(DRAIN_SHOUT);
+  if (at === -1) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, at)}
+      <span className={styles.shout}>{DRAIN_SHOUT}</span>
+      {text.slice(at + DRAIN_SHOUT.length)}
+    </>
+  );
 }
 
 /** One fight told step by step (2.10): who is on the field, health, switch gauges and the log. */
@@ -87,7 +103,7 @@ export function FightPanel(props: FightPanelProps) {
         </span>
       </div>
 
-      <p className={styles.banner}>{shown > 0 ? describeStep(record, shown - 1, names) : 'Si comincia!'}</p>
+      <p className={styles.banner}>{shown > 0 ? withShout(describeStep(record, shown - 1, names)) : 'Si comincia!'}</p>
 
       {SIDES.map((side: Side) => (
         <div key={side} className={`${styles.board} ${styles[side]}`}>
@@ -141,7 +157,7 @@ export function FightPanel(props: FightPanelProps) {
       <ol className={styles.log}>
         {log.map((line, index) => (
           <li key={log.length - index}>
-            <span className={styles.exchange}>{line.exchange}</span> {line.text}
+            <span className={styles.exchange}>{line.exchange}</span> {withShout(line.text)}
           </li>
         ))}
       </ol>

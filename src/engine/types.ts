@@ -48,6 +48,8 @@ export interface FightMove {
   kind: 'wave' | 'rush';
   /** A rush that works on giants all the same, as in BT3 (D-057). */
   hitsGiants?: boolean;
+  /** Who lands it drains part of the damage into their own health (spec 073, D-098). */
+  drains?: boolean;
 }
 
 /** The columns of the sheet in the character list (spec 037, 2.2): each one missing takes the normal value. */
@@ -64,6 +66,8 @@ export interface FightSheet {
   finale?: FightMove;
   /** The code of the next form, a character of the list with a tier (spec 037, 2.3). */
   transformsInto?: string;
+  /** HP won back by who transforms into this form (spec 073, D-098). */
+  transformHeal?: number;
 }
 
 /**

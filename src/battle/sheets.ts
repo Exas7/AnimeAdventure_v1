@@ -23,6 +23,8 @@ export interface Sheet {
   moves: readonly [Move, Move];
   /** The Ultimate Blast of BT3. */
   finale: Move;
+  /** HP won back by who transforms into this form (spec 073, 2.4); missing: none. */
+  transformHeal?: number;
 }
 
 /** Everyone without a sheet of their own, and every empty column. */
@@ -51,5 +53,11 @@ export function sheetOf(character: Character): Sheet {
     giant: own.giant ?? NORMAL_SHEET.giant,
     moves: [own.move1 ?? NORMAL_SHEET.moves[0], own.move2 ?? NORMAL_SHEET.moves[1]],
     finale: own.finale ?? NORMAL_SHEET.finale,
+    ...(own.transformHeal ? { transformHeal: own.transformHeal } : {}),
   };
+}
+
+/** Who has a move that drains also grabs and drains with blows (spec 073, 2.2). */
+export function drainsWithGrab(sheet: Sheet): boolean {
+  return [...sheet.moves, sheet.finale].some((move) => move.drains);
 }

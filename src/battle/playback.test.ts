@@ -12,6 +12,7 @@ import {
   afterNextExchange,
   captionOf,
   describeStep,
+  drainOf,
   eventDuration,
   fightDuration,
   formatHp,
@@ -212,3 +213,49 @@ describe('telling a fight (spec 035, 2.9-2.11)', () => {
   });
 });
 
+
+describe('telling drains and cures (spec 073, 2.6)', () => {
+  const drainLife = { name: 'Drain Life', kind: 'rush', drains: true } as const;
+  const record = handMade([
+    {
+      event: { type: 'grab', exchange: 1, side: 'a', damage: 2_500, drained: 2_500 },
+      after: snapshot([40_000, 40_000], [37_500]),
+    },
+    {
+      event: { type: 'move', exchange: 2, side: 'b', move: drainLife, finale: true, outcome: 'hit', damage: 18_000, drained: 0 },
+      after: snapshot([22_000, 40_000], [37_500]),
+    },
+    {
+      event: { type: 'transform', exchange: 3, side: 'a', fighter: 0, healed: 2_500 },
+      after: snapshot([24_500, 40_000], [37_500], 0, [1, 0]),
+    },
+    {
+      event: { type: 'move', exchange: 4, side: 'b', move: galick, finale: false, outcome: 'hit', damage: 9_000 },
+      after: snapshot([15_500, 40_000], [37_500]),
+    },
+  ]);
+
+  it('the grab and the move that drains shout «CIUCCIAAAAA» with the HP won back', () => {
+    expect(describeStep(record, 0)).toBe('Goku afferra Vegeta: −2.500, CIUCCIAAAAA! +2.500 HP');
+    expect(describeStep(record, 1)).toBe(
+      'Vegeta, mossa finale: Drain Life! A segno: −18.000, CIUCCIAAAAA! la vita era già piena',
+    );
+    expect(captionOf(record, 0)).toEqual({ title: 'PRESA!', detail: 'Goku afferra Vegeta · −2.500, +2.500 HP' });
+    expect(drainOf(record.steps[0]?.event as FightEvent)).toEqual({ side: 'a', won: 2_500 });
+    expect(drainOf(record.steps[3]?.event as FightEvent)).toBeNull();
+  });
+
+  it('a cure of the transformation is told with its HP, without the shout', () => {
+    expect(describeStep(record, 2)).not.toContain('CIUCCIAAAAA');
+    expect(describeStep(record, 2)).toContain('(+2.500 HP)');
+    expect(captionOf(record, 2)?.detail).toContain('+2.500 HP');
+    expect(drainOf(record.steps[2]?.event as FightEvent)).toBeNull();
+  });
+
+  it('a drain stays a second longer on screen, so the shout can be read', () => {
+    const plain = record.steps[3]?.event as FightEvent;
+    const drained = { ...plain, drained: 1_000 } as FightEvent;
+    expect(eventDuration(drained)).toBe(eventDuration(plain) + 1000);
+    expect(eventDuration(record.steps[0]?.event as FightEvent)).toBe(1500);
+  });
+});

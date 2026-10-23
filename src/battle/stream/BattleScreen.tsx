@@ -3,6 +3,8 @@ import { Placeholder } from '../../ui/Placeholder';
 import { BAR_HP, otherSide, SIDES, type FightEvent, type FightSnapshot, type Fighter, type Side } from '../fight';
 import {
   captionOf,
+  DRAIN_SHOUT,
+  drainOf,
   eventDuration,
   fighterAt,
   formatHp,
@@ -47,9 +49,11 @@ export function BattleScreen({ view }: BattleScreenProps) {
   // Everyone in the form they have at this moment (spec 037, 2.3).
   const current = (side: Side) => record.teams[side].map((_, index) => fighterAt(record, snapshot, side, index));
   const onField = (side: Side) => fighterAt(record, snapshot, side, snapshot.active[side]);
+  // «CIUCCIAAAAA» once the drain has landed, for the rest of the event (spec 073, 2.6).
+  const drain = event ? drainOf(event) : null;
 
   return (
-    <div className={styles.scene} style={{ '--beat': `${beat}ms` } as CSSProperties}>
+    <div className={styles.scene} style={{ '--beat': `${beat}ms`, '--shout': `${beat - impact}ms` } as CSSProperties}>
       <div className={styles.hud}>
         {SIDES.map((side) => (
           <div key={side} className={`${styles.hudSide} ${styles[side]}`}>
@@ -87,6 +91,11 @@ export function BattleScreen({ view }: BattleScreenProps) {
             );
           })}
           <Effects key={shown} event={event} onField={onField} />
+          {drain && impacted && (
+            <span key={`shout-${shown}`} className={styles.shout}>
+              {DRAIN_SHOUT}
+            </span>
+          )}
         </div>
         <TeamList side="b" name={names.b} fighters={current('b')} snapshot={snapshot} />
       </div>
@@ -156,6 +165,8 @@ function impactShare(event: FightEvent): number {
   switch (event.type) {
     case 'blow':
       return 0.15;
+    case 'grab':
+      return 0.3;
     case 'move':
       return 0.45;
     case 'clash':
@@ -172,6 +183,7 @@ function motionOf(event: FightEvent | undefined, side: Side): string | undefined
   }
   switch (event.type) {
     case 'blow':
+    case 'grab':
       return event.side === side ? styles.lunge : styles.shake;
     case 'move': {
       if (event.side === side) {
@@ -212,15 +224,23 @@ interface EffectsProps {
   onField(side: Side): Fighter;
 }
 
-/** Energy waves, sparks and damage numbers between the two fighters. */
+/** Energy waves, sparks and damage numbers between the two fighters; the HP a drain wins back (spec 073). */
 function Effects({ event, onField }: EffectsProps) {
   if (!event) {
     return null;
   }
+  const drain = drainOf(event);
   const damage = (side: Side, amount: number, timing: 'early' | 'mid' | 'late') => (
-    <span className={`${styles.damage} ${styles[`on${side.toUpperCase()}`]} ${styles[timing]}`}>
-      −{formatHp(amount)}
-    </span>
+    <>
+      <span className={`${styles.damage} ${styles[`on${side.toUpperCase()}`]} ${styles[timing]}`}>
+        −{formatHp(amount)}
+      </span>
+      {drain && drain.won > 0 && (
+        <span className={`${styles.damage} ${styles.heal} ${styles[`on${drain.side.toUpperCase()}`]} ${styles[timing]}`}>
+          +{formatHp(drain.won)}
+        </span>
+      )}
+    </>
   );
   const wave = (from: Side, moveName: string, mode: 'reach' | 'fizzle' | 'pushWin' | 'pushLose') => (
     <EnergyWave key={from} look={waveLook(onField(from), moveName)} from={from} mode={mode} />
@@ -229,6 +249,8 @@ function Effects({ event, onField }: EffectsProps) {
   switch (event.type) {
     case 'blow':
       return damage(otherSide(event.side), event.damage, 'early');
+    case 'grab':
+      return damage(otherSide(event.side), event.damage, 'mid');
     case 'move':
       return (
         <>

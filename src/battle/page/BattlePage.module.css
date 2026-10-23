@@ -324,3 +324,11 @@
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* «CIUCCIAAAAA» in the banner and the log (spec 073, 2.6). */
+.shout {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: #ff3b30;
+  text-shadow: 0 0.08em 0 var(--ink);
+}

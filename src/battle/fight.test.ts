@@ -15,6 +15,7 @@ import {
   transformationsOf,
   transformChance,
   worksOn,
+  type FightEvent,
   type Fighter,
   type FightRecord,
   type FightSnapshot,
@@ -328,5 +329,126 @@ describe('transformations (spec 037, 2.3 and criteria 4-5)', () => {
     const changed = fights.find((record) => transformationsOf(record, 'a').length > 0);
     expect(transformationsOf(changed as FightRecord, 'a')).toEqual([{ from: goku, to: goku.next }]);
     expect(fights.every((record) => transformationsOf(record, 'b').length === 0)).toBe(true);
+  });
+});
+
+describe('drains and the cure of transformations (spec 073)', () => {
+  const withForms = (id: string) => fighterOf(catalog.find((entry) => entry.id === id) as Character, catalog) as Fighter;
+  const cell = fighter('cell-prima-forma');
+  /** Who drained in an event, and the event's drain. */
+  const drainer = (event: FightEvent): Side | null =>
+    event.type === 'grab' || event.type === 'move' ? event.side : event.type === 'clash' ? event.winner : null;
+  const drainedOf = (event: FightEvent) =>
+    event.type === 'grab' || event.type === 'move' || event.type === 'clash' ? event.drained : undefined;
+
+  it('C1: a move that drains gives back two thirds of the HP it took, never beyond the bars', () => {
+    let drains = 0;
+    for (const record of records([cell], [normal('S')], 150, 731)) {
+      for (const { event, before, after } of withBefore(record)) {
+        if (event.type !== 'move' && event.type !== 'clash') {
+          continue;
+        }
+        const won = event.type === 'move' ? event.outcome === 'hit' : true;
+        const side = drainer(event) as Side;
+        const move = event.type === 'clash' && event.winner !== event.side ? event.counter : event.move;
+        if (!won || !move.drains) {
+          expect(event.drained).toBeUndefined();
+          continue;
+        }
+        const target = otherSide(side);
+        const taken = Math.min(event.damage, before.hp[target][0] as number);
+        const room = cell.sheet.bars * BAR_HP - (before.hp[side][0] as number);
+        expect(event.drained).toBe(Math.min(Math.round((taken * 2) / 3), room));
+        expect(after.hp[side][0]).toBe((before.hp[side][0] as number) + (event.drained as number));
+        drains += (event.drained as number) > 0 ? 1 : 0;
+      }
+    }
+    expect(drains).toBeGreaterThan(10);
+  });
+
+  it('C2: a grab only by who drains: it takes 2,500 HP and gives them to who grabs', () => {
+    let grabs = 0;
+    for (const record of records([cell], [normal('S')], 150, 732)) {
+      for (const { event, before, after } of withBefore(record)) {
+        if (event.type !== 'grab') {
+          continue;
+        }
+        grabs += 1;
+        expect(event.side).toBe('a');
+        expect(event.damage).toBe(2500);
+        const taken = Math.min(2500, before.hp.b[0] as number);
+        expect(after.hp.b[0]).toBe((before.hp.b[0] as number) - taken);
+        expect(event.drained).toBe(Math.min(taken, cell.sheet.bars * BAR_HP - (before.hp.a[0] as number)));
+      }
+    }
+    expect(grabs).toBeGreaterThan(20);
+    const plain = records([normal('S')], [normal('S')], 100, 733);
+    expect(plain.some((record) => record.steps.some(({ event }) => event.type === 'grab'))).toBe(false);
+  });
+
+  it('C2: giants are not grabbed; androids and robots are never drained, C-8, Arale and the Robot di Pilaf too', () => {
+    const immune = ['c-17', 'c-8', 'arale', 'robot-di-pilaf'].map(fighter);
+    expect(immune.every((one) => one.drainImmune)).toBe(true);
+    expect(cell.drainImmune).toBeUndefined();
+    for (const target of [...immune, fighter('nappa-oozaru')]) {
+      for (const record of records([cell], [target], 60, 734)) {
+        for (const { event } of record.steps) {
+          expect(event.type).not.toBe('grab');
+          expect(drainedOf(event)).toBeUndefined();
+        }
+      }
+    }
+  });
+
+  it('C3: evened out, who drains wins about half of the fights against a normal sheet of its tier', () => {
+    expect(winShare([cell], [normal('S')], 3000, 735)).toBeGreaterThan(0.45);
+    expect(winShare([cell], [normal('S')], 3000, 735)).toBeLessThan(0.55);
+    expect(winShare([fighter('c-19')], [normal('SS-')], 3000, 736)).toBeGreaterThan(0.45);
+    expect(winShare([fighter('c-19')], [normal('SS-')], 3000, 736)).toBeLessThan(0.55);
+  });
+
+  it('C4: transforming into a form with «cura trasformandosi» heals that much, never beyond the bars', () => {
+    let healed = 0;
+    for (const record of records([withForms('cell-prima-forma')], [normal('S')], 300, 737)) {
+      for (const { event, before, after } of withBefore(record)) {
+        if (event.type !== 'transform') {
+          continue;
+        }
+        const form = fighterAt(record, after, event.side, event.fighter);
+        const kept = Math.min(before.hp[event.side][event.fighter] as number, form.sheet.bars * BAR_HP);
+        const cure = Math.min(form.sheet.transformHeal ?? 0, form.sheet.bars * BAR_HP - kept);
+        expect(event.healed ?? 0).toBe(cure);
+        expect(after.hp[event.side][event.fighter]).toBe(kept + cure);
+        healed += cure > 0 ? 1 : 0;
+      }
+    }
+    expect(healed).toBeGreaterThan(50);
+  });
+
+  it('C5: fights without drains or cures are the same as before spec 073', () => {
+    // Digests of the steps, taken with the engine before spec 073 and its transformation chance of then.
+    const settings = { ...DEFAULT_SETTINGS, transformChance: 1 / 40 };
+    const digest = (text: string) => {
+      let hash = 0x811c9dc5;
+      for (let index = 0; index < text.length; index++) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 0x01000193);
+      }
+      return (hash >>> 0).toString(16).padStart(8, '0');
+    };
+    const cases = [
+      { a: ['freeza-prima-forma', 'son-goku-meta'], b: ['vegeta', 'c-17'], seed: 101, expected: 'f83788fd' },
+      { a: ['nappa-oozaru', 'recoome'], b: ['son-goku-fine', 'piccolo-fine'], seed: 102, expected: '587f27be' },
+      {
+        a: ['son-gohan', 'c-18', 'arale', 'trunks-spada', 'majin-buu-puro-male'],
+        b: ['vegeta-seconda-forma', 'trunks', 'freeza-forma-finale', 'son-gohan-ultimate', 'son-goku-ssj4'],
+        seed: 103,
+        expected: '3c2c50af',
+      },
+    ];
+    for (const { a, b, seed, expected } of cases) {
+      const record = recordFight({ a: a.map(withForms), b: b.map(withForms) }, settings, seededRandom(seed));
+      expect(digest(JSON.stringify(record.steps))).toBe(expected);
+    }
   });
 });

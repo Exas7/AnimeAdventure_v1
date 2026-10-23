@@ -228,3 +228,32 @@ describe('the fight sheet columns (spec 037, 2.2 and criteria 2-3)', () => {
     expect(parseMove('Kamehameha (raggio)')).toBeNull();
   });
 });
+
+describe('drains and «cura trasformandosi» (spec 073, criterion 6)', () => {
+  it('«risucchio» marks a move that drains, wave or rush, with «giganti» in any order', () => {
+    expect(parseMove('Drain Life 19 (impeto, risucchio)')).toEqual({ name: 'Drain Life 19', kind: 'rush', drains: true });
+    expect(parseMove('Energy Drain (onda, risucchio)')).toEqual({ name: 'Energy Drain', kind: 'wave', drains: true });
+    expect(parseMove('Grab (impeto, risucchio, giganti)')).toEqual({
+      name: 'Grab',
+      kind: 'rush',
+      hitsGiants: true,
+      drains: true,
+    });
+    expect(parseMove('Grab (impeto, giganti, risucchio)')).toEqual(parseMove('Grab (impeto, risucchio, giganti)'));
+    expect(parseMove('Grab (impeto, succhia)')).toBeNull();
+  });
+
+  it('reads the HP of «cura trasformandosi», also with the dot for thousands; a wrong value is listed', () => {
+    const result = imported(
+      [
+        'nome;tier;cura trasformandosi',
+        'Cell (seconda forma);S;2500',
+        'Cell (forma perfetta);A+;2.500',
+        'Broli;S;tanta',
+        'Freeza;S;',
+      ].join('\n'),
+    );
+    expect(result.catalog.map((character) => character.fight?.transformHeal)).toEqual([2500, 2500, undefined, undefined]);
+    expect(result.sheetProblems).toEqual(['Broli: cura trasformandosi «tanta», va un numero di HP, es. «2.500»']);
+  });
+});

@@ -3,11 +3,15 @@ import {
   BLOW_DAMAGE,
   DEFAULT_SETTINGS,
   DODGE_CHANCE,
+  DRAIN_IMMUNE_RACES,
+  DRAIN_SHARE,
   FAIL_CHANCE,
   FINALE_COUNTER_SHARE,
   FINALE_DAMAGE,
   fighterOf,
   fightStats,
+  GRAB_CHANCE,
+  GRAB_DRAIN,
   MOVE_DAMAGE,
   TIER_STEP,
   type Fighter,
@@ -85,7 +89,7 @@ const cell = (text: string) => text.replace(/\|/g, '\\|');
 
 function moveText(move: Move): string {
   const kind = move.kind === 'wave' ? 'onda' : move.hitsGiants ? 'impeto, colpisce i giganti' : 'impeto';
-  return cell(`${move.name} (${kind})`);
+  return cell(`${move.name} (${kind}${move.drains ? ', risucchio' : ''})`);
 }
 
 function rules(settings: FightSettings): string[] {
@@ -101,12 +105,13 @@ function rules(settings: FightSettings): string[] {
     `- **La scheda decide lo stile, non il risultato.** Barre di vita (da 3 a 5, ognuna da 10.000 HP), potenza (quanto toglie un colpo) e velocità (quanto spesso attacca e schiva), da 1 a 5, con potenza + velocità = 6. Allo stesso tier, schede diverse vincono più o meno lo stesso numero di volte: il simulatore pareggia i danni di ogni scheda contro quella normale (${NORMAL_SHEET.bars} barre, potenza ${NORMAL_SHEET.power}, velocità ${NORMAL_SHEET.speed}). Più barre vogliono dire più colpi per mandare a terra un personaggio, non più forza.`,
     `- **Gli attacchi.** A ogni scambio attacca uno dei due: chi è più veloce attacca più spesso. Di solito è un colpo normale (circa ${formatHp(BLOW_DAMAGE)} HP a tier pari e potenza 3); una volta ogni ${oneIn(settings.moveChance)} attacchi una delle due mosse base (circa ${formatHp(MOVE_DAMAGE)} HP); una volta ogni ${oneIn(settings.finaleChance)} la mossa finale (circa ${formatHp(FINALE_DAMAGE)} HP).`,
     "- **Onde e impeti.** Ogni mossa è un'onda (energia: raggi, raffiche di ki, esplosioni, bombe, massi lanciati) o un impeto (fisico: cariche, prese). Gli impeti non funzionano sui **giganti**, tranne quelli segnati «colpisce i giganti».",
+    `- **Il risucchio.** Una mossa segnata «risucchio» (Drain Life) restituisce a chi la mette a segno il ${Math.round(DRAIN_SHARE * 100)}% del danno che fa, mai oltre le sue barre. Chi ha una mossa col risucchio afferra anche l'avversario: una volta ogni ${oneIn(GRAB_CHANCE)} colpi la presa gli toglie ${formatHp(GRAB_DRAIN)} HP e glieli prende. I giganti non si afferrano, e chi è di razza ${DRAIN_IMMUNE_RACES.map((race) => `«${race}»`).join(' o ')} non si risucchia. Come le altre schede, il risucchio cambia lo stile, non il risultato: il simulatore pareggia i danni di chi risucchia.`,
     `- **Come va una mossa.** Schivata il ${Math.round(DODGE_CHANCE * 100)}% delle volte (di più se chi difende è più veloce), fallita il ${Math.round(FAIL_CHANCE * 100)}%, contrastata il ${Math.round(settings.counterChance * 100)}%; altrimenti va a segno.`,
     `- **Gli scontri fra mosse.** Se la mossa è contrastata, chi difende risponde con una delle sue (con la mossa finale una volta su ${oneIn(FINALE_COUNTER_SHARE)}). Onda contro onda: vince uno dei due, a caso ma pesato su tier e potenza, e fa il 150% del danno della sua mossa. Impeto contro onda: vince sempre l'onda. Impeto contro impeto: vince uno dei due e fa il danno pieno.`,
     `- **La forma della squadra.** A inizio scontro ogni squadra tira un dado che la rende più forte o più debole per tutto lo scontro, di solito entro il ${Math.round(settings.formSpread * 100)}% in più o in meno: la giornata buona o quella storta.`,
     `- **Il cambio.** Ogni squadra ha una barra di ricarica che si riempie in ${settings.switchRecharge} scambi. A barra carica il simulatore può cambiare chi è in campo, tanto più volentieri quanta più vita recupererebbe: chi esce torna a fine barra meno 1 (da 14.300 a 19.999 HP).`,
     '- **Chi entra**, dopo un cambio o un KO: un compagno al massimo 3 gradini sotto l\'avversario in campo, a caso; se non ce n\'è, un compagno qualsiasi.',
-    `- **Le trasformazioni.** Chi ha una forma successiva («si trasforma in») può trasformarsi in campo, una forma alla volta: una volta ogni ${oneIn(settings.transformChance)} scambi a vita piena, fino a 3 volte più spesso vicino al KO. Da lì combatte con tier e scheda della nuova forma, e tiene la vita che aveva.`,
+    `- **Le trasformazioni.** Chi ha una forma successiva («si trasforma in») può trasformarsi in campo, una forma alla volta: una volta ogni ${oneIn(settings.transformChance)} scambi a vita piena, fino a 3 volte più spesso vicino al KO. Da lì combatte con tier e scheda della nuova forma, e tiene la vita che aveva; una forma con «cura trasformandosi» recupera in più quegli HP.`,
     '',
   ];
 }
@@ -148,7 +153,7 @@ function charactersSection(catalog: readonly Character[]): string[] {
     '## I personaggi',
     '',
     `${fighters.length} personaggi con un tier, divisi per saga. Prezzo: in un negozio (vuoto per chi non si vende).`,
-    'Gigante: gli impeti normali non lo colpiscono.',
+    'Gigante: gli impeti normali non lo colpiscono. Risucchio: la mossa restituisce energia a chi la fa. Cura trasformandosi: gli HP che recupera chi si trasforma in questa forma.',
     '',
   ];
   for (const saga of sagas) {
@@ -156,8 +161,8 @@ function charactersSection(catalog: readonly Character[]): string[] {
     lines.push(
       `### ${saga} (${members.length})`,
       '',
-      '| Personaggio | Tier | Prezzo | Barre | Potenza | Velocità | Gigante | Mossa 1 | Mossa 2 | Mossa finale | Si trasforma in |',
-      '|---|---|---|---|---|---|---|---|---|---|---|',
+      '| Personaggio | Tier | Prezzo | Barre | Potenza | Velocità | Gigante | Mossa 1 | Mossa 2 | Mossa finale | Si trasforma in | Cura trasformandosi |',
+      '|---|---|---|---|---|---|---|---|---|---|---|---|',
       ...members.map((character) => {
         const sheet = sheetOf(character);
         return `| ${[
@@ -172,6 +177,7 @@ function charactersSection(catalog: readonly Character[]): string[] {
           moveText(sheet.moves[1]),
           moveText(sheet.finale),
           cell(nameOf(character.fight?.transformsInto)),
+          sheet.transformHeal ? `${formatHp(sheet.transformHeal)} HP` : '',
         ].join(' | ')} |`;
       }),
       '',
