@@ -89,6 +89,9 @@ const TAP_RADIUS = 60;
 
 /** The pause between two steps of the AI's turn (spec 053, 2.2). */
 const AI_PAUSE_MS = 900;
+
+/** After a quiz answer the window closes by itself: never stuck on it (spec 080). */
+const ANSWER_CLOSE_MS = 4000;
 /** A turn of the AI never takes more steps than this (spec 053, criterion 3). */
 const AI_MAX_STEPS = 20;
 
@@ -364,6 +367,15 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
     return () => window.clearTimeout(timer);
     // One step per tick: runAiStep reads the latest game from gameRef.
   }, [aiBusy, aiTick, aiSkip]);
+
+  const answered = overlay?.kind === 'challenge' && overlay.answer !== undefined;
+  useEffect(() => {
+    if (!answered) {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setOverlay(null), ANSWER_CLOSE_MS);
+    return () => window.clearTimeout(timer);
+  }, [answered]);
 
   const skipAiTurn = () => {
     setAiSkip(true);
