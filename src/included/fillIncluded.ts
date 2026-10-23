@@ -9,7 +9,7 @@ import { includedCatalog, includedMissions, includedQuestions } from './included
  * The fingerprints of the included missions of before (codes left out): a
  * browser that still has one of those lists, never changed, gets the new one
  * (spec 063 and 066, 2.3: more coins; spec 069, 2.6: the story missions; spec 071: more chains;
- * spec 074, 2.7: the guests; spec 079: the lines of the characters who do not speak). Any other
+ * spec 074, 2.7: the guests; spec 079: the lines of the characters who do not speak; spec 084: «ripassa»). Any other
  * list stays as it is.
  *
  * Spec 079 (D-103): the fingerprints of before are those of the lists with «Babidi» in place of
@@ -21,6 +21,7 @@ export const MISSIONS_BEFORE_069 = '206a3dec';
 export const MISSIONS_BEFORE_071 = '56cf8b91';
 export const MISSIONS_BEFORE_074 = 'd7acf173';
 export const MISSIONS_BEFORE_079 = '15c3e083';
+export const MISSIONS_BEFORE_084 = '627c29a2';
 const OLD_MISSIONS = [
   MISSIONS_BEFORE_063,
   MISSIONS_BEFORE_066,
@@ -28,6 +29,7 @@ const OLD_MISSIONS = [
   MISSIONS_BEFORE_071,
   MISSIONS_BEFORE_074,
   MISSIONS_BEFORE_079,
+  MISSIONS_BEFORE_084,
 ];
 
 /** The included questions of before spec 074, never changed: they get the guests' ones (spec 074, 2.7). */

@@ -194,9 +194,13 @@ export function MissionEditor({ mission, onChange, catalog, groups, items }: Mis
         </>
       )}
 
-      {(mission?.type === 'wait' || mission?.type === 'skipTurns') && (
+      {(mission?.type === 'wait' || mission?.type === 'skipTurns' || mission?.type === 'comeBack') && (
         <label className={styles.field}>
-          {mission.type === 'wait' ? 'Turni da attendere (il giocatore sta fermo)' : 'Turni da saltare'}
+          {mission.type === 'wait'
+            ? 'Turni da attendere (il giocatore sta fermo)'
+            : mission.type === 'comeBack'
+              ? 'Turni dopo i quali tornare (intanto si gioca)'
+              : 'Turni da saltare'}
           <NumberField
             label="Turni"
             value={mission.turns ?? 1}

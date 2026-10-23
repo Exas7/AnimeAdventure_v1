@@ -9,6 +9,7 @@ import {
   MISSIONS_BEFORE_071,
   MISSIONS_BEFORE_074,
   MISSIONS_BEFORE_079,
+  MISSIONS_BEFORE_084,
   PRICES_BEFORE_066,
   QUESTIONS_BEFORE_074,
   withGuestsOf,
@@ -28,10 +29,20 @@ const SPOKEN_LINES: [string[], string[]][] = [
   [['(Ghigna e fa un verso gutturale.)', 'Costringilo a trasformarsi e verrà con te.'], ['Il mondo dei morti è sottosopra per colpa mia!', 'Costringimi a trasformarmi e verrò con te.']],
   [["(Un ruggito basso fa tremare l'aria.)",'Costringilo a trasformarsi: ti lascerà passare e avrai {monete} monete.'], ["L'inferno si sta riversando sulla Terra...", 'Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.']],
 ];
+/** Spec 084: the five «ripassa» were «attendi» with these turns and coins: new coins -> [turns, coins] of before. */
+const WAITS_THEN: Record<number, [number, number]> = { 2400: [2, 1400], 2500: [2, 1500], 2800: [3, 1500] };
 const withSpokenLines = (list: CatalogMission[]) =>
   list.map((entry) => {
     const old = SPOKEN_LINES.find(([now]) => now.join('|') === entry.lines.join('|'));
     return old ? { ...entry, lines: old[1] } : entry;
+  });
+/** The list as it was before spec 084 (the lines of 079 stay as they are). */
+const beforeRipassa = (list: CatalogMission[]) =>
+  list.map((entry) => {
+    const then = entry.mission.type === 'comeBack' ? WAITS_THEN[entry.mission.reward.coins ?? 0] : undefined;
+    return then
+      ? { ...entry, mission: { ...entry.mission, type: 'wait' as const, turns: then[0], reward: { ...entry.mission.reward, coins: then[1] } } }
+      : entry;
   });
 const isStory = (entry: CatalogMission) => 'group' in entry.giver && entry.giver.group === 'story';
 const turnsToWait = ({ mission }: CatalogMission) =>
@@ -44,26 +55,29 @@ const PRICES_THEN: Record<number, number> = {
 };
 
 describe('the missions give coins (spec 063 and 066, criterion 1)', () => {
-  it('every mission that gives the character of the cell gives 400 coins, plus 500 a turn to wait or skip', () => {
+  it('every mission that gives the character of the cell gives 400 coins, plus 500 a turn to wait or skip, 400 to come back', () => {
     for (const entry of missions().filter((candidate) => candidate.mission.reward.cellCharacter)) {
-      expect(entry.mission.reward.coins).toBe(400 + 500 * turnsToWait(entry));
+      const comeBack = entry.mission.type === 'comeBack' ? 400 * (entry.mission.turns ?? 0) : 0;
+      expect(entry.mission.reward.coins).toBe(400 + 500 * turnsToWait(entry) + comeBack);
     }
   });
 
-  it('the missions of the story pay more: 1,500 to wait 2 turns or skip 1, 800 for a quiz', () => {
+  it('the missions of the story pay more: 1,500 to skip 1 turn, 2,500 to come back after 5, 800 for a quiz', () => {
     const story = missions().filter(isStory);
     const coins = (type: string) => story.filter((entry) => entry.mission.type === type).map((entry) => entry.mission.reward.coins);
-    expect(coins('wait')).toEqual([1500]);
+    expect(coins('wait')).toEqual([]);
+    expect(coins('comeBack')).toEqual([2500]);
     expect(coins('skipTurns')).toEqual([1500]);
     expect(coins('quiz')).toEqual([800]);
   });
 
-  it("Bulma and Chichi's waits of 3 turns give 1,500 coins as well as their characters; Babidi's fight 2,000", () => {
+  it("Bulma and Chichi ask to come back after 6 turns and give 2,800 coins as well as their characters (spec 084); Babidi's fight 2,000", () => {
     const others = missions().filter((entry) => !isStory(entry) && !entry.mission.reward.cellCharacter);
-    const waits = others.filter((entry) => entry.mission.type === 'wait');
+    const waits = others.filter((entry) => entry.mission.type === 'comeBack');
     expect(waits).toHaveLength(2);
     for (const { mission } of waits) {
-      expect(mission.reward.coins).toBe(1500);
+      expect(mission.turns).toBe(6);
+      expect(mission.reward.coins).toBe(2800);
       expect(mission.reward.characters?.length).toBe(1);
     }
     // The other fights that do not recruit open a chain of one person (spec 069, 2.2).
@@ -179,13 +193,18 @@ describe('a browser with the untouched lists of before gets the guests (spec 074
 
   it("the missions of before are today's without the guests' ones", () => {
     // Spec 079 changed the lines of Broli and Janemba after that: they are put back as they were.
-    expect(missionsFingerprint(withSpokenLines(missions()).filter((entry) => !ofGuest(entry)))).toBe(MISSIONS_BEFORE_074);
+    expect(missionsFingerprint(withSpokenLines(beforeRipassa(missions())).filter((entry) => !ofGuest(entry)))).toBe(MISSIONS_BEFORE_074);
     expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_074);
   });
 
   it("the missions of before spec 079 are today's with the old lines of Broli and Janemba", () => {
-    expect(missionsFingerprint(withSpokenLines(missions()))).toBe(MISSIONS_BEFORE_079);
+    expect(missionsFingerprint(withSpokenLines(beforeRipassa(missions())))).toBe(MISSIONS_BEFORE_079);
     expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_079);
+  });
+
+  it("the missions of before spec 084 are today's with the five waits as they were", () => {
+    expect(missionsFingerprint(beforeRipassa(missions()))).toBe(MISSIONS_BEFORE_084);
+    expect(missionsFingerprint(missions())).not.toBe(MISSIONS_BEFORE_084);
   });
 
   it("the questions of before are today's without those of one character", () => {

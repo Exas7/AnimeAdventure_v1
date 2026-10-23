@@ -243,6 +243,37 @@ describe('missions in progress and their conditions (spec 026, 2.4)', () => {
     expect(missionsDone(old).map((active) => active.nodeId)).toEqual(['c3']);
   });
 
+  it('Ripassa: nobody is stopped, and the reward comes back on the cell after the turns (spec 084, criteria 1-4)', () => {
+    let game = withMission('c3', { type: 'comeBack', turns: 2, reward: { coins: 900 } });
+    game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });
+    expect(currentState(game).players.p1.turnsToSkip).toBe(0);
+    // On the cell at once: the turns have not passed.
+    game = act(game, { type: 'placePawn', player: 'p1', nodeId: 'c3' });
+    expect(doneIds(game)).toEqual([]);
+    // Two turns of p1 pass, nobody is skipped.
+    game = play(game, { type: 'endTurn' }, { type: 'endTurn' }, { type: 'endTurn' });
+    const state = currentState(game);
+    expect(state.currentPlayer).toBe('p2');
+    expect(state.players.p1.turnsPlayed).toBe(2);
+    // The turns passed, but p1 went away from the cell: not yet.
+    game = act(game, { type: 'placePawn', player: 'p1', nodeId: 'c1' });
+    expect(doneIds(game)).toEqual([]);
+    const [active] = currentState(game).activeMissions ?? [];
+    expect(active && activeMissionText(active, currentState(game), testCatalog)).toBe(
+      'Personaggio C: torna da Personaggio C: puoi riscuotere il premio',
+    );
+    game = act(game, { type: 'placePawn', player: 'p1', nodeId: 'c3' });
+    expect(doneIds(game)).toEqual(['c3']);
+  });
+
+  it('Ripassa: the panel counts the turns left (spec 084, criterion 4)', () => {
+    let game = withMission('c3', { type: 'comeBack', turns: 3, reward: {} });
+    game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });
+    const state = currentState(game);
+    const [active] = state.activeMissions ?? [];
+    expect(active && activeMissionParts(active, state, testCatalog).task).toBe('ripassa da Personaggio C tra 3 turni');
+  });
+
   it('fights, quizzes and "other" missions are never detected: the host judges them', () => {
     let game = withMission('c3', { type: 'other', text: 'Canta', reward: { coins: 50 } });
     game = act(game, { type: 'acceptMission', nodeId: 'c3', player: 'p1' });

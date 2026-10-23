@@ -6,14 +6,14 @@ arruolabili;combattimento;;vincere;;;;;;sì;;400;;;2;Vediamo quanto sei forte! |
 arruolabili;combattimento;;vincere;;;;;;sì;;400;;;2;Non mi unisco a chi non sa combattere. | Battimi e sarò dei vostri.
 arruolabili;combattimento;;vincere;;;;;;sì;;400;;;1;Un vero scontro vale più di mille parole. | Battimi e combatterò al tuo fianco.
 arruolabili;quiz;;;;;;;;sì;;400;;;2;Prima di seguirti voglio sapere quanto ne sai. | Rispondi giusto e sarò dei vostri.
-arruolabili;attendi;;;;;;2;;sì;;1400;;;1;Devo finire il mio allenamento. | Torna tra {n} turni e verrò con te.
+arruolabili;ripassa;;;;;;5;;sì;;2400;;;1;Devo finire il mio allenamento. | Torna tra {n} turni e verrò con te.
 arruolabili;salta turni;;;;;;1;;sì;;900;;;1;Allenarsi da soli non serve a niente. | Allenati con me per {n} turno e poi verrò con te.
-storia;attendi;;;;;;2;;;;1500;;;2;Ho mille cose da fare e nessuno che mi aiuti. | Ripassa tra {n} turni e avrai {premio}.
+storia;ripassa;;;;;;5;;;;2500;;;2;Ho mille cose da fare e nessuno che mi aiuti. | Ripassa tra {n} turni e avrai {premio}.
 storia;salta turni;;;;;;1;;;;1500;;;1;Mi serve una mano, subito. | Resta qui {n} turno ad aiutarmi e avrai {premio}.
 storia;quiz;;;;;;;;;;800;;;2;Vediamo se sei preparato. | Rispondi giusto e avrai {premio}.
-Chichi (adulta);attendi;;;;;;3;;;Son Goten;1500;;;2;Goku è sempre in giro ad allenarsi... | Ripassa tra {n} turni: ti presento {premio}!
+Chichi (adulta);ripassa;;;;;;6;;;Son Goten;2800;;;2;Goku è sempre in giro ad allenarsi... | Ripassa tra {n} turni: ti presento {premio}!
 Chichi (adulta);quiz;;;;;;;;;;800;;;1;Mio figlio deve studiare, non fare a botte! | Rispondi giusto e avrai {premio}.
-Bulma;attendi;;;;;;3;;;Trunks (bambino);1500;;;1;Vegeta non si accorge di niente... | Torna tra {n} turni e avrai {premio}!
+Bulma;ripassa;;;;;;6;;;Trunks (bambino);2800;;;1;Vegeta non si accorge di niente... | Torna tra {n} turni e avrai {premio}!
 Bulma;accompagnami da;;;;Son Goku (bambino);;;;;;800;;;1;Sto cercando le sfere del drago, ma da sola ho paura. | Accompagnami da {obiettivo} e avrai {monete} monete.
 Bulma;accompagnami da;;;;Trunks (bambino);;;;;;800;;;1;Trunks è sparito di nuovo con Goten! | Accompagnami da {obiettivo} e avrai {monete} monete.
 Chichi (adulta);accompagnami da;;;;Son Goku (fine);;;;;;800;;;1;Goku non torna a casa da giorni! | Accompagnami da {obiettivo} e avrai {monete} monete.
@@ -124,7 +124,7 @@ Son Goku (fine) SSJ;batti;;;;Majin Vegeta;;;;sì;;400;;;1;Vegeta si è fatto con
 Son Goku (fine) SSJ3;batti;;;;Majin Buu (puro);;;;sì;;400;;;1;Majin Bu è tornato alla sua forma originale: la più pericolosa. | Batti {obiettivo} e verrò con te.
 Majin Vegeta;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Babidi mi ha dato ciò che volevo: il potere! | Battimi, se ci riesci, e verrò con te.
 Vegeta (seconda forma);porta;;;;Trunks (bambino);;;;sì;;400;;;1;Trunks deve diventare più forte: lo alleno io. | Portami {obiettivo} e verrò con te.
-Trunks (bambino);attendi;;;;;;2;;sì;;1400;;;1;Sto finendo l'allenamento nella stanza gravitazionale. | Ripassa tra {n} turni e verrò con te.
+Trunks (bambino);ripassa;;;;;;5;;sì;;2400;;;1;Sto finendo l'allenamento nella stanza gravitazionale. | Ripassa tra {n} turni e verrò con te.
 Son Goten;porta;;;;Trunks (bambino);;;;sì;;400;;;1;Senza Trunks non vengo da nessuna parte! | Portami {obiettivo} e veniamo tutti e due.
 Son Goten SSJ;porta;;;;Trunks (bambino) SSJ;;;;sì;;400;;;1;Io e Trunks abbiamo imparato la danza della fusione! | Portami {obiettivo} e la proviamo subito.
 Son Gohan;porta;;;;Videl;;;;sì;;400;;;1;Videl vuole imparare a volare... | Portami {obiettivo} e verrò con te.

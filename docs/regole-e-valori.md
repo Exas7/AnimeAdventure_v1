@@ -69,8 +69,8 @@ le monete che promettono. Il premio va a chi completa la missione per primo.
 | Quiz | 9 | 4 | 400$, 800$, 1.500$ |
 | Batti | 38 | 38 | 400$ |
 | Porta | 12 | 12 | 400$ |
-| Attendi | 5 | 2 | 1.400$, 1.500$ |
 | Salta turni | 6 | 5 | 900$, 1.500$ |
+| Ripassa | 5 | 2 | 2.400$, 2.500$, 2.800$ |
 | Accompagnami da | 8 | 0 | 800$ |
 
 ## Gli oggetti del negozio
@@ -104,10 +104,11 @@ I poteri pronti che «Randomizza» e «Nuova partita» propongono con gli starte
 - **Porta**: avere in squadra un certo personaggio.
 - **Attendi**: stare fermi mentre passano alcuni turni, che l'app salta da sola.
 - **Salta turni**: saltare alcuni turni.
+- **Ripassa**: aspettare alcuni dei propri turni giocando, poi tornare sulla casella per il premio.
 - **Altro**: una missione scritta a mano: in regia la giudica chi conduce, sul telefono vale la parola del giocatore.
 - **Accompagnami da**: il personaggio viaggia con il giocatore fino alla casella di un altro; un compagno alla volta.
 
-Le missioni che durano («Vai da», «Batti», «Porta», «Attendi», «Salta turni» e «Accompagnami da») si accettano nella scena e danno il premio da sole
+Le missioni che durano («Vai da», «Batti», «Porta», «Attendi», «Salta turni», «Ripassa» e «Accompagnami da») si accettano nella scena e danno il premio da sole
 quando la condizione si avvera; si possono abbandonare. Una sfida persa non si ritenta, a meno che il
 potere dello starter lo permetta.
 
@@ -125,7 +126,7 @@ potere dello starter lo permetta.
 - **Formato degli scontri:** 1v1 nel terzo di caselle più vicino alla propria partenza, 2v2 più lontano, 3v3
   solo nella casella più lontana di ogni lato. Dove potrebbe esserci uno scontro a squadre, il personaggio
   combatte da solo il 67% delle volte fino a B+, il 50% delle volte se è A, il 33% delle volte se è S e il 25% delle volte se è SS.
-- **Missioni facili:** «Quiz», «Attendi» e «Salta turni» reclutano solo personaggi fino a B+.
+- **Missioni facili:** «Quiz», «Attendi», «Salta turni» e «Ripassa» reclutano solo personaggi fino a B+.
 - **Domande dei quiz:** facili fino a C+, medie da B- a B e difficili da B+ in su; medie per i personaggi della storia. Chi ha domande
   sue fa solo quelle, con le risposte in un ordine nuovo a ogni puntata.
 - **Una persona in un posto solo:** lo stesso personaggio, con le sue forme, non compare due volte nella
@@ -149,8 +150,8 @@ mappe.
 | Quiz | 6% | 7% | 6% |
 | Batti | 10% | 10% | 9% |
 | Porta | 1% | 1% | 1% |
-| Attendi | 3% | 3% | 3% |
 | Salta turni | 2% | 2% | 2% |
+| Ripassa | 3% | 3% | 3% |
 | Accompagnami da | 6% | 6% | 6% |
 
 **I combattimenti, per formato** (quota dei combattimenti)
@@ -170,7 +171,7 @@ mappe.
 | Catene sulle strade grigie | 6,0 | 6,0 | 7,0 |
 | Personaggi messi sulla mappa per la missione di un altro | 3,5 | 4,0 | 3,7 |
 | Caselle che danno il loro personaggio | 78% | 78% | 78% |
-| Monete in palio nelle missioni | 23.100$ | 23.300$ | 24.600$ |
+| Monete in palio nelle missioni | 24.400$ | 24.800$ | 26.000$ |
 | Puntate con un ospite fra i personaggi della storia | 96% | 99% | 96% |
 | Ospiti che tengono un negozio | 0,6 | 0,7 | 0,7 |
 
@@ -189,7 +190,7 @@ Nella partita PvP / PvIA e sul telefono l'IA è G2 e gioca con lo stesso arbitro
 | Showdown | non ci pensa | non ci pensa | se lo vincerebbe insegue l'avversario, con la squadra completa o 3 personaggi più di lui; se lo perderebbe gli sta lontano |
 | Starter | a caso | il più forte | il più forte |
 
-- Non accetta mai «Attendi», «Salta turni» e «Altro», e non compra né usa Nuvola Speedy e Trasmissione
+- Non accetta mai «Attendi», «Salta turni», «Ripassa» e «Altro», e non compra né usa Nuvola Speedy e Trasmissione
   Istantanea.
 - Usa «Salta turno» quando l'avversario sta per completare la squadra, a livello Difficile anche quando è
   vicino e lo showdown lo perderebbe, e comunque dal turno 40 in poi.

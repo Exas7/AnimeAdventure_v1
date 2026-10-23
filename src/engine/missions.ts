@@ -24,12 +24,13 @@ export const MISSION_TYPES: { type: MissionType; label: string }[] = [
   { type: 'bring', label: 'Porta' },
   { type: 'wait', label: 'Attendi' },
   { type: 'skipTurns', label: 'Salta turni' },
+  { type: 'comeBack', label: 'Ripassa' },
   { type: 'other', label: 'Altro' },
   { type: 'escort', label: 'Accompagnami da' },
 ];
 
 /** Missions that last over turns: accepted in the scene, then followed by the app. */
-export const LASTING_MISSIONS: MissionType[] = ['goTo', 'defeat', 'bring', 'wait', 'skipTurns', 'escort'];
+export const LASTING_MISSIONS: MissionType[] = ['goTo', 'defeat', 'bring', 'wait', 'skipTurns', 'comeBack', 'escort'];
 
 /** A fight in this format with the cell's character, won to recruit it. */
 export function fightMission(format: ChallengeFormat): Mission {
@@ -60,6 +61,8 @@ export function defaultMission(
       return { type, turns: 2, reward };
     case 'skipTurns':
       return { type, turns: 1, reward };
+    case 'comeBack':
+      return { type, turns: 5, reward };
     case 'other':
       return { type, text: '', reward };
   }
@@ -150,6 +153,8 @@ export function missionLabel(mission: Mission, catalog: Character[]): string {
       return `Missione · Attendi ${turns} ${turnWord}`;
     case 'skipTurns':
       return `Missione · Salta ${turns} ${turnWord}`;
+    case 'comeBack':
+      return `Missione · Ripassa tra ${turns} ${turnWord}`;
     case 'other':
       return mission.text?.trim() ? `Missione · ${mission.text.trim()}` : 'Missione';
   }
@@ -236,6 +241,12 @@ function missionTask(active: ActiveMission, state: GameState, catalog: Character
       const left = active.turnsToSkipLeft ?? 0;
       return `salta ${turns} ${turns === 1 ? 'turno' : 'turni'} (${leftText(left)})`;
     }
+    case 'comeBack': {
+      const left = Math.max(0, turns - (state.players[active.player].turnsPlayed - active.turnsPlayedAtStart));
+      return left > 0
+        ? `ripassa da ${giver} tra ${left} ${left === 1 ? 'turno' : 'turni'}`
+        : `torna da ${giver}: puoi riscuotere il premio`;
+    }
     case 'fight':
     case 'quiz':
     case 'other':
@@ -298,6 +309,10 @@ function isDone(state: GameState, active: ActiveMission): boolean {
         : player.turnsPlayed - active.turnsPlayedAtStart >= (mission.turns ?? 0);
     case 'skipTurns':
       return (active.turnsToSkipLeft ?? 0) <= 0;
+    case 'comeBack':
+      return (
+        player.turnsPlayed - active.turnsPlayedAtStart >= (mission.turns ?? 0) && player.position === active.nodeId
+      );
     case 'fight':
     case 'quiz':
     case 'other':

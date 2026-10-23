@@ -71,7 +71,7 @@ export const CELLS_PER_STORY_CHARACTER = 8;
 export const OPENER_MISSIONS: readonly Mission['type'][] = ['fight', 'defeat'];
 
 /** Easy missions: they recruit only characters up to B+ (D-069). */
-export const EASY_MISSIONS: readonly Mission['type'][] = ['quiz', 'wait', 'skipTurns'];
+export const EASY_MISSIONS: readonly Mission['type'][] = ['quiz', 'wait', 'skipTurns', 'comeBack'];
 export const STRONGEST_FOR_EASY = tierRank('B+') as number;
 
 /**
@@ -560,6 +560,7 @@ export function randomizeWithMissions(
       }
       case 'wait':
       case 'skipTurns':
+      case 'comeBack':
       case 'other':
         break;
     }

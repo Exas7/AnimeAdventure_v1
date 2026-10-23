@@ -87,6 +87,8 @@ export type MissionType =
   | 'bring'
   | 'wait'
   | 'skipTurns'
+  // «Ripassa» (spec 084, D-106): wait moving freely, then come back to the cell.
+  | 'comeBack'
   | 'other'
   // «Accompagnami da» (spec 069, 2.5; D-097): the giver travels with the player to the target.
   | 'escort';

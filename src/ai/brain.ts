@@ -293,6 +293,7 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
     case 'other':
     case 'skipTurns':
     case 'wait':
+    case 'comeBack':
       return 0;
     default:
       return LEVELS[level].lasting.includes(mission.type) ? reward * 0.5 : 0;

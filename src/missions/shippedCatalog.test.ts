@@ -41,11 +41,11 @@ describe('the rules of the catalog in docs (spec 043, criteria 5-6; D-069, D-070
     (entry): entry is CatalogMission & { giver: { characterId: string } } => 'characterId' in entry.giver,
   );
 
-  it('group missions are only fights, quiz, waits and skipped turns: no target drawn at random', () => {
+  it('group missions are only fights, quiz, waits, come-backs and skipped turns: no target drawn at random', () => {
     const groups = entries.filter((entry) => 'group' in entry.giver);
     expect(groups.length).toBeGreaterThan(0);
     for (const entry of groups) {
-      expect(['fight', 'quiz', 'wait', 'skipTurns']).toContain(entry.mission.type);
+      expect(['fight', 'quiz', 'wait', 'skipTurns', 'comeBack']).toContain(entry.mission.type);
     }
   });
 

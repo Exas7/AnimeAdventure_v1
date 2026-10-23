@@ -104,6 +104,7 @@ export const KIND_FILTERS: { filter: MissionFilter; label: string }[] = [
   { filter: 'bring', label: 'Porta' },
   { filter: 'wait', label: 'Attendi' },
   { filter: 'skipTurns', label: 'Salta turni' },
+  { filter: 'comeBack', label: 'Ripassa' },
   { filter: 'other', label: 'Altro' },
   { filter: 'none', label: 'Senza missione' },
 ];

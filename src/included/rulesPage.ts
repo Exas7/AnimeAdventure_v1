@@ -337,6 +337,7 @@ const MISSION_TEXTS: Record<MissionType, string> = {
   bring: 'avere in squadra un certo personaggio.',
   wait: "stare fermi mentre passano alcuni turni, che l'app salta da sola.",
   skipTurns: 'saltare alcuni turni.',
+  comeBack: 'aspettare alcuni dei propri turni giocando, poi tornare sulla casella per il premio.',
   escort: 'il personaggio viaggia con il giocatore fino alla casella di un altro; un compagno alla volta.',
   other: 'una missione scritta a mano: in regia la giudica chi conduce, sul telefono vale la parola del giocatore.',
 };
@@ -508,7 +509,7 @@ function aiSection(): string[] {
     ),
     row('Starter', (rules) => (rules.buysBest ? 'il più forte' : 'a caso')),
     '',
-    `- Non accetta mai ${quoted(['wait', 'skipTurns', 'other'])}, e non compra né usa Nuvola Speedy e Trasmissione`,
+    `- Non accetta mai ${quoted(['wait', 'skipTurns', 'comeBack', 'other'])}, e non compra né usa Nuvola Speedy e Trasmissione`,
     '  Istantanea.',
     "- Usa «Salta turno» quando l'avversario sta per completare la squadra, a livello Difficile anche quando è",
     `  vicino e lo showdown lo perderebbe, e comunque dal turno ${LATE_TURN} in poi.`,

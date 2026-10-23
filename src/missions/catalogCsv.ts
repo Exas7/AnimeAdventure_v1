@@ -50,6 +50,7 @@ export const TYPE_NAMES: Record<MissionType, string> = {
   bring: 'porta',
   wait: 'attendi',
   skipTurns: 'salta turni',
+  comeBack: 'ripassa',
   other: 'altro',
   escort: 'accompagnami da',
 };
