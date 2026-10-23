@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { Character } from '../engine';
 import type { CatalogMission } from '../missions/catalog';
-import { MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069, PRICES_BEFORE_066, withPricesOf } from './fillIncluded';
+import {
+  MISSIONS_BEFORE_063,
+  MISSIONS_BEFORE_066,
+  MISSIONS_BEFORE_069,
+  MISSIONS_BEFORE_071,
+  PRICES_BEFORE_066,
+  withPricesOf,
+} from './fillIncluded';
 import { missionsFingerprint, pricesFingerprint } from './fingerprint';
 import { includedCatalog, includedMissions } from './includedLists';
 
@@ -96,8 +103,9 @@ describe('a browser with the untouched lists of before gets the new values (spec
   it('the mission lists of before are known to the app; the new one is not among them', () => {
     // Spec 069 changed which missions there are, so the lists of before can no longer be
     // rebuilt from today's: their fingerprints were taken from the files of those versions.
-    expect(new Set([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069]).size).toBe(3);
-    expect([MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069]).not.toContain(missionsFingerprint(missions()));
+    const before = [MISSIONS_BEFORE_063, MISSIONS_BEFORE_066, MISSIONS_BEFORE_069, MISSIONS_BEFORE_071];
+    expect(new Set(before).size).toBe(4);
+    expect(before).not.toContain(missionsFingerprint(missions()));
   });
 
   it('a list with other coins is a list of before only if every mission matches', () => {

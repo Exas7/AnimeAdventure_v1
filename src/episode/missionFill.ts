@@ -161,17 +161,10 @@ export function randomizeWithMissions(
   // the draw does not use them elsewhere.
   const chained = new Map<string, CatalogMission>();
   const chainCells = new Set<string>();
-  // Heavier chains come out more often (spec 069, 2.2). Who opens is of medium-high
-  // strength, at least A-, and who is behind is stronger still (D-096).
-  const rankOf = (id: string | undefined) => tierRank(find(id)?.tier) ?? -1;
+  // Heavier chains come out more often (spec 069, 2.2). The chains of the list are
+  // used as they are: their strength rule is the list's, with the host's exceptions (spec 071, D-096).
   const chainEntries = weightedOrder(
-    sources.catalog.filter(
-      (entry) =>
-        entry.behindId &&
-        'characterId' in entry.giver &&
-        rankOf(entry.giver.characterId) >= CHAIN_OPENER_RANK &&
-        rankOf(entry.behindId) > rankOf(entry.giver.characterId),
-    ),
+    sources.catalog.filter((entry) => entry.behindId && 'characterId' in entry.giver),
     random,
   );
   for (const edge of map.edges) {
@@ -576,9 +569,6 @@ interface Planned {
   /** A character moved into another cell so that the mission can be done. */
   replace?: { cellId: string; characterId: string };
 }
-
-/** The weakest who may open a chain (spec 069, 2.2; D-096): medium-high strength. */
-const CHAIN_OPENER_RANK = tierRank('A-') as number;
 
 /**
  * Format by distance (spec 027, 2.4): 1v1 in the nearest third of each side,

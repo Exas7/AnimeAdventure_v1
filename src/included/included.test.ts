@@ -12,13 +12,14 @@ import { includedCatalog, includedMissions, includedQuestions } from './included
 import { includedMapId, isIncludedMapId, listIncludedMaps, readIncludedMaps } from './includedMaps';
 
 describe('the lists that come with the app (spec 030, criterion 5)', () => {
-  it('read without errors: 166 characters, 140 missions, 60 questions', () => {
+  it('read without errors: 166 characters, 159 missions, 60 questions', () => {
     const catalog = includedCatalog();
     expect(catalog).toHaveLength(166);
     expect(catalog.filter((character) => character.possibleStarter)).toHaveLength(24);
     // Spec 043: the catalog rewritten (it was 45 after specs 031 and 034), 20 questions for each level (it was 45).
-    // Spec 069: 140 missions (it was 128), with the story fights, the chains and «Accompagnami da».
-    expect(includedMissions(catalog)).toHaveLength(140);
+    // Spec 069: 140 missions (it was 128), with the story fights, the chains and «Accompagnami da»;
+    // spec 071: 159, with 19 chains more.
+    expect(includedMissions(catalog)).toHaveLength(159);
     expect(includedQuestions()).toHaveLength(60);
   });
 
@@ -83,8 +84,9 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
     }
     // The conductor (spec 034): 60-65% is right, 50-70% is fine. Since spec 069 the villains
     // give almost only fights: about 74%, and up to 75% is fine (the conductor, 23 October 2026).
+    // Spec 071: with more chains about 75.5%, and up to 77% is fine (the conductor, same day).
     const characterCells = map.nodes.filter((node) => node.type === 'character').length;
-    expect(fights / runs / characterCells).toBeLessThanOrEqual(0.75);
+    expect(fights / runs / characterCells).toBeLessThanOrEqual(0.77);
   });
 
   it('on Pianeta Nameck: who opens a grey road fights or gives "Batti", stronger than the others; no target off the board (spec 034, criterion 3)', async () => {
@@ -142,6 +144,7 @@ describe('«Batti» without chains, the story missions (spec 070, criterion 1; s
     const buus = ['majin-buu-buono', 'majin-buu-puro-male', 'super-buu', 'majin-buu-puro'];
     let defeats = 0;
     let chains = 0;
+    let zarbonAndDodoria = 0;
     let daburas = 0;
     for (const { map } of (await listIncludedMaps()).maps) {
       for (let run = 0; run < 40; run++) {
@@ -160,8 +163,10 @@ describe('«Batti» without chains, the story missions (spec 070, criterion 1; s
         for (const extra of extras) {
           if (extra.kind === 'chain') {
             chains += 1;
-            expect(rank(extra.giverId)).toBeGreaterThanOrEqual(tierRank('A-') as number);
             expect(rank(extra.behindId)).toBeGreaterThan(rank(extra.giverId));
+            if (extra.giverId === 'zarbon' || extra.giverId === 'dodoria') {
+              zarbonAndDodoria += 1;
+            }
           }
         }
         for (const cell of Object.values(content)) {
@@ -180,6 +185,8 @@ describe('«Batti» without chains, the story missions (spec 070, criterion 1; s
     }
     expect(defeats).toBeGreaterThan(50);
     expect(chains).toBeGreaterThan(20);
+    // The host's exception comes out too (spec 071, criterion 2).
+    expect(zarbonAndDodoria).toBeGreaterThan(0);
     expect(daburas).toBeGreaterThan(0);
   });
 });

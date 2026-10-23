@@ -53,16 +53,22 @@ Son Goku (metà);batti;;;;Ginyu;;;;sì;;400;;;1;La Squadra Ginyu sta attaccando 
 Son Goku (metà) SSJ;batti;;;;Freeza (forma finale);;;;sì;;400;;;1;Freeza ha ucciso Krilin: per questo sono diventato Super Saiyan. | Batti {obiettivo} e combatterò al tuo fianco.
 Nail;batti;;;;Zarbon;;;;sì;;400;;;1;Il pianeta Nameck è in pericolo. | Batti {obiettivo} e combatterò per te.
 Zarbon;combattimento;1v1;trasformazione;;;;;;sì;;400;;;1;Non costringermi a mostrarti il mio vero aspetto! | Se ci riesci, verrò con te.
+Zarbon;combattimento;2v2;vincere;Zarbon | Dodoria;;;;;sì;;400;;Freeza (prima forma);1;Il grande Freeza non riceve visite. | Battete me e Dodoria, e la strada per Freeza sarà aperta.
 Zarbon (trasformato);combattimento;1v1;vincere;;;;;;sì;;400;;;1;Ora vedrai il mio vero aspetto! | Battimi e verrò con te.
 Dodoria;combattimento;2v2;vincere;Dodoria | Zarbon;;;;;sì;;400;;;1;Zarbon, questi qui li sistemo io! | Battete me e Zarbon, e vi seguirò.
+Dodoria;combattimento;2v2;vincere;Dodoria | Zarbon;;;;;sì;;400;;Freeza (prima forma);1;Freeza mi ha mandato a sistemarvi! | Battete me e Zarbon, e la strada per Freeza sarà aperta.
 Ginyu;combattimento;2v2;vincere;Recoome | Guldo;;;;;sì;;400;;;1;Squadra Ginyu, in posizione! | Battete Recoome e Guldo e sarò dei vostri.
+Ginyu;combattimento;2v2;vincere;Recoome | Guldo;;;;;sì;;400;;Freeza (forma finale);1;Il grande Freeza ci ha ordinato di fermarvi! | Battete Recoome e Guldo, e la strada per Freeza sarà aperta.
 Recoome;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Recoome Ultra Fighting Bomber! | Battimi e passo dalla tua parte.
 Guldo;salta turni;;;;;;1;;sì;;900;;;1;Ho fermato il tempo! | Resta immobile per {n} turno, poi verrò con te.
 Butter;combattimento;2v2;vincere;Butter | Jeeth;;;;;sì;;400;;;1;Sono il guerriero più veloce dell'universo! | Battete me e Jeeth, e verrò con voi.
 Butter;combattimento;2v2;vincere;Butter | Jeeth;;;;;sì;;400;;Freeza (forma finale);3;Il grande Freeza non vuole essere disturbato! | Battete me e Jeeth, e la strada per Freeza sarà aperta.
 Jeeth;combattimento;2v2;vincere;Jeeth | Butter;;;;;sì;;400;;;1;Io e Butter colpiamo sempre in coppia. | Battete tutti e due e verrò con voi.
+Jeeth;combattimento;2v2;vincere;Jeeth | Butter;;;;;sì;;400;;Freeza (forma finale);1;Il grande Freeza non vuole essere disturbato! | Battete me e Butter, e la strada per Freeza sarà aperta.
 Freeza (seconda forma);combattimento;;trasformazione;;;;;;sì;;400;;;1;La mia potenza supera il milione. | Costringimi a trasformarmi di nuovo e verrò con te.
+Freeza (seconda forma);combattimento;;trasformazione;;;;;;;;1200;;Freeza (forma finale);1;Questa è solo la mia seconda forma. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Freeza (terza forma);combattimento;;trasformazione;;;;;;sì;;400;;;1;Questa forma non piace a nessuno, nemmeno a me. | Costringimi alla forma finale e verrò con te.
+Freeza (terza forma);combattimento;;trasformazione;;;;;;;;1200;;Freeza (forma finale);1;Ancora una trasformazione, e sarà la fine per voi. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Freeza (forma finale);combattimento;2v2;vincere;Freeza (forma finale) | Re Cold;;;;;sì;;400;;;1;Papà, guarda come tratto questi insetti. | Battete me e mio padre, e vi servirò.
 Trunks (spada);porta;;;;Son Goku (metà);;;;sì;;400;;;1;Vengo dal futuro: devo parlare con Son Goku. | Portami {obiettivo} e verrò con te.
 Trunks (spada) SSJ;batti;;;;Mecha Freeza;;;;sì;;400;;;1;Freeza è tornato, ricostruito come una macchina. | Batti {obiettivo} e la mia spada sarà tua.
@@ -81,19 +87,26 @@ Piccolo (fine);batti;;;;C-17;;;;sì;;400;;;1;Mi sono fuso con Kami per affrontar
 C-17;combattimento;2v2;vincere;C-17 | C-18;;;;;sì;;400;;;1;Io e mia sorella non obbediamo a nessuno. | Battete me e C-18, e vi seguirò.
 C-17;combattimento;2v2;vincere;C-17 | C-18;;;;;sì;;400;;Cell (prima forma);1;Cell ci sta cercando, ma noi non abbiamo paura. | Battete me e C-18, e la strada per Cell sarà aperta.
 C-18;combattimento;2v2;vincere;C-18 | C-17;;;;;sì;;400;;;1;Mio fratello e io ci annoiamo. | Battete tutti e due e verrò con voi.
+C-18;combattimento;2v2;vincere;C-18 | C-17;;;;;sì;;400;;Cell (prima forma);1;Cell ci sta cercando, ma non ci prenderà. | Battete me e C-17, e la strada per Cell sarà aperta.
 C-16;combattimento;3v3;vincere;C-16 | C-17 | C-18;;;;;sì;;400;;;1;Non voglio combattere... ma C-17 e C-18 non mi lasciano scelta. | Battete tutti e tre e verrò con voi.
 C-19;combattimento;2v2;vincere;C-19 | Dr. Gero (C-20);;;;;sì;;400;;;1;Assorbirò la vostra energia. | Battete me e il dottor Gero, e vi seguirò.
 Dr. Gero (C-20);combattimento;2v2;vincere;Dr. Gero (C-20) | C-19;;;;;sì;;400;;;1;Ho studiato Son Goku per anni. | Battete me e C-19, e lavorerò per voi.
 Cell (seconda forma);combattimento;;trasformazione;;;;;;sì;;400;;;1;Ho assorbito C-17. Me ne manca solo una. | Costringimi a trasformarmi e verrò con te.
+Cell (seconda forma);combattimento;;trasformazione;;;;;;;;1200;;Cell (perfetto, massima potenza);1;Ho assorbito C-17: me ne manca solo una. | Costringimi a trasformarmi: la strada si aprirà e avrai {monete} monete.
 Cell (forma perfetta);combattimento;2v2;vincere;Cell (forma perfetta) | Cell Jr.;;;;;sì;;400;;;1;Ti presento mio figlio. | Battete noi due, e verrò con voi.
+Cell (forma perfetta);combattimento;2v2;vincere;Cell (forma perfetta) | Cell Jr.;;;;;;;1200;;Cell (perfetto, massima potenza);1;Ecco i miei figli, i Cell Jr.! | Battete me e il mio Cell Jr.: la strada si aprirà e avrete {monete} monete.
 Son Gohan (futuro);porta;;;;Trunks (spada);;;;sì;;400;;;1;Nel mio futuro i cyborg hanno distrutto tutto: mi resta solo Trunks. | Portami {obiettivo} e combatteremo insieme.
 Son Gohan (futuro) SSJ;batti;;;;C-18;;;;sì;;400;;;1;C-17 e C-18 seminano il terrore nel mio tempo. | Batti {obiettivo} e verrò con te.
 Cooler (forma finale);combattimento;1v1;vincere;;;;;;sì;;400;;;1;Ora conoscerai la mia forma finale! | Battimi e verrò con te.
 C-13;combattimento;;trasformazione;;;;;;sì;;400;;;1;Il dottor Gero mi ha programmato per una cosa sola. | Costringimi a trasformarmi e ti seguirò.
+C-13;combattimento;;trasformazione;;;;;;;;1200;;Super C-13;1;C-14 e C-15 mi hanno lasciato i loro chip. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Turles;combattimento;;trasformazione;;;;;;sì;;400;;;1;L'albero della potenza mi rende invincibile! | Costringimi a trasformarmi e ti seguirò.
 Slug;combattimento;;trasformazione;;;;;;sì;;400;;;1;Il mio vero potere ha dimensioni enormi. | Costringimi a diventare gigante e verrò con te.
+Slug;combattimento;;trasformazione;;;;;;;;1200;;Slug (gigante);1;La Terra sarà la mia nuova astronave. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Broli;combattimento;;trasformazione;;;;;;sì;;400;;;1;Kakaroth... KAKAROTH! | Se mi fai trasformare, ti seguirò.
+Broli;combattimento;;trasformazione;;;;;;;;1200;;Broli SSJ;1;Kakaroth... | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Broli SSJ;combattimento;;trasformazione;;;;;;sì;;400;;;1;Kakaroth... KAKAROTH! | Costringimi a trasformarmi e verrò con te.
+Broli SSJ;combattimento;;trasformazione;;;;;;;;1200;;Broli Super Saiyan Leggendario;1;Il mio potere non ha limiti! | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Zangya;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Bojack ci ha liberati: ora la Terra è nostra. | Battimi e ti seguirò.
 Bojack;combattimento;2v2;vincere;Bojack | Zangya;;;;;sì;;400;;;1;Il mio gruppo è libero, finalmente. | Battete me e Zangya, e verrò con voi.
 Bojack;combattimento;1v1;trasformazione;;;;;;;;1200;;Bojack (massima potenza);1;Il mio vero potere ti spazzerà via. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
@@ -124,7 +137,9 @@ Spopovitch;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Bobbidi mi ha dato un pot
 Kaioshin;batti;;;;Bobbidi;;;;sì;;400;;;1;Bobbidi vuole risvegliare Majin Bu. | Batti {obiettivo} e verrò con te.
 Kibitoshin;batti;;;;Dabura;;;;sì;;400;;;1;Dabura serve Bobbidi: va fermato. | Batti {obiettivo} e ti aiuterò.
 Majin Buu (buono);porta;;;;Uub;;;;sì;;400;;;1;Bu sente che quel bambino, Uub, è come lui. | Portami {obiettivo} e Bu verrà con te.
+Majin Buu (puro male);combattimento;1v1;vincere;;;;;;sì;;400;;Super Buu;1;Il Bu cattivo è uscito... e vuole tutto. | Battimi e vedrai che cosa diventerò.
 Super Buu;combattimento;;trasformazione;;;;;;sì;;400;;;1;Buu ha fame... Buu assorbe! | Costringimi a trasformarmi e verrò con te.
+Super Buu;combattimento;;trasformazione;;;;;;;;1200;;Super Buu (Son Gohan assorbito);1;Buu vuole assorbire qualcuno di forte... | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Super Buu (Gotenks assorbito);combattimento;;trasformazione;;;;;;sì;;400;;;1;Gotenks è dentro di me, e voglio di più! | Costringimi a trasformarmi e verrò con te.
 Vegetto;batti;;;;Super Buu (Son Gohan assorbito);;;;sì;;400;;;1;Io sono Vegetto: Goku e Vegeta in un solo guerriero. | Batti {obiettivo} e combatterò con te.
 Uub;combattimento;;vincere;;;;;;sì;;400;;;1;Il signor Goku mi ha detto di allenarmi. | Battimi e vengo con te!
@@ -137,5 +152,9 @@ Vegeta SSJ4;porta;;;;Son Goku SSJ4;;;;sì;;400;;;1;Bulma ha trovato il modo di f
 Gogeta SSJ4;batti;;;;Super Ii Shenron;;;;sì;;400;;;1;Il drago più forte è nato dalle sfere del drago. | Batti {obiettivo} e combatterò con te.
 Super C-17;combattimento;1v1;vincere;;;;;;sì;;400;;;1;Due C-17 in uno: nessuno può fermarmi. | Battimi e verrò con te.
 Baby Vegeta;combattimento;;trasformazione;;;;;;sì;;400;;;1;Mi vendicherò dei Saiyan! | Costringimi a trasformarmi e ti seguirò.
+Baby Vegeta;combattimento;;trasformazione;;;;;;;;1200;;Super Baby 1;1;Il corpo di Vegeta è perfetto per me. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
+Super Baby 2;combattimento;;trasformazione;;;;;;;;1200;;Baby Oozaru;1;Con la luce Blutz diventerò inarrestabile! | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
 Super Uub;batti;;;;Super Baby 2;;;;sì;;400;;;1;Con Majin Bu dentro di me ho una forza nuova. | Batti {obiettivo} e verrò con te.
 Ii Shenron;combattimento;;trasformazione;;;;;;sì;;400;;;1;Dentro di me ci sono tutte e sette le sfere del drago. | Costringimi a usarle e verrò con te.
+Ii Shenron;combattimento;;trasformazione;;;;;;;;1200;;Super Ii Shenron;1;Le altre sfere nere stanno per diventare mie. | Costringimi a trasformarmi: ti lascerò passare e avrai {monete} monete.
+Su Shenron;combattimento;1v1;vincere;;;;;;sì;;400;;Ii Shenron;1;Sono il drago della sfera a quattro stelle. | Battimi e potrai affrontare il più forte dei draghi neri.

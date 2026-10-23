@@ -163,6 +163,20 @@ describe('the story missions in docs (spec 069, criteria 3 and 4)', () => {
     );
   });
 
+  it('the chains: who opens is B+ or more, Zarbon and Dodoria apart; who is behind is stronger (spec 071, criterion 1)', () => {
+    const rank = (characterId: string | undefined) =>
+      tierRank(characters.find((character) => character.id === characterId)?.tier) ?? -1;
+    const chains = entries.filter((entry) => entry.behindId);
+    expect(chains).toHaveLength(27);
+    for (const entry of chains) {
+      const giver = 'characterId' in entry.giver ? entry.giver.characterId : '';
+      expect(rank(entry.behindId), giver).toBeGreaterThan(rank(giver));
+      if (giver !== id('Zarbon') && giver !== id('Dodoria')) {
+        expect(rank(giver), giver).toBeGreaterThanOrEqual(tierRank('B+') as number);
+      }
+    }
+  });
+
   it('Cell Jr. and Saibaiman are never a target or a reward', () => {
     const henchmen = ['cell-jr', 'saibaiman'];
     for (const entry of entries) {
