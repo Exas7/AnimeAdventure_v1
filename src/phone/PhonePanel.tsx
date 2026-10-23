@@ -5,6 +5,7 @@ import {
   trainingRule,
   travelRule,
   type Character,
+  type FusionOption,
   type GameState,
   type ItemDefinition,
   type PlayerId,
@@ -29,6 +30,8 @@ interface PhonePanelProps {
   onUsePower(powerId: string): void;
   onUseItem(itemId: string): void;
   onAbandonMission(missionId: number): void;
+  /** «Fondi» in the «i» (spec 068, 2.2); missing for the AI, which fuses by itself. */
+  onFuse?(option: FusionOption): void;
   onEndTurn(): void;
   onUndo(): void;
   onMenu(): void;
@@ -213,6 +216,28 @@ function PlayerInfoDialog(props: PhonePanelProps & { onClose(): void; canAbandon
         <h3>Sesto personaggio</h3>
         <p>{info.sixth[0]?.toUpperCase() + info.sixth.slice(1)}.</p>
       </section>
+      {info.fusions.length > 0 && (
+        <section className={styles.section}>
+          <h3>Fusioni</h3>
+          {info.fusions.map((fusion) => (
+            <div key={fusion.result} className={styles.mission}>
+              <p>
+                {fusion.pair} possono fondersi in <strong>{fusion.result}</strong>.
+              </p>
+              {props.onFuse && !props.locked && (
+                <button
+                  onClick={() => {
+                    props.onFuse?.(fusion.option);
+                    props.onClose();
+                  }}
+                >
+                  Fondi
+                </button>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
     </Dialog>
   );
 }

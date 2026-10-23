@@ -35,11 +35,18 @@ export const RETRY_LOST_CHALLENGE_POWER: ReadyPower = makeReadyPower(
   { ...newPowerForm('retryLostChallenge'), uses: 2 },
 );
 
-/** The powers that give no coins have two uses (spec 063, 2.2). */
+/** The powers that give no coins have two uses (spec 063, 2.2). «Doppio movimento» was one of them until spec 067. */
 export const DOUBLE_MOVE_POWER: ReadyPower = makeReadyPower(
   'potere-doppio-movimento-2',
   'Due volte per partita: doppio movimento (2 azioni in più)',
   { ...newPowerForm('extraActionsOnDemand'), name: 'Doppio movimento', amount: 2, uses: 2 },
+);
+
+/** In its place since spec 067: a second interaction in the turn too. */
+export const DOUBLE_ACTION_POWER: ReadyPower = makeReadyPower(
+  'potere-doppia-azione',
+  'Due volte per partita: doppia azione (2 azioni e 1 interazione in più)',
+  { ...newPowerForm('doubleActionOnDemand'), name: 'Doppia azione', uses: 2 },
 );
 
 export const SKIP_TURN_POWER: ReadyPower = makeReadyPower(
@@ -76,6 +83,9 @@ export const REPLACED_READY_POWERS: [ReadyPower, ReadyPower][] = [
   ],
 ];
 
+/** Spec 067, storage version 11: «Doppio movimento», unchanged, becomes «Doppia azione». */
+export const REPLACED_READY_POWERS_067: [ReadyPower, ReadyPower][] = [[DOUBLE_MOVE_POWER, DOUBLE_ACTION_POWER]];
+
 /** True when two ready powers say and do the same: same code, card and effect. */
 export function sameReadyPower(a: ReadyPower, b: ReadyPower): boolean {
   const fields: (keyof PowerForm)[] = ['kind', 'name', 'amount', 'n', 'uses', 'text', 'moment'];
@@ -85,7 +95,7 @@ export function sameReadyPower(a: ReadyPower, b: ReadyPower): boolean {
 /**
  * The ready powers a new browser starts with: the three of coins of the
  * channel's graphic and three without coins, two uses each (spec 025, 2.1;
- * spec 061; spec 063).
+ * spec 061; spec 063; spec 067).
  */
 export const DEFAULT_READY_POWERS: ReadyPower[] = [
   makeReadyPower('potere-ogni-2-turni-200', 'Ogni 2 turni guadagni 200$', {
@@ -100,7 +110,7 @@ export const DEFAULT_READY_POWERS: ReadyPower[] = [
   ),
   EXTRA_STARTING_COINS_POWER,
   RETRY_LOST_CHALLENGE_POWER,
-  DOUBLE_MOVE_POWER,
+  DOUBLE_ACTION_POWER,
   SKIP_TURN_POWER,
 ];
 

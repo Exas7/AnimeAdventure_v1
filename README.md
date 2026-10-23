@@ -110,6 +110,9 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
   il potere «Ritenta una sfida persa»; una volta per partita, con la
   squadra completa, si può arruolare un sesto personaggio e poi cacciarne
   uno (mai lo starter).
+- **Fusioni**: Goku e Vegeta (fine di Dragon Ball) in Vegetto o Gogeta,
+  Goku e Vegeta SSJ4 in Gogeta SSJ4, Goten e Trunks bambino in Gotenks:
+  con la coppia in squadra il gioco ti chiede se fonderli.
 - **Apri stream** (in regia): apre la finestra per gli spettatori.
 
 ## I tuoi dati

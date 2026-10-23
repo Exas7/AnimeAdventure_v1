@@ -263,6 +263,9 @@ export function randomizeWithMissions(
   // Cells whose character a mission needs where it is: the target of a
   // mission, or someone put there for one. Nobody else goes there.
   const pinned = new Set<string>();
+  // Cells of someone a «Batti» asks to beat: they hold a fight, never another
+  // «Batti» or anything else, so «Batti» never makes a chain (spec 070).
+  const fightOnly = new Set<string>();
   const usedQuestions = new Set(
     Object.entries(result)
       .filter(([id]) => !cellTargets.includes(id))
@@ -280,7 +283,9 @@ export function randomizeWithMissions(
     const own = chained.get(cellId);
     // Who opens a locked path gives a hard mission (D-052); a strong character never an easy one (D-069).
     const fits = (entry: CatalogMission) =>
-      (!openers.has(cellId) || OPENER_MISSIONS.includes(entry.mission.type)) && !tooEasyFor(entry.mission, character);
+      (!openers.has(cellId) || OPENER_MISSIONS.includes(entry.mission.type)) &&
+      (!fightOnly.has(cellId) || entry.mission.type === 'fight') &&
+      !tooEasyFor(entry.mission, character);
     // Their own missions first; if none fits here, those of their group.
     const candidates = own
       ? [[own]]
@@ -332,6 +337,9 @@ export function randomizeWithMissions(
       : undefined;
     if (targetCell) {
       pinned.add(targetCell);
+      if (chosen.mission.type === 'defeat') {
+        fightOnly.add(targetCell);
+      }
     }
     for (const id of chosen.mission.reward.characters ?? []) {
       rewarded.add(id);
@@ -437,6 +445,16 @@ export function randomizeWithMissions(
           if (isReserved(target)) {
             return null;
           }
+          // Who is to be beaten already has a mission: only a fight will do (spec 070).
+          const targetCell = characterCellIds.find((id) => result[id]?.characterId === target);
+          if (
+            mission.type === 'defeat' &&
+            targetCell &&
+            processed.has(targetCell) &&
+            result[targetCell]?.mission?.type !== 'fight'
+          ) {
+            return null;
+          }
           if (!onBoard(target)) {
             // Put on the board only if no other form of its person is in the game (spec 039).
             if (forSale(target) || rewarded.has(target) || !find(target) || personTaken(target)) {
@@ -464,7 +482,13 @@ export function randomizeWithMissions(
             replace = { cellId: cell, characterId: target };
           }
         } else {
-          const choices = characterCells.filter((id) => farther(id) && notGiver(result[id]?.characterId));
+          // A «Batti» chosen here aims at someone with a tier, who can get a fight (spec 070).
+          const choices = characterCells.filter(
+            (id) =>
+              farther(id) &&
+              notGiver(result[id]?.characterId) &&
+              (mission.type === 'goTo' || find(result[id]?.characterId)?.tier),
+          );
           const cell = choices[Math.floor(random() * choices.length)];
           if (!cell) {
             return null;

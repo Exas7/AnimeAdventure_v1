@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { act, createGame, currentState } from './game';
+import { act, createGame, currentState, lastWarnings } from './game';
 import { gameLog } from './log';
 import { powerCatalog } from './powers';
 import { testSetup } from './testMap';
@@ -64,6 +64,22 @@ describe('powers (spec 001, criteria 1-8)', () => {
     game = play(game, endTurn, endTurn);
     expect(currentState(game).currentPlayer).toBe('p1');
     expect(currentState(game).actions.available).toBe(2);
+  });
+
+  it('«Doppia azione» gives 2 actions and 1 interaction more: a third interaction is warned (spec 067, criterion 1)', () => {
+    let game = createGame(testSetup({ p1Powers: [powerCatalog.doubleActionOnDemand(2)] }));
+    game = act(game, { type: 'usePower', player: 'p1', powerId: 'p1-0' });
+    expect(currentState(game).actions).toMatchObject({ available: 4, interactionsAvailable: 2 });
+    expect(currentState(game).notifications.at(-1)?.text).toBe('G1 · Doppia azione: +2 azioni e +1 interazione');
+
+    // Interacting where the pawn stands again only reopens the scene: three different cells.
+    game = play(game, { type: 'interact', nodeId: 's1' }, { type: 'interact', nodeId: 'c1' });
+    expect(lastWarnings(game)).toEqual([]);
+    game = act(game, { type: 'interact', nodeId: 'c2' });
+    expect(lastWarnings(game).map((warning) => warning.kind)).toContain('noInteractionsLeft');
+
+    game = play(game, endTurn, endTurn);
+    expect(currentState(game).actions).toMatchObject({ available: 2, interactionsAvailable: 1 });
   });
 
   it('C6: a skipped turn is lost entirely and shows in the log', () => {

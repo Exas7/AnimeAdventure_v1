@@ -357,7 +357,7 @@ function Cell({ node, clipId, highlighted, onClick, onDoubleClick, onContextMenu
   const image = node.imageData ?? characterFace(node.characterId);
   const classes = [
     onClick || onDoubleClick ? styles.interactive : '',
-    node.conqueredBy ? styles.conquered : '',
+    node.conqueredBy || node.off ? styles.conquered : '',
   ].join(' ');
 
   return (

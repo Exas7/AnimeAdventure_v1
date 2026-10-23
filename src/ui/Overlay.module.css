@@ -10,7 +10,7 @@
   animation: fade 0.2s ease-out;
 }
 
-/* «✕ Chiudi» of the scene, the shop and the showdown (spec 065): top right, over everything. */
+/* «✕ Chiudi» of the shop and the showdown (spec 065): top right, over everything. */
 .corner {
   position: absolute;
   top: 10px;

@@ -8,6 +8,8 @@ import type { GameSession } from '../director/useGameSession';
 import {
   cellMission,
   currentState,
+  fusionOptions,
+  fusionPairText,
   isRepeatInteraction,
   LASTING_MISSIONS,
   mustSendAway,
@@ -16,6 +18,7 @@ import {
   stepBackCell,
   trainingRule,
   travelRule,
+  type FusionOption,
   type Game,
   type GameAction,
   type PlayerId,
@@ -87,6 +90,9 @@ const AI_PAUSE_MS = 900;
 /** A turn of the AI never takes more steps than this (spec 053, criterion 3). */
 const AI_MAX_STEPS = 20;
 
+/** Rewards that complete other missions (spec 070): a safe bound on the rounds. */
+const MAX_REWARD_ROUNDS = 10;
+
 /**
  * The game on the phone (spec 052; D-083, D-084, D-085): the map with a
  * narrow column, one player at a time, the phone passed at every turn. The
@@ -114,6 +120,8 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   );
   // The character chosen to leave the team after the sixth (spec 061, 2.3).
   const [leaving, setLeaving] = useState<string | null>(null);
+  // Fusions answered «Non ora» (spec 068, 2.2): asked again only for another pair; «Fondi» stays in the «i».
+  const [fusionsDeclined, setFusionsDeclined] = useState<string[]>([]);
   // «Tocca a G2: passa il telefono» (spec 052, 2.8), and the winner of the showdown (2.9).
   const [passTo, setPassTo] = useState<PlayerId | null>(null);
   const [winner, setWinner] = useState<PlayerId | null>(null);
@@ -165,22 +173,31 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
     }
   }, [due, showdownOpen, passTo, aiSummary, setOverlay]);
 
-  /** The rewards of the missions that came true, at once (D-084). */
+  /**
+   * The rewards of the missions that came true, at once (D-084); a reward
+   * that completes another mission (the cell of a «Batti» conquered) gives
+   * that one too, at once (spec 070, 2.2).
+   */
   const giveRewards = (from: Game) => {
     let latest = from;
-    for (const reward of rewardsDue(currentState(latest))) {
-      const next = session.perform(reward);
-      if (!next) {
-        break;
+    let due = rewardsDue(currentState(latest));
+    // Each round completes at least one mission: never more rounds than missions.
+    for (let round = 0; due.length > 0 && round < MAX_REWARD_ROUNDS; round++) {
+      for (const reward of due) {
+        const next = session.perform(reward);
+        if (!next) {
+          return;
+        }
+        latest = next;
+        // Its notification is the alert; in the AI's turn it goes in the summary (spec 055, 2.2).
+        const done = currentState(next);
+        const news = done.notifications[done.notifications.length - 1];
+        if (ai && done.currentPlayer === ai.player && news) {
+          const prefix = `${name(ai.player)} · `;
+          aiLog.current.push(news.text.startsWith(prefix) ? news.text.slice(prefix.length) : news.text);
+        }
       }
-      latest = next;
-      // Its notification is the alert; in the AI's turn it goes in the summary (spec 055, 2.2).
-      const done = currentState(next);
-      const news = done.notifications[done.notifications.length - 1];
-      if (ai && done.currentPlayer === ai.player && news) {
-        const prefix = `${name(ai.player)} · `;
-        aiLog.current.push(news.text.startsWith(prefix) ? news.text.slice(prefix.length) : news.text);
-      }
+      due = rewardsDue(currentState(latest));
     }
   };
 
@@ -444,6 +461,15 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
   const characterName = (characterId: string) =>
     game.catalog.find((character) => character.id === characterId)?.name ?? characterId;
 
+  // A pair that may fuse (spec 068, 2.2): the app asks the player whose turn it is.
+  const fusionKey = (option: FusionOption) => `${current}:${option.members.join('+')}`;
+  const fusionsOffered =
+    aiTurn || current === ai?.player
+      ? []
+      : fusionOptions(state, game.catalog, current).filter((option) => !fusionsDeclined.includes(fusionKey(option)));
+  const fuse = (option: FusionOption) =>
+    apply([{ type: 'fuse', player: current, members: option.members, resultId: option.resultId }]);
+
   const handlePawnDrop = (player: PlayerId, nodeId: string) => {
     if (player !== current) {
       setMessage(`La pedina di ${name(player)} si muove nel suo turno`);
@@ -528,6 +554,8 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
             Completata
           </button>
         )}
+        {/* At the bottom with the others, not at the top (the host's choice, spec 065). */}
+        <button onClick={closeOverlay}>Chiudi</button>
       </>
     );
   };
@@ -653,6 +681,7 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
       onUsePower={(powerId) => attempt({ type: 'usePower', player: current, powerId })}
       onUseItem={useItem}
       onAbandonMission={(missionId) => attempt({ type: 'abandonMission', missionId })}
+      {...(playerId === ai?.player ? {} : { onFuse: fuse })}
       onEndTurn={askEndTurn}
       onUndo={() => {
         setTravel(null);
@@ -696,7 +725,6 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
                   buyItem: (itemId) => attempt({ type: 'buyItem', shopNodeId, itemId }),
                 })
           }
-          onCloseScene={aiTurn ? undefined : closeOverlay}
           onCloseShop={aiTurn ? undefined : closeOverlay}
           stackedShop
         />
@@ -779,6 +807,33 @@ export function PhoneGame({ session, game, onMenu, onGameOver }: PhoneGameProps)
           </div>
         </div>
       )}
+      {fusionsOffered[0] &&
+        !overlay &&
+        !fight &&
+        !sendingAway &&
+        !retryOffer &&
+        !passTo &&
+        !aiSummary &&
+        !winner && (
+          <div className={styles.dialog} role="dialog" aria-modal="true">
+            <div className={styles.dialogBox}>
+              <p>
+                {name(current)}: {fusionPairText(fusionsOffered[0], game.catalog)} possono fondersi. I due lasciano la
+                squadra e al loro posto entra la fusione.
+              </p>
+              <div className={styles.buttons}>
+                <button onClick={() => setFusionsDeclined([...fusionsDeclined, ...fusionsOffered.map(fusionKey)])}>
+                  Non ora
+                </button>
+                {fusionsOffered.map((option) => (
+                  <button key={option.resultId} className={styles.primary} onClick={() => fuse(option)}>
+                    {characterName(option.resultId)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       {aiFightView && ai && (
         <PhoneFight
           game={game}

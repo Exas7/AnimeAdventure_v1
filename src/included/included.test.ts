@@ -132,6 +132,36 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
   });
 });
 
+describe('«Batti» without chains (spec 070, criterion 1)', () => {
+  it('on every base map, who is to be beaten holds a fight', async () => {
+    const catalog = includedCatalog();
+    const random = seeded(70);
+    let defeats = 0;
+    for (const { map } of (await listIncludedMaps()).maps) {
+      for (let run = 0; run < 40; run++) {
+        const { content } = randomEpisode(map, {
+          catalog,
+          specialKeepers: [],
+          powers: DEFAULT_READY_POWERS,
+          texts: EMPTY_TEXT_LIBRARY,
+          missions: { catalog: includedMissions(catalog), questions: includedQuestions(), items: testItems },
+          perShop: 3,
+          random,
+        });
+        for (const cell of Object.values(content)) {
+          if (cell.mission?.type !== 'defeat') {
+            continue;
+          }
+          defeats += 1;
+          const target = Object.values(content).find((other) => other.characterId === cell.mission?.targetId);
+          expect(target?.mission?.type).toBe('fight');
+        }
+      }
+    }
+    expect(defeats).toBeGreaterThan(50);
+  });
+});
+
 describe('the maps that come with the app (spec 030, criterion 6)', () => {
   it('a file is read as a map, with the name written inside; a broken one is reported', async () => {
     const result = await readIncludedMaps({

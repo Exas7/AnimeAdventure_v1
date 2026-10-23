@@ -214,7 +214,8 @@ export type Trigger =
 
 export type Effect =
   | { type: 'addCoins'; amount: number }
-  | { type: 'extraActions'; amount: number }
+  // With `interactions`, interactions more too: «Doppia azione» (spec 067).
+  | { type: 'extraActions'; amount: number; interactions?: number }
   | { type: 'skipOpponentTurn' }
   | { type: 'reminder'; text: string }
   // On the cell of a character who beat the owner: they may challenge it again (spec 061, D-090).
@@ -404,6 +405,8 @@ export interface GameState {
    * at a cell. Missing in games saved before.
    */
   defeats?: Defeat[];
+  /** Cells turned off by a fusion, for both players (spec 068, 2.3). Missing in games saved before. */
+  offCells?: string[];
   nextMissionId?: number;
   notifications: Notification[];
   nextNotificationId: number;
@@ -455,7 +458,9 @@ export type GameAction =
   | { type: 'useTraining'; player: PlayerId; itemId: string; choices: TrainingChoice[] }
   // "Usa" on a Senzu (no `to`) or on a travel item, whose pawn goes `to` a cell (spec 047).
   // A Senzu may name the power it recharges (spec 061, 2.1); otherwise the first rechargeable one.
-  | { type: 'useItem'; player: PlayerId; itemId: string; to?: string; powerId?: string };
+  | { type: 'useItem'; player: PlayerId; itemId: string; to?: string; powerId?: string }
+  // Two of the team fuse into one (spec 068).
+  | { type: 'fuse'; player: PlayerId; members: [string, string]; resultId: string };
 
 export type RecordedAction = { type: 'startGame' } | GameAction;
 
@@ -474,6 +479,8 @@ export type WarningKind =
   // 'characterAlreadySold', 'itemSoldOut', 'itemAlreadyBought', 'nothingToRecharge'
   // and 'teamFull' are turn rules too when they come from a purchase.
   | 'nodeAlreadyConquered'
+  // A cell turned off by a fusion (spec 068, 2.3).
+  | 'cellOff'
   | 'notAdjacent'
   | 'noActionsLeft'
   | 'noInteractionsLeft'

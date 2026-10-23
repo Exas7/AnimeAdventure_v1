@@ -51,8 +51,7 @@ interface StageProps {
   showdownControls?: ReactNode;
   shopActions?: (shopNodeId: string) => ShopActions;
   shopControls?: ReactNode;
-  /** «✕ Chiudi» in the top right corner of the scene, the shop and the showdown (spec 065). */
-  onCloseScene?: () => void;
+  /** «✕ Chiudi» in the top right corner of the shop and the showdown (spec 065). */
   onCloseShop?: () => void;
   onCloseShowdown?: () => void;
   /** The phone (spec 057, 2.1): the shop in one column, scrolled only up and down. */
@@ -102,7 +101,6 @@ export function Stage(props: StageProps) {
           answer={challenge.answer}
           onAnswer={props.onAnswer}
           hideRightAnswer={props.hideRightAnswer}
-          onClose={props.onCloseScene}
         >
           {props.challengeControls?.(challenge.nodeId, challengeCharacter)}
         </ChallengeScreen>

@@ -1,7 +1,8 @@
 import {
   DEFAULT_READY_POWERS,
-  DOUBLE_MOVE_POWER,
+  DOUBLE_ACTION_POWER,
   REPLACED_READY_POWERS,
+  REPLACED_READY_POWERS_067,
   RETRY_LOST_CHALLENGE_POWER,
   sameReadyPower,
   SKIP_TURN_POWER,
@@ -16,11 +17,12 @@ import {
 // list of ready powers, which starts with the channel's three (D-037),
 // version 8 the catalog of missions and the quiz questions (D-041), version
 // 9 the power to retry a lost challenge in the lists made before (D-090),
-// version 10 the ready powers of spec 063 in the lists made before.
+// version 10 the ready powers of spec 063 in the lists made before,
+// version 11 «Doppia azione» in place of «Doppio movimento» (spec 067).
 
 /** Internal code: stays 'arkanite' after the rename, or saved data would vanish (D-020). */
 const DB_NAME = 'arkanite';
-const DB_VERSION = 10;
+const DB_VERSION = 11;
 
 export type StoreName =
   | 'autosave'
@@ -71,29 +73,39 @@ function openDatabase(): Promise<IDBDatabase> {
       }
       // Once per browser used before (spec 063, 2.3): the ready powers the app
       // put there and nobody changed take their new values, in the same place;
-      // «Doppio movimento» and «Salta turno» join the list, last.
+      // «Doppia azione» (since spec 067) and «Salta turno» join the list, last.
       if (event.oldVersion >= 7 && event.oldVersion < 10) {
         const powers = request.transaction?.objectStore('powers');
-        for (const [old, next] of REPLACED_READY_POWERS) {
-          const read = powers?.get(old.id);
-          if (read) {
-            read.onsuccess = () => {
-              const entry = read.result as { power?: ReadyPower; createdAt?: number } | undefined;
-              if (entry?.power && sameReadyPower(entry.power, old)) {
-                powers?.delete(old.id);
-                powers?.put({ power: next, createdAt: entry.createdAt ?? Date.now() }, next.id);
-              }
-            };
-          }
-        }
-        [DOUBLE_MOVE_POWER, SKIP_TURN_POWER].forEach((power, index) =>
+        replaceUnchanged(powers, REPLACED_READY_POWERS);
+        [DOUBLE_ACTION_POWER, SKIP_TURN_POWER].forEach((power, index) =>
           powers?.put({ power, createdAt: Date.now() + index }, power.id),
         );
+      }
+      // Once per browser that had version 10 (spec 067, 2.2): «Doppio movimento»,
+      // unchanged, becomes «Doppia azione» in the same place.
+      if (event.oldVersion === 10) {
+        replaceUnchanged(request.transaction?.objectStore('powers'), REPLACED_READY_POWERS_067);
       }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error ?? new Error('Cannot open IndexedDB'));
   });
+}
+
+/** Each old ready power still as the app put it takes the place of the new one; changed ones stay. */
+function replaceUnchanged(powers: IDBObjectStore | undefined, pairs: [ReadyPower, ReadyPower][]): void {
+  for (const [old, next] of pairs) {
+    const read = powers?.get(old.id);
+    if (read) {
+      read.onsuccess = () => {
+        const entry = read.result as { power?: ReadyPower; createdAt?: number } | undefined;
+        if (entry?.power && sameReadyPower(entry.power, old)) {
+          powers?.delete(old.id);
+          powers?.put({ power: next, createdAt: entry.createdAt ?? Date.now() }, next.id);
+        }
+      };
+    }
+  }
 }
 
 export async function withStore<T>(

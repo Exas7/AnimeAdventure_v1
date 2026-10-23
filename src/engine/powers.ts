@@ -41,6 +41,12 @@ export const powerCatalog = {
     trigger: { type: 'manual', uses },
     effect: { type: 'extraActions', amount },
   }),
+  /** «Doppia azione» (spec 067): 2 actions and 1 interaction more in the turn it is used. */
+  doubleActionOnDemand: (uses: number, name = 'Doppia azione'): PowerDefinition => ({
+    name,
+    trigger: { type: 'manual', uses },
+    effect: { type: 'extraActions', amount: 2, interactions: 1 },
+  }),
   skipOpponentTurn: (uses: number, name = 'Fai perdere un turno'): PowerDefinition => ({
     name,
     trigger: { type: 'manual', uses },
@@ -89,9 +95,15 @@ function applyEffect(state: GameState, ownerId: PlayerId, effect: Effect): strin
     case 'addCoins':
       state.players[ownerId].coins += effect.amount;
       return `${signed(effect.amount)} monete`;
-    case 'extraActions':
+    case 'extraActions': {
       state.actions.available += effect.amount;
-      return `${signed(effect.amount)} azioni`;
+      const interactions = effect.interactions ?? 0;
+      if (interactions === 0) {
+        return `${signed(effect.amount)} azioni`;
+      }
+      state.actions.interactionsAvailable += interactions;
+      return `${signed(effect.amount)} azioni e ${signed(interactions)} ${interactions === 1 ? 'interazione' : 'interazioni'}`;
+    }
     case 'skipOpponentTurn': {
       const opponent = state.players[opponentOf(ownerId)];
       opponent.turnsToSkip += 1;

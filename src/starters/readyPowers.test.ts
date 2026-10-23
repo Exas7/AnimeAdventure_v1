@@ -8,18 +8,19 @@ import {
   makeReadyPower,
   readyPowerDefinition,
   REPLACED_READY_POWERS,
+  REPLACED_READY_POWERS_067,
   sameReadyPower,
 } from './readyPowers';
 
 describe('the list of ready powers (spec 025)', () => {
-  it('starts with the three powers of coins of the channel graphic and three without coins, two uses each, with the right effects (criterion 1; spec 061, criterion 6; spec 063, criterion 2)', () => {
+  it('starts with the three powers of coins of the channel graphic and three without coins, two uses each, with the right effects (criterion 1; spec 061, criterion 6; spec 063, criterion 2; spec 067, criterion 2)', () => {
     expect(DEFAULT_READY_POWERS.map((power) => power.cardText)).toEqual([
       'Ogni 2 turni guadagni 200$',
       'Ogni volta che interagisci con un PG prendi 250$',
       // Spec 029 (2.5): the numbers follow the starting coins of the game.
       'Parti con {totale} invece che {iniziali}',
       'Due volte per partita puoi ritentare una sfida persa',
-      'Due volte per partita: doppio movimento (2 azioni in più)',
+      'Due volte per partita: doppia azione (2 azioni e 1 interazione in più)',
       "Due volte per partita fai saltare un turno all'avversario",
     ]);
     expect(DEFAULT_READY_POWERS.map(readyPowerDefinition)).toEqual([
@@ -27,7 +28,7 @@ describe('the list of ready powers (spec 025)', () => {
       powerCatalog.coinsPerInteraction(250),
       powerCatalog.extraStartingCoins(1500),
       powerCatalog.retryLostChallenge(2),
-      powerCatalog.extraActionsOnDemand(2, 2, 'Doppio movimento'),
+      powerCatalog.doubleActionOnDemand(2),
       powerCatalog.skipOpponentTurn(2, 'Salta turno'),
     ]);
     expect(new Set(DEFAULT_READY_POWERS.map((power) => power.id)).size).toBe(6);
@@ -87,7 +88,7 @@ describe('the list of ready powers (spec 025)', () => {
 
 describe('the ready powers of before spec 063 in a browser (spec 063, 2.3)', () => {
   it('each old one is recognised only when unchanged, and its new version has another code', () => {
-    for (const [old, next] of REPLACED_READY_POWERS) {
+    for (const [old, next] of [...REPLACED_READY_POWERS, ...REPLACED_READY_POWERS_067]) {
       expect(sameReadyPower(old, old)).toBe(true);
       expect(sameReadyPower({ ...old, cardText: `${old.cardText}!` }, old)).toBe(false);
       expect(sameReadyPower({ ...old, effect: { ...old.effect, uses: old.effect.uses + 1 } }, old)).toBe(false);

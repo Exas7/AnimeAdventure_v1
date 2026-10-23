@@ -1,11 +1,14 @@
 import {
   activeMissionParts,
+  fusionOptions,
+  fusionPairText,
   rechargesStarter,
   TEAM_SIZE,
   trainingRule,
   trainingRuleText,
   travelRule,
   type Character,
+  type FusionOption,
   type GameState,
   type ItemDefinition,
   type PlayerId,
@@ -14,7 +17,7 @@ import {
 
 // What the «i» of a player's column shows on the phone (spec 064, 2.1): the
 // powers with their uses, the items, the missions in progress in full, the
-// lost challenges and the sixth character.
+// lost challenges, the sixth character and the fusions (spec 068).
 
 export interface PlayerInfo {
   powers: { name: string; text: string; usesLeft: number | null }[];
@@ -22,9 +25,15 @@ export interface PlayerInfo {
   missions: { id: number; giver: string; task: string }[];
   lostTo: string[];
   sixth: string;
+  /** The fusions the player may do now, with who fuses and into whom. */
+  fusions: { pair: string; result: string; option: FusionOption }[];
 }
 
 const coins = (amount: number) => `${amount > 0 ? '+' : ''}${amount} monete`;
+/** "+2 azioni", or "+2 azioni e +1 interazione" for «Doppia azione» (spec 067). */
+const actions = (amount: number, interactions: number) =>
+  `${amount > 0 ? '+' : ''}${amount} azioni` +
+  (interactions > 0 ? ` e +${interactions} ${interactions === 1 ? 'interazione' : 'interazioni'}` : '');
 
 /** What a power does, in words: its trigger and its effect. */
 export function powerText(definition: PowerDefinition): string {
@@ -38,7 +47,7 @@ export function powerText(definition: PowerDefinition): string {
   if (effect.type === 'skipOpponentTurn') {
     return "l'avversario salta il suo prossimo turno";
   }
-  const what = effect.type === 'addCoins' ? coins(effect.amount) : `${effect.amount > 0 ? '+' : ''}${effect.amount} azioni`;
+  const what = effect.type === 'addCoins' ? coins(effect.amount) : actions(effect.amount, effect.interactions ?? 0);
   switch (trigger.type) {
     case 'gameStart':
       return `${what} a inizio partita`;
@@ -98,5 +107,10 @@ export function playerInfo(state: GameState, catalog: Character[], items: ItemDe
       .filter((defeat) => defeat.player === playerId)
       .map((defeat) => name(state.cells[defeat.nodeId]?.characterId)),
     sixth,
+    fusions: fusionOptions(state, catalog, playerId).map((option) => ({
+      pair: fusionPairText(option, catalog),
+      result: name(option.resultId),
+      option,
+    })),
   };
 }

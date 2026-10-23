@@ -38,6 +38,7 @@ export {
 } from './missions';
 export { hasLostAt, isAdjacent, isRepeatInteraction, reachableCells, turnRuleWarnings } from './rules';
 export { mustSendAway, sixthAvailable, teamIsFull } from './team';
+export { FUSION_PAIRS, fusionOptions, fusionPairText, isOffCell, type FusionOption } from './fusions';
 export { rechargesStarter, travelRule } from './itemUse';
 export {
   characterPrice,

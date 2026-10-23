@@ -53,6 +53,9 @@ describe('a power in words, for the list of powers (spec 025, 2.1)', () => {
       'Azioni extra a comando: +2, 2 usi · «Doppio movimento»',
     );
     expect(describePower(newPowerForm('skipOpponentTurn'))).toBe('Fai perdere un turno: 1 uso');
+    expect(describePower({ ...newPowerForm('doubleActionOnDemand'), uses: 2, name: 'Doppia azione' })).toBe(
+      'Doppia azione a comando: 2 usi · «Doppia azione»',
+    );
     expect(
       describePower({ ...newPowerForm('reminder'), text: 'Puoi ritentare', moment: 'turnStart' }),
     ).toBe("Promemoria (all'inizio di ogni turno): «Puoi ritentare»");

@@ -66,6 +66,8 @@ function describeAction(action: RecordedAction, before: GameState, context: Game
     }
     case 'loseChallenge':
       return `${name(action.player)} perde la sfida di ${cell(action.nodeId)}`;
+    case 'fuse':
+      return `${name(action.player)}: ${character(action.members[0])} e ${character(action.members[1])} si fondono in ${character(action.resultId)}`;
     case 'useItem':
       return action.to === undefined
         ? `${name(action.player)} usa ${item(action.itemId)}`

@@ -1,9 +1,11 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import {
+  fusionPairText,
   rechargesStarter,
   TEAM_SIZE,
   trainingRule,
   travelRule,
+  type FusionOption,
   type PanelMission,
   type Character,
   type ItemDefinition,
@@ -32,6 +34,8 @@ export interface PlayerPanelActions {
   /** "Completata": the reward by hand, even if the app has not noticed (spec 026, 2.4). */
   completeMission(nodeId: string): void;
   abandonMission(missionId: number): void;
+  /** «Fondi» (spec 068, 2.2): the host accepts the proposal, or ignores it (D-007). */
+  fuse(option: FusionOption): void;
 }
 
 interface PlayerPanelProps {
@@ -42,6 +46,8 @@ interface PlayerPanelProps {
   isCurrent: boolean;
   /** Missions in progress (spec 026, 2.4), on director and stream. */
   missions?: PanelMission[];
+  /** Director only: the fusions the team may do now (spec 068). */
+  fusions?: FusionOption[];
   actions?: PlayerPanelActions;
 }
 
@@ -249,6 +255,25 @@ export function PlayerPanel(props: PlayerPanelProps) {
                     <button onClick={() => actions.abandonMission(mission.id)}>Abbandona</button>
                   </span>
                 )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {actions && props.fusions && props.fusions.length > 0 && (
+        <div className={styles.missions}>
+          <span className={styles.missionsTitle}>Fusione possibile</span>
+          <ul>
+            {props.fusions.map((option) => (
+              <li key={option.resultId}>
+                <span>
+                  {fusionPairText(option, catalog)} →{' '}
+                  {catalog.find((character) => character.id === option.resultId)?.name ?? option.resultId}
+                </span>
+                <span className={styles.missionActions}>
+                  <button onClick={() => actions.fuse(option)}>Fondi</button>
+                </span>
               </li>
             ))}
           </ul>

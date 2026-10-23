@@ -2,6 +2,7 @@ import { cellLabel, findCharacter, findItem } from './lookup';
 import { rechargesStarter, travelRule } from './itemUse';
 import { hasBought, isSoldOut, rechargeablePower } from './shop';
 import { teamIsFull } from './team';
+import { isOffCell } from './fusions';
 import {
   type GameAction,
   type GameContext,
@@ -157,6 +158,12 @@ function boardWarnings(
       warnings.push({
         kind: 'nodeAlreadyConquered',
         message: `${state.players[conqueror].name} ha già conquistato ${label(action.nodeId)}`,
+      });
+    }
+    if (isOffCell(state, action.nodeId)) {
+      warnings.push({
+        kind: 'cellOff',
+        message: `${label(action.nodeId)} è spenta: quel personaggio è entrato in una fusione`,
       });
     }
     if (hasLostAt(state, playerId, action.nodeId)) {

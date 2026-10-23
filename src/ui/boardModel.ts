@@ -109,6 +109,8 @@ export interface NodeView {
   /** Small caption under the label, e.g. "Negozio". */
   caption: string | null;
   conqueredBy: PlayerId | null;
+  /** Turned off by a fusion, for both players (spec 068, 2.3): drawn as conquered. */
+  off?: boolean;
   /** Special cells: colour chosen in the editor. */
   color: string | null;
   /** Special cells: the meaning written in the editor, shown only in the director (spec 034). */
@@ -160,6 +162,7 @@ export function boardView(
   return {
     ...layoutView(map, catalog, state.cells, {
       conquests: state.conquests,
+      offCells: state.offCells ?? [],
       isClosed: (edge) => state.edgeLocks[edge.id]?.[viewer] ?? edge.locked,
     }),
     pawns: pawnViews(state, nodesById, toBoard),
@@ -185,7 +188,11 @@ function layoutView(
   map: GameMap,
   catalog: Character[],
   cells: Record<string, CellContent>,
-  status: { conquests: Partial<Record<string, PlayerId>>; isClosed: (edge: MapEdge) => boolean },
+  status: {
+    conquests: Partial<Record<string, PlayerId>>;
+    offCells?: readonly string[];
+    isClosed: (edge: MapEdge) => boolean;
+  },
 ): Omit<BoardView, 'pawns'> {
   const nodesById = new Map(map.nodes.map((node) => [node.id, node]));
   const size = boardSize(map);
@@ -203,6 +210,7 @@ function layoutView(
       label,
       caption,
       conqueredBy: status.conquests[node.id] ?? null,
+      ...(status.offCells?.includes(node.id) ? { off: true } : {}),
       color: node.type === 'special' ? (node.color ?? null) : null,
       ...(node.type === 'special' && node.note?.trim() ? { note: node.note.trim() } : {}),
       characterId: role === 'character' || role === 'shop' ? (content?.characterId ?? null) : null,

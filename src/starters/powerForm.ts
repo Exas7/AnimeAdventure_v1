@@ -32,6 +32,8 @@ export const POWER_KINDS: { kind: PowerKind; label: string; fields: PowerField[]
   { kind: 'coinsAtTurnEnd', label: 'Monete a fine turno', fields: ['amount'] },
   { kind: 'fixedExtraActions', label: 'Azioni extra fisse', fields: ['amount'] },
   { kind: 'extraActionsOnDemand', label: 'Azioni extra a comando', fields: ['amount', 'uses'] },
+  // Spec 067: 2 actions and 1 interaction more, the turn of a second interaction.
+  { kind: 'doubleActionOnDemand', label: 'Doppia azione a comando', fields: ['uses'] },
   { kind: 'skipOpponentTurn', label: 'Fai perdere un turno', fields: ['uses'] },
   { kind: 'reminder', label: 'Promemoria', fields: ['text', 'moment'] },
   // Spec 061, D-090: the app offers it on the character who beat the player.
@@ -82,6 +84,8 @@ export function powerDefinition(power: PowerForm): PowerDefinition {
       return powerCatalog.fixedExtraActions(power.amount, name);
     case 'extraActionsOnDemand':
       return powerCatalog.extraActionsOnDemand(power.amount, power.uses, name);
+    case 'doubleActionOnDemand':
+      return powerCatalog.doubleActionOnDemand(power.uses, name);
     case 'skipOpponentTurn':
       return powerCatalog.skipOpponentTurn(power.uses, name);
     case 'reminder':
@@ -109,6 +113,7 @@ export function describePower(power: PowerForm): string {
       return `${label}: ${signed(power.amount)}${own}`;
     case 'extraActionsOnDemand':
       return `${label}: ${signed(power.amount)}, ${uses}${own}`;
+    case 'doubleActionOnDemand':
     case 'skipOpponentTurn':
     case 'retryLostChallenge':
       return `${label}: ${uses}${own}`;

@@ -7,6 +7,7 @@ import {
   missionsDone,
   missionsOf,
   createGame,
+  fusionOptions,
   currentState,
   isRepeatInteraction,
   PLAYER_IDS,
@@ -964,6 +965,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
     useItem: (itemId) => useInventoryItem(playerId, itemId),
     completeMission: (nodeId) => perform({ type: 'completeMission', nodeId, player: playerId }),
     abandonMission: (missionId) => perform({ type: 'abandonMission', missionId }),
+    fuse: (option) => perform({ type: 'fuse', player: playerId, members: option.members, resultId: option.resultId }),
   });
 
   // Missions whose condition came true (D-040): the host gives the reward with one click.
@@ -1130,6 +1132,8 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
                   ) : (
                     exploreButton
                   )}
+                  {/* At the bottom with the others, not at the top (the host's choice, spec 065). */}
+                  <button onClick={close}>Chiudi</button>
                 </>
               );
             }}
@@ -1146,7 +1150,6 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
             }
             shopActions={shopActions}
             shopControls={exploreButton}
-            onCloseScene={() => applyScreens(closeShown(screens))}
             onCloseShop={() => session.setOverlay(null)}
             onCloseShowdown={() => session.setOverlay(null)}
           />
@@ -1205,6 +1208,7 @@ export function DirectorApp({ phone = false }: DirectorAppProps) {
               items={game.items}
               isCurrent={current === playerId}
               missions={missionsOf(state, playerId, game.catalog)}
+              fusions={fusionOptions(state, game.catalog, playerId)}
               actions={panelActions(playerId)}
             />
           ))}

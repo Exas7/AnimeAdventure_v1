@@ -344,3 +344,21 @@ describe('missions in progress after the sixth (spec 063, criterion 5; D-092)', 
     expect(rewardsDue(currentState(accepted))).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1' }]);
   });
 });
+
+describe('«Batti» rewards at once (spec 070, 2.2)', () => {
+  it('the reward of a fight conquers the cell, and the «Batti» of that cell comes due too', () => {
+    const defeat: Mission = { type: 'defeat', targetId: 'char-b', reward: { cellCharacter: true } };
+    const fight: Mission = { type: 'fight', format: '1v1', condition: 'win', reward: { cellCharacter: true } };
+    const accepted = play(
+      start(),
+      { type: 'setCellContent', nodeId: 'c1', content: { characterId: 'char-a', mission: defeat } },
+      { type: 'setCellContent', nodeId: 'c2', content: { characterId: 'char-b', mission: fight } },
+      { type: 'acceptMission', nodeId: 'c1', player: 'p1' },
+    );
+    expect(rewardsDue(currentState(accepted))).toEqual([]);
+    const won = play(accepted, { type: 'completeMission', nodeId: 'c2', player: 'p1' });
+    expect(rewardsDue(currentState(won))).toEqual([{ type: 'completeMission', nodeId: 'c1', player: 'p1' }]);
+    const p1 = currentState(play(won, ...rewardsDue(currentState(won)))).players.p1;
+    expect(p1.team).toEqual(expect.arrayContaining(['char-a', 'char-b']));
+  });
+});

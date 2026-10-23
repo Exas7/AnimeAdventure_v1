@@ -4,7 +4,9 @@ import { tierRank, type Random } from '../episode/fill';
 import {
   cellMission,
   currentState,
+  fusionOptions,
   hasLostAt,
+  isOffCell,
   isAdjacent,
   isRepeatInteraction,
   mustSendAway,
@@ -255,7 +257,12 @@ function cellValue(game: Game, state: GameState, nodeId: string, level: AiLevel,
   const player = state.currentPlayer;
   const content = state.cells[nodeId];
   const node = game.map.nodes.find((candidate) => candidate.id === nodeId);
-  if (!content?.characterId || node?.type === 'shop' || state.conquests[nodeId] !== undefined) {
+  if (
+    !content?.characterId ||
+    node?.type === 'shop' ||
+    state.conquests[nodeId] !== undefined ||
+    isOffCell(state, nodeId)
+  ) {
     return 0;
   }
   // A character who beat it: only with a power to retry (spec 061, 2.4; spec 063, 2.4).
@@ -416,6 +423,17 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
     }
   }
 
+  // It fuses whenever it can, into the strongest fusion (spec 068, 2.4).
+  const fusion = fusionOptions(state, game.catalog, player)
+    .map((option) => ({ option, result: game.catalog.find((character) => character.id === option.resultId) }))
+    .sort((a, b) => characterValue(b.result) - characterValue(a.result))[0];
+  if (fusion?.result) {
+    const action: GameAction = { type: 'fuse', player, members: fusion.option.members, resultId: fusion.result.id };
+    if (allowed(action)) {
+      return { kind: 'act', action, text: `Fonde la coppia in ${fusion.result.name}` };
+    }
+  }
+
   if (rules.usesItems) {
     // Manual powers: coins at once; the others when they pay (spec 063, 2.4).
     for (const power of me.powers) {
@@ -522,20 +540,32 @@ export function nextAiStep(game: Game, level: AiLevel, random: Random, memory: A
     return { kind: 'interact', nodeId: position, text: `Incontra ${nameAt(game, state, position)}` };
   }
 
-  if (actionsLeft > 0) {
+  // Extra actions when they take it to its goal in this turn (spec 063, 2.4),
+  // and with «Doppia azione» to a second interaction too (spec 067, 2.3).
+  const extra = usablePower(state, player, 'extraActions');
+  const effect = extra?.definition.effect;
+  const extraActions = effect?.type === 'extraActions' ? effect.amount : 0;
+  const extraInteractions = effect?.type === 'extraActions' ? (effect.interactions ?? 0) : 0;
+  if (actionsLeft > 0 || extraInteractions > 0) {
     const move = chooseMove(game, state, level, memory, random);
     if (move) {
-      // Extra actions when they take it to its goal in this turn (spec 063, 2.4).
-      const extra = usablePower(state, player, 'extraActions');
-      const amount = extra?.definition.effect.type === 'extraActions' ? extra.definition.effect.amount : 0;
       const needed = move.distance + (move.interact ? 1 : 0);
-      if (extra && rules.usesItems && needed > actionsLeft && needed <= actionsLeft + amount) {
+      const noInteraction = move.interact && interactionsLeft <= 0;
+      if (
+        extra &&
+        rules.usesItems &&
+        (needed > actionsLeft || noInteraction) &&
+        needed <= actionsLeft + extraActions &&
+        (!noInteraction || extraInteractions > 0)
+      ) {
         const action: GameAction = { type: 'usePower', player, powerId: extra.id };
         if (allowed(action)) {
           return { kind: 'act', action, text: `Usa il potere «${extra.definition.name}» per arrivare prima` };
         }
       }
-      return { kind: 'act', action: { type: 'move', to: move.to }, text: move.text };
+      if (actionsLeft > 0) {
+        return { kind: 'act', action: { type: 'move', to: move.to }, text: move.text };
+      }
     }
   }
   return { kind: 'end', text: 'Finisce il turno' };

@@ -12,6 +12,7 @@ import {
   type AiLevel,
   type PowerDefinition,
   type CellContent,
+  type Character,
   type Game,
   type GameAction,
 } from '../engine';
@@ -286,6 +287,23 @@ describe('the AI uses its powers when they pay (spec 063, criterion 4)', () => {
     expect(nextAiStep(near, 'normal', seeded(1), newMemory())).toMatchObject({ kind: 'act', action: { type: 'move' } });
   });
 
+  it('uses «Doppia azione» for a second interaction within reach, «Doppio movimento» not (spec 067, criterion 3)', () => {
+    // At n1, after meeting someone there: no interaction left, Personaggio A in c1 one step away.
+    const met = (power: PowerDefinition) => {
+      const game = place(withPowers([power]), 'n1');
+      const state = currentState(game);
+      const actions = { ...state.actions, used: 1, interactionsUsed: 1 };
+      return { ...game, history: [{ ...game.history[0]!, state: { ...state, actions } }] };
+    };
+    expect(nextAiStep(met(powerCatalog.doubleActionOnDemand(2)), 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'usePower', powerId: 'p1-0' },
+    });
+    expect(
+      nextAiStep(met(powerCatalog.extraActionsOnDemand(2, 2, 'Doppio movimento')), 'normal', seeded(1), newMemory()),
+    ).not.toMatchObject({ action: { type: 'usePower' } });
+  });
+
   it('uses «Salta turno» when the opponent is about to complete the team, not before', () => {
     const game = withPowers([powerCatalog.skipOpponentTurn(2)]);
     expect(nextAiStep(game, 'normal', seeded(1), newMemory())).not.toMatchObject({ action: { type: 'usePower' } });
@@ -305,6 +323,27 @@ describe('the AI uses its powers when they pay (spec 063, criterion 4)', () => {
     expect(nextAiStep(game, 'normal', seeded(1), newMemory())).toMatchObject({
       kind: 'act',
       action: { type: 'buyItem', itemId: 'senzu' },
+    });
+  });
+});
+
+describe('the AI fuses (spec 068, criterion 4)', () => {
+  it('fuses a pair of its team into the strongest fusion it may take', () => {
+    const pair: Character[] = [
+      { id: 'son-goku-fine-ssj', name: 'Son Goku (fine) SSJ', person: 'Son Goku (fine)', tier: 'A+' },
+      { id: 'vegeta-seconda-forma-ssj', name: 'Vegeta (seconda forma) SSJ', person: 'Vegeta (seconda forma)', tier: 'A+' },
+      { id: 'super-vegetto', name: 'Super Vegetto', person: 'Vegetto', tier: 'SS+', price: 3900 },
+      { id: 'super-gogeta', name: 'Super Gogeta', person: 'Super Gogeta', tier: 'SS+', price: 3800 },
+    ];
+    const base = aiGame();
+    const withPair = { ...base, catalog: [...base.catalog, ...pair] };
+    const game = ['son-goku-fine-ssj', 'vegeta-seconda-forma-ssj'].reduce(
+      (next, characterId) => act(next, { type: 'addCharacter', player: 'p1', characterId }),
+      withPair,
+    );
+    expect(nextAiStep(game, 'normal', seeded(1), newMemory())).toMatchObject({
+      kind: 'act',
+      action: { type: 'fuse', player: 'p1', members: ['son-goku-fine-ssj', 'vegeta-seconda-forma-ssj'], resultId: 'super-vegetto' },
     });
   });
 });

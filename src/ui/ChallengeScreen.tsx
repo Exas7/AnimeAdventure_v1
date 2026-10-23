@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { cellNumber, type CellContent, type Character, type QuizQuestion } from '../engine';
-import { CloseButton } from './CloseButton';
 import { Placeholder } from './Placeholder';
 import overlayStyles from './Overlay.module.css';
 import styles from './ChallengeScreen.module.css';
@@ -29,8 +28,6 @@ interface ChallengeScreenProps {
   hideRightAnswer?: boolean;
   /** Director buttons; absent on the stream. */
   children?: ReactNode;
-  /** «✕ Chiudi» in the corner (spec 065); absent on the stream. */
-  onClose?: () => void;
 }
 
 /**
@@ -49,7 +46,6 @@ export function ChallengeScreen(props: ChallengeScreenProps) {
 
   return (
     <div className={overlayStyles.backdrop}>
-      {props.onClose && <CloseButton className={overlayStyles.corner} onClose={props.onClose} />}
       <div className={styles.scene}>
         <div className={styles.figure}>
           <Placeholder

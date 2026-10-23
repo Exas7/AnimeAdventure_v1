@@ -24,6 +24,7 @@ import { travelRule, rechargesStarter } from './itemUse';
 import { buyCharacter, buyItem, rechargeStarter } from './shop';
 import { joinTeam, addToTeam, removeFromTeam, transformInTeam } from './team';
 import { useTraining } from './training';
+import { fuse } from './fusions';
 import {
   BASE_ACTIONS,
   BASE_INTERACTIONS,
@@ -90,6 +91,9 @@ export function applyAction(
       break;
     case 'useItem':
       useItem(draft, context, action, out);
+      break;
+    case 'fuse':
+      fuse(draft, context, action.player, action.members, action.resultId, out);
       break;
     case 'setConquest':
       setConquest(draft, action.nodeId, action.player, context, out);

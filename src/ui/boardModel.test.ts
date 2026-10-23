@@ -51,6 +51,16 @@ describe('board as seen by the current player (spec 003, criterion 1)', () => {
     expect(c1(act(game, { type: 'endTurn' }))?.conqueredBy).toBe('p1');
   });
 
+  it('a cell turned off by a fusion is grey for both players, conquered by nobody (spec 068, 2.3)', () => {
+    const game = createGame(testSetup());
+    const first = game.history[0]!;
+    const off = { ...game, history: [{ ...first, state: { ...first.state, offCells: ['c1'] } }] };
+    const c1 = (g: Game) => viewOf(g).nodes.find((node) => node.id === 'c1');
+    expect(c1(off)).toMatchObject({ off: true, conqueredBy: null });
+    expect(c1(act(off, { type: 'endTurn' }))).toMatchObject({ off: true });
+    expect(c1(game)?.off).toBeUndefined();
+  });
+
   it('labels large cells with the placeholder name', () => {
     const nodes = viewOf(createGame(testSetup())).nodes;
     expect(nodes.find((node) => node.id === 'c1')).toMatchObject({ label: 'Personaggio A' });

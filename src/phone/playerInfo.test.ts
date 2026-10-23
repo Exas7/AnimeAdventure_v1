@@ -22,6 +22,7 @@ describe('the «i» of a player on the phone (spec 064, criterion 1)', () => {
     expect(powerText(powerCatalog.coinsAtTurnEnd(100))).toBe('+100 monete a fine turno');
     expect(powerText(powerCatalog.skipOpponentTurn(2))).toBe("l'avversario salta il suo prossimo turno");
     expect(powerText(powerCatalog.retryLostChallenge(2))).toMatch(/sfidi di nuovo/);
+    expect(powerText(powerCatalog.doubleActionOnDemand(2))).toBe('+2 azioni e +1 interazione nel turno in cui lo usi');
   });
 
   it('the items, the missions in progress in full, the lost challenges and the sixth', () => {

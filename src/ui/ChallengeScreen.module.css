@@ -88,11 +88,10 @@
   font-size: 0.6em;
 }
 
-/* Top left: the top right corner is for «✕ Chiudi» (spec 065). */
 .label {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   padding: 4px 12px;
   border-radius: 6px;
   background: var(--danger);
