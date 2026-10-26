@@ -2,9 +2,9 @@
 
 Un gioco da tavolo per le dirette, da giocare insieme a **Dragon Ball Z:
 Budokai Tenkaichi 3**. Due giocatori si muovono su una mappa, incontrano
-personaggi, completano missioni (combattimenti su BT3, quiz, sfide) e
-formano la loro squadra di 5; quando le squadre sono complete, o i due si
-incontrano, c'è lo scontro finale.
+personaggi, completano missioni (combattimenti su BT3 o simulati, quiz,
+sfide) e formano la loro squadra di 5; quando le squadre sono complete, o
+i due si incontrano, c'è lo scontro finale.
 
 Il gioco ha due finestre:
 
@@ -14,8 +14,8 @@ Il gioco ha due finestre:
   OBS oppure la condividi su Discord.
 
 **Gioca online:** https://exas7.github.io/AnimeAdventure_v1/ (meglio con
-Chrome): si apre la regia; per lo stream premi «Apri stream». Le partite
-restano salvate nel tuo browser.
+Chrome), senza scaricare né installare niente: si apre la regia; per lo
+stream premi «Apri stream». Le partite restano salvate nel tuo browser.
 
 **Senza conduttore, dal PC:** in «Nuova partita» scegli in alto
 «PvP / PvIA» al posto di «Regia + Stream». Giocate 1 contro 1 sullo
@@ -48,12 +48,23 @@ separate da quelle del browser).
 
 ## Cosa serve
 
-- **Windows** con **Chrome** (il gioco salva i dati in Chrome).
-- **Node.js**, il programma che lo fa funzionare: se non ce l'hai, il
-  launcher ti offre di installarlo.
-- Per giocare davvero: Budokai Tenkaichi 3, dove si fanno i combattimenti.
+- **Per giocare online**: solo un browser, meglio Chrome, sul computer,
+  sul telefono o sul tablet. Niente da scaricare o installare.
+- **Budokai Tenkaichi 3** non è obbligatorio: i combattimenti si possono
+  giocare su BT3 oppure far simulare al gioco («Simula» in regia; nelle
+  partite PvP / PvIA e da telefono sono sempre simulati).
 
-## Come avviarlo
+Se vuoi, puoi anche scaricare il gioco e farlo girare sul tuo PC: così
+funziona anche senza internet. In questo caso servono:
+
+- **Windows** con **Chrome** (il gioco salva i dati in Chrome); per Mac e
+  Linux vedi più sotto;
+- **Node.js**, il programma che fa girare il gioco sul tuo PC: se non ce
+  l'hai, il launcher ti offre di installarlo;
+- internet solo la prima volta e dopo un aggiornamento, per scaricare i
+  pacchetti del gioco: poi si gioca anche senza rete.
+
+## Come avviarlo sul tuo PC
 
 ### Strada 1, la più semplice: chiedi a un agente AI
 
@@ -158,17 +169,21 @@ che hai.
 
 ## I tuoi dati
 
-Mappe, puntate e partite restano **nel tuo Chrome**, sull'indirizzo
-`localhost:5173`: non vanno su internet. Per non perderle:
+Mappe, puntate e partite restano **nel tuo browser**: non vanno su
+internet. Quelle del sito e quelle del gioco scaricato (che stanno in
+Chrome, sull'indirizzo `localhost:5173`) sono separate: le une non vedono
+le altre. Per non perderle:
 
-- non cancellare i dati di navigazione di Chrome per quel sito;
+- non cancellare i dati di navigazione del browser per quel sito;
 - salva le partite con «Salva su file» ed esporta mappe e puntate.
 
 ## Aggiornare a una versione nuova
 
-Scarica di nuovo il gioco (o `git pull`) nella stessa cartella e riavvia
-il launcher: ricostruisce da solo ciò che serve. I tuoi dati restano in
-Chrome.
+Il sito si aggiorna da solo: basta ricaricare la pagina.
+
+Per il gioco scaricato: scaricalo di nuovo (o `git pull`) nella stessa
+cartella e riavvia il launcher, che ricostruisce da solo ciò che serve. I
+tuoi dati restano in Chrome.
 
 ## Licenza
 

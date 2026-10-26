@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cellNumber, testItems, type Character, type GameMap } from '../engine';
 import { fullView, type ViewBox } from '../editor/viewBox';
 import type { CatalogMission, QuestionEntry } from '../missions/catalog';
@@ -272,6 +272,19 @@ export function NewEpisodeWizard(props: NewEpisodeWizardProps) {
         ))}
       </ol>
 
+      {/* At the top and always in view while the page scrolls (spec 091, 2.1). */}
+      <nav className={styles.nav}>
+        <button onClick={() => void goTo(step - 1).catch(mapNotRead)} disabled={step === 0}>
+          ← Indietro
+        </button>
+        <span className={styles.small}>
+          Passo {step + 1} di {STEPS.length}
+        </span>
+        <button className={styles.primary} onClick={() => void goTo(step + 1).catch(mapNotRead)} disabled={step === STEPS.length - 1 || (step === 1 && !mapId)}>
+          Avanti →
+        </button>
+      </nav>
+
       <section className={styles.body}>
         {step === 0 && (
           <>
@@ -447,7 +460,8 @@ export function NewEpisodeWizard(props: NewEpisodeWizardProps) {
                 vicino alle partenze, i più forti lontano e dietro i percorsi bloccati, in equilibrio tra i
                 due lati; per ognuno una missione del catalogo adatta al posto. I negozi del passo 4
                 restano; se sono ancora vuoti, li riempie anche. Si può ripetere finché il risultato non
-                piace; i ritocchi a mano si fanno poi nell'editor.
+                piace; i ritocchi a mano si fanno poi nell'editor. Sulla mappa la rotellina ingrandisce,
+                trascinare la sposta e «Adatta» la mostra intera.
               </InfoButton>
             </h2>
             <div className={styles.buttons}>
@@ -455,22 +469,11 @@ export function NewEpisodeWizard(props: NewEpisodeWizardProps) {
                 {cellSummary.length > 0 ? 'Randomizza personaggi e missioni di nuovo' : 'Randomizza personaggi e missioni'}
               </button>
             </div>
+            {map && view && (
+              <MapPreview map={map} catalog={known} content={content ?? {}} view={view} onViewChange={setView} />
+            )}
             <Report lines={cellSummary} />
             <Guides lines={guides} />
-            {map && view && (
-              <div className={styles.preview}>
-                <PrepCanvas
-                  map={map}
-                  catalog={known}
-                  content={content ?? {}}
-                  selected={[]}
-                  view={view}
-                  panning={false}
-                  onViewChange={setView}
-                  onSelect={() => undefined}
-                />
-              </div>
-            )}
             {map && content && (
               <>
                 <h3 className={styles.listTitle}>Tutte le missioni</h3>
@@ -531,18 +534,6 @@ export function NewEpisodeWizard(props: NewEpisodeWizardProps) {
         )}
       </section>
 
-      <footer className={styles.footer}>
-        <button onClick={() => void goTo(step - 1).catch(mapNotRead)} disabled={step === 0}>
-          ← Indietro
-        </button>
-        <span className={styles.small}>
-          Passo {step + 1} di {STEPS.length}
-        </span>
-        <button className={styles.primary} onClick={() => void goTo(step + 1).catch(mapNotRead)} disabled={step === STEPS.length - 1 || (step === 1 && !mapId)}>
-          Avanti →
-        </button>
-      </footer>
-
       {newPowerFor && (
         <PowerDialog
           onClose={() => setNewPowerFor(null)}
@@ -592,6 +583,46 @@ function LibraryAction({ id, ready, onImportMissions, onImportQuestions }: Libra
         }}
       />
     </span>
+  );
+}
+
+interface MapPreviewProps {
+  map: GameMap;
+  catalog: Character[];
+  content: Content;
+  view: ViewBox;
+  onViewChange(view: ViewBox): void;
+}
+
+/**
+ * The map at step 5, as large as the window allows (spec 091, 2.3): dragging
+ * moves it, the wheel zooms it. Cells are not selected here.
+ */
+function MapPreview({ map, catalog, content, view, onViewChange }: MapPreviewProps) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  // React listens to the wheel passively: only a listener of its own stops the page scrolling while zooming.
+  useEffect(() => {
+    const box = boxRef.current;
+    const keepPage = (event: WheelEvent) => event.preventDefault();
+    box?.addEventListener('wheel', keepPage, { passive: false });
+    return () => box?.removeEventListener('wheel', keepPage);
+  }, []);
+  return (
+    <div ref={boxRef} className={styles.preview}>
+      <PrepCanvas
+        map={map}
+        catalog={catalog}
+        content={content}
+        selected={[]}
+        view={view}
+        panning
+        onViewChange={onViewChange}
+        onSelect={() => undefined}
+      />
+      <button className={styles.fit} onClick={() => onViewChange(fullView(map))}>
+        Adatta
+      </button>
+    </div>
   );
 }
 

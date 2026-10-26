@@ -181,12 +181,24 @@
   margin: 0;
 }
 
-/* The map with what "Randomizza" put in it, to see the result at a glance. */
+/*
+ * The map with what "Randomizza" put in it, to see the result at a glance:
+ * as tall as the window below the header, the steps, the buttons and the
+ * step title (about 310px), never smaller than before (spec 091).
+ */
 .preview {
-  height: 460px;
+  position: relative;
+  flex: none;
+  height: max(460px, calc(100dvh - 310px));
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
+}
+
+.page .fit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .recap {
@@ -215,15 +227,20 @@
   font-weight: 600;
 }
 
-.footer {
+/* «Indietro» and «Avanti»: under the steps, stuck to the top while the page scrolls (spec 091). */
+.nav {
+  position: sticky;
+  top: -20px;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   width: min(1100px, 100%);
   margin: 0 auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .listTitle {
