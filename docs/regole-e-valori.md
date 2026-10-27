@@ -183,16 +183,18 @@ Nella partita PvP / PvIA e sul telefono l'IA è G2 e gioca con lo stesso arbitro
 | | Facile | Normale | Difficile |
 |---|---|---|---|
 | Quiz giusti | 5 su 10 | 7 su 10 | 9 su 10 |
-| Dove va | a caso 6 volte su 10, se no verso la casella utile più vicina | verso la casella più conveniente: il premio diviso per la distanza | verso la casella più conveniente: il premio diviso per la distanza |
+| Dove va | a caso 6 volte su 10, se no verso la casella utile più vicina | verso la casella più conveniente: il premio diviso per la distanza, e tiene la destinazione finché ci arriva | verso la casella più conveniente: il premio diviso per la distanza, e tiene la destinazione finché ci arriva; lascia perdere le caselle dove l'avversario arriva prima |
 | Combattimenti | li accetta tutti | solo se i suoi personaggi non sono più deboli di quelli della missione | simula 40 scontri e combatte se ne vince almeno il 45% |
-| Missioni che durano | «Vai da» | «Vai da», «Batti», «Porta» e «Accompagnami da» | «Vai da», «Batti», «Porta» e «Accompagnami da» |
-| Negozi | un personaggio a caso fra quelli che può permettersi | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene |
+| Missioni che durano | «Vai da», solo se può finirle | «Vai da», «Batti», «Porta» e «Accompagnami da», solo se può finirle | «Vai da», «Batti», «Porta» e «Accompagnami da», solo se può finirle |
+| Negozi | un personaggio a caso fra quelli che può permettersi | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene | il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene, un viaggio quando le serve |
 | Oggetti e poteri da usare a mano | no | sì | sì |
-| Showdown | non ci pensa | non ci pensa | se lo vincerebbe insegue l'avversario, con la squadra completa o 3 personaggi più di lui; se lo perderebbe gli sta lontano |
+| Nuvola Speedy e Trasmissione Istantanea | no | no | le compra per una casella utile ad almeno 5 strade e le usa per caselle ad almeno 4 strade |
+| Showdown | non ci pensa | non ci pensa | se lo vincerebbe insegue l'avversario, con la squadra completa o 3 personaggi più di lui, e quando lo raggiunge si ferma; prova a tagliargli la strada, andando dove crede che lui vada; mentre lo insegue si ferma per strada solo per un SS o per le monete per comprarne uno, e con la squadra completa mai; se lo perderebbe gli sta lontano; all'apertura si mette nell'ordine migliore secondo il simulatore |
 | Starter | a caso | il più forte | il più forte |
 
-- Non accetta mai «Attendi», «Salta turni», «Ripassa» e «Altro», e non compra né usa Nuvola Speedy e Trasmissione
-  Istantanea.
+- Sceglie dove andare chiedendo all'arbitro: non va dove non potrebbe incontrare il personaggio o accettarne
+  la missione. Se ha già usato l'interazione del turno, aspetta sulla casella che vuole.
+- Non accetta mai «Attendi», «Salta turni», «Ripassa» e «Altro».
 - Usa «Salta turno» quando l'avversario sta per completare la squadra, a livello Difficile anche quando è
   vicino e lo showdown lo perderebbe, e comunque dal turno 40 in poi.
 - Fonde sempre quando può; dopo il sesto personaggio manda via il suo più debole.

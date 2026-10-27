@@ -5,6 +5,8 @@ import {
   LEVEL_NAMES,
   LEVELS,
   SIMULATIONS,
+  TRIP_BUY_MIN,
+  TRIP_MIN,
   type LevelRules,
 } from '../ai/brain';
 import { seededRandom } from '../battle/random';
@@ -493,25 +495,38 @@ function aiSection(): string[] {
     row('Dove va', (rules) =>
       rules.wander > 0
         ? `a caso ${Math.round(rules.wander * 10)} volte su 10, se no verso la casella utile più vicina`
-        : 'verso la casella più conveniente: il premio diviso per la distanza',
+        : 'verso la casella più conveniente: il premio diviso per la distanza' +
+          (rules.keepsGoal ? ', e tiene la destinazione finché ci arriva' : '') +
+          (rules.races ? "; lascia perdere le caselle dove l'avversario arriva prima" : ''),
     ),
     row('Combattimenti', fightRule),
-    row('Missioni che durano', (rules) => quoted(rules.lasting)),
+    row('Missioni che durano', (rules) => `${quoted(rules.lasting)}, solo se può finirle`),
     row('Negozi', (rules) =>
       rules.buysBest
-        ? 'il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene'
+        ? 'il personaggio più forte che può permettersi, gli oggetti di allenamento che può usare, il Senzu quando conviene' +
+          (rules.travels ? ', un viaggio quando le serve' : '')
         : 'un personaggio a caso fra quelli che può permettersi',
     ),
     row('Oggetti e poteri da usare a mano', (rules) => (rules.usesItems ? 'sì' : 'no')),
+    row('Nuvola Speedy e Trasmissione Istantanea', (rules) =>
+      rules.travels
+        ? `le compra per una casella utile ad almeno ${TRIP_BUY_MIN} strade e le usa per caselle ad almeno ${TRIP_MIN} strade`
+        : 'no',
+    ),
     row('Showdown', (rules) =>
       rules.showdown
-        ? `se lo vincerebbe insegue l'avversario, con la squadra completa o ${CHASE_LEAD} personaggi più di lui; se lo perderebbe gli sta lontano`
+        ? `se lo vincerebbe insegue l'avversario, con la squadra completa o ${CHASE_LEAD} personaggi più di lui, e quando ` +
+          'lo raggiunge si ferma; prova a tagliargli la strada, andando dove crede che lui vada; mentre lo ' +
+          'insegue si ferma per strada solo per un SS o per le monete per comprarne uno, e con la squadra ' +
+          'completa mai; se lo perderebbe gli sta lontano' +
+          (rules.ordersTeam ? "; all'apertura si mette nell'ordine migliore secondo il simulatore" : '')
         : 'non ci pensa',
     ),
     row('Starter', (rules) => (rules.buysBest ? 'il più forte' : 'a caso')),
     '',
-    `- Non accetta mai ${quoted(['wait', 'skipTurns', 'comeBack', 'other'])}, e non compra né usa Nuvola Speedy e Trasmissione`,
-    '  Istantanea.',
+    "- Sceglie dove andare chiedendo all'arbitro: non va dove non potrebbe incontrare il personaggio o accettarne",
+    "  la missione. Se ha già usato l'interazione del turno, aspetta sulla casella che vuole.",
+    `- Non accetta mai ${quoted(['wait', 'skipTurns', 'comeBack', 'other'])}.`,
     "- Usa «Salta turno» quando l'avversario sta per completare la squadra, a livello Difficile anche quando è",
     `  vicino e lo showdown lo perderebbe, e comunque dal turno ${LATE_TURN} in poi.`,
     '- Fonde sempre quando può; dopo il sesto personaggio manda via il suo più debole.',

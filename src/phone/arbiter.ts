@@ -62,23 +62,59 @@ export function moveTargets(game: Game, state: GameState): Set<string> {
  * Ending the turn with actions left is asked, not refused (spec 052, 2.8).
  */
 export function blockReason(game: Game, action: GameAction): string | null {
+  return refusals(game, action)[0]?.message ?? null;
+}
+
+/** What the referee refuses, and why. */
+interface Refusal {
+  kind: string;
+  message: string;
+}
+
+/**
+ * Everything the referee would refuse about an action, in the order
+ * blockReason reports it. The checks stop at the first ones found, unless
+ * they are all of a kind in `ignored`: then the action is also tried, to
+ * find what it would refuse beyond those.
+ */
+function refusals(game: Game, action: GameAction, ignored: ReadonlySet<string> = new Set()): Refusal[] {
   const state = currentState(game);
   const refused = (warning: { kind: string }) => warning.kind !== 'actionsLeft';
-  const rule = turnRuleWarnings(state, action, game).find(refused);
-  if (rule) {
-    return rule.message;
+  const found: Refusal[] = turnRuleWarnings(state, action, game).filter(refused);
+  const coins = missingCoins(game, state, action);
+  if (coins) {
+    found.push({ kind: 'missingCoins', message: coins });
   }
-  const reason = missingCoins(game, state, action) ?? fullTeam(state, action);
-  if (reason) {
-    return reason;
+  const full = fullTeam(state, action);
+  if (full) {
+    found.push({ kind: 'teamFull', message: full });
+  }
+  if (found.some((refusal) => !ignored.has(refusal.kind))) {
+    return found;
   }
   let next: Game;
   try {
     next = act(game, action);
   } catch (cause) {
-    return `Non si può fare: ${describeError(cause)}`;
+    return [...found, { kind: 'notPossible', message: `Non si può fare: ${describeError(cause)}` }];
   }
-  return lastWarnings(next).find(refused)?.message ?? null;
+  const kinds = new Set(found.map((refusal) => refusal.kind));
+  return [...found, ...lastWarnings(next).filter((warning) => refused(warning) && !kinds.has(warning.kind))];
+}
+
+/** The refusals about the actions and interactions left in the turn, not about the cell. */
+const TURN_BUDGET: ReadonlySet<string> = new Set(['noActionsLeft', 'noInteractionsLeft']);
+
+/**
+ * What the referee would refuse about an action on a cell, leaving out the
+ * actions and interactions of the turn (spec 093, 2.1; D-109): the kinds,
+ * empty when allowed. The AI asks it about cells it could go to: meeting a
+ * character, accepting a mission, buying in a shop.
+ */
+export function cellRefusals(game: Game, action: GameAction): string[] {
+  return refusals(game, action, TURN_BUDGET)
+    .map((refusal) => refusal.kind)
+    .filter((kind) => !TURN_BUDGET.has(kind));
 }
 
 function missingCoins(game: Game, state: GameState, action: GameAction): string | null {

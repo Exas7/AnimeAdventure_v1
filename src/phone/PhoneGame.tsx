@@ -2,7 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { boardSize } from '../ui/boardModel';
 import { useDoubleSpace, useSpaceKey } from '../ui/useDoubleSpace';
 import { sideColumns } from './sideColumns';
-import { aiFight, LEVEL_NAMES, newMemory, nextAiStep, type AiMemory } from '../ai/brain';
+import {
+  aiFight,
+  aiShowdownOrder,
+  LEVEL_NAMES,
+  LEVELS,
+  newMemory,
+  nextAiStep,
+  nextTurnMemory,
+  swapsTo,
+  type AiMemory,
+} from '../ai/brain';
 import type { FightRecord } from '../battle/fight';
 import { proposedOutcome } from '../battle/inGame';
 import { TrainingDialog } from '../director/TrainingDialog';
@@ -258,16 +268,38 @@ export function PhoneGame({ session, game, phone, onMenu, onGameOver }: PhoneGam
     return next;
   };
 
-  // A new turn of the AI: a fresh memory, an empty summary.
+  // A new turn of the AI: what it learnt stays (spec 093, 2.4), an empty summary.
   const turn = state.turn;
   useEffect(() => {
     if (aiTurn) {
-      aiMemory.current = newMemory();
+      aiMemory.current = nextTurnMemory(aiMemory.current);
       aiLog.current = [];
       aiSteps.current = 0;
       setAiSkip(false);
     }
   }, [aiTurn, turn]);
+
+  // The AI Difficile takes its order once, when the showdown opens (spec 093, 2.7; D-110):
+  // the player may still change both teams afterwards (spec 081).
+  const orderedForShowdown = useRef(false);
+  useEffect(() => {
+    if (!showdownOpen) {
+      orderedForShowdown.current = false;
+      return undefined;
+    }
+    if (orderedForShowdown.current || !ai || !LEVELS[ai.level].ordersTeam) {
+      return undefined;
+    }
+    orderedForShowdown.current = true;
+    const latest = gameRef.current;
+    const order = aiShowdownOrder(latest, ai.player, Math.random);
+    if (order) {
+      const team = currentState(latest).players[ai.player].team;
+      apply(swapsTo(team, order).map(({ a, b }): GameAction => ({ type: 'swapTeam', player: ai.player, a, b })));
+    }
+    return undefined;
+    // Once per opening: apply reads the latest game from the session.
+  }, [showdownOpen, ai]);
 
   const finishAiFight = (view: { nodeId: string; record: FightRecord; team: string[] }) => {
     if (!ai) {
