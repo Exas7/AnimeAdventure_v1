@@ -89,7 +89,8 @@ describe('the lists that come with the app (spec 030, criterion 5)', () => {
     // Spec 071: with more chains about 75.5%, and up to 77% is fine (the conductor, same day).
     const characterCells = map.nodes.filter((node) => node.type === 'character').length;
     expect(fights / runs / characterCells).toBeLessThanOrEqual(0.77);
-  });
+    // 50 episodes take under 1 s alone, more than 5 s right after a fresh «npm ci» (spec 095): 30 s.
+  }, 30_000);
 
   it('on Pianeta Nameck: who opens a grey road fights or gives "Batti", stronger than the others; no target off the board (spec 034, criterion 3)', async () => {
     const catalog = includedCatalog();

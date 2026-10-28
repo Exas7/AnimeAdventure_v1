@@ -70,7 +70,8 @@ describe('who wins (spec 035, criteria 1-3)', () => {
       expect(share).toBeGreaterThanOrEqual(0.75);
       expect(share).toBeLessThanOrEqual(0.85);
     }
-  });
+    // 9,000 fights take under 1 s alone, more than 5 s right after a fresh «npm ci» (spec 095): 30 s.
+  }, 30_000);
 
   it('A+ beats B- more often than A and A- do (spec 035, 1)', () => {
     const shares = ['A+', 'A', 'A-'].map((tier) => winShare([normal(tier)], [normal('B-')], 4000, 7));

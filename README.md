@@ -31,20 +31,8 @@ schermata Home», e apri il gioco dall'icona (le partite salvate lì sono
 separate da quelle del browser).
 
 > Progetto di fan, non ufficiale e senza scopo di lucro. Dragon Ball e i
-> suoi personaggi appartengono ai rispettivi proprietari. Le immagini
-> degli oggetti del negozio vengono dal web o sono generate e appartengono
-> ai loro autori: Senzu, render di Forever-DB (DeviantArt); Camera
-> Gravitazionale, navicella da Comic Vine; Vestiti pesanti, generati con
-> Ideogram; Stanza dello Spirito e del Tempo, Nuvola Speedy e abitante di
-> Yardrat (Trasmissione Istantanea), immagini dal web. Gli sfondi della
-> pagina iniziale, Shenron e la Kame House, sono generati con Gemini. Le
-> immagini dei personaggi sono illustrazioni ufficiali di Dragon Ball:
-> Sparking! ZERO, Dragon Ball Legends e Budokai Tenkaichi 3 (Bandai
-> Namco) e ritagli di fan su DeviantArt di illustrazioni ufficiali
-> (Maxiuchiha22, SuperDabura, Ltxalex, PrinceofDBZGames, MonkeyOfLife,
-> Rabazza), con un contorno aggiunto; i tre ospiti (Livio, Maggi e
-> Meliador) sono ritagliati da un'illustrazione «NIGHTLIVE» pubblicata su
-> Instagram. I crediti di ognuna sono in `assets/characters/CREDITI.md`.
+> suoi personaggi appartengono ai rispettivi proprietari. Da dove vengono
+> le immagini: vedi [Crediti delle immagini](#crediti-delle-immagini).
 
 ## Cosa serve
 
@@ -113,7 +101,155 @@ npm run preview -- --port 5173 --strictPort
 
 e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
 
-## Come si gioca, in breve
+## Le regole
+
+In **regia** le regole sono una guida: chi conduce può cambiare prezzi,
+monete e missioni, e una mossa fuori regola dà un avviso, ma con un
+secondo clic si fa lo stesso. Nella partita **PvP / PvIA** e sul
+**telefono** l'app fa da arbitro: ciò che è fuori regola non si fa. I
+numeri qui sotto sono quelli che il gioco propone.
+
+### Come si vince
+
+Ognuno forma una squadra di **5 personaggi**. La partita finisce con lo
+**showdown**, lo scontro fra le due squadre: chi lo vince vince la
+partita.
+
+- Lo showdown si apre da solo a fine turno, quando le due pedine sono
+  sulla stessa casella.
+- In regia chi conduce lo può aprire anche a mano, con le squadre
+  complete. Nella partita PvP / PvIA e sul telefono si apre da solo anche
+  quando tutti e due hanno la squadra completa e hanno già preso il sesto
+  personaggio (vedi «La squadra»).
+- Nella schermata dello showdown tocca due personaggi della stessa
+  squadra per scambiarli di posto.
+
+### L'inizio
+
+- A ognuno si propongono **3 starter** e ne sceglie uno. Lo starter è il
+  primo della squadra, non se ne va mai, e ha un **potere**, uno di
+  questi:
+  - Ogni 2 turni guadagni 200$
+  - Ogni volta che interagisci con un PG prendi 250$
+  - Parti con 2.500$ invece che 1.000$
+  - Due volte per partita puoi ritentare una sfida persa
+  - Due volte per partita: doppia azione (2 azioni e 1 interazione in più)
+  - Due volte per partita fai saltare un turno all'avversario
+- Si parte con **1.000$**.
+
+### Il turno
+
+Ogni turno hai **2 azioni** e **1 interazione**.
+
+- **Muoversi** di una casella, lungo una strada aperta, costa 1 azione:
+  senza poteri ti sposti al massimo di 2 caselle a turno. Se torni sulla
+  casella da cui sei appena partito, la mossa si annulla e non spendi
+  niente.
+- **Sfidare il personaggio** della tua casella costa 1 azione e
+  l'interazione: una sfida a turno. Quindi in un turno fai 2 caselle,
+  oppure 1 casella e una sfida. Riaprire la stessa scena senza lasciare la
+  casella non costa niente.
+- Entrare in un negozio, comprare, usare il Senzu o un oggetto di
+  allenamento e fondere due personaggi non costano azioni; usare un
+  oggetto di viaggio costa 1 azione.
+- Chi deve saltare un turno lo salta, e un turno saltato non conta per i
+  poteri «ogni N turni».
+
+### La mappa
+
+- **Caselle personaggio**: ognuna ha un personaggio e la sua missione.
+- **Negozi**: personaggi in vendita e oggetti (vedi «Il negozio»).
+- **Pallini**: caselle di passaggio, senza niente.
+- **Strade grigie**: chiuse all'inizio. Si aprono completando la missione
+  della casella davanti, e solo per chi l'ha completata. Dietro di solito
+  c'è un personaggio più forte, spesso chi nella storia viene dopo.
+- Sul tabellone appare grigio ciò che il giocatore di turno non può
+  usare: strade chiuse per lui, personaggi già presi o già venduti.
+- I **personaggi della storia** (come Bulma, Chichi o Kami) non entrano in
+  squadra: danno solo una missione, con un premio in monete.
+
+### Le missioni
+
+Il premio è il personaggio della casella, delle monete, o tutti e due, e
+va a **chi completa la missione per primo**.
+
+- **Combattimento**: battere il personaggio della casella, da solo o con
+  i suoi compagni (2 contro 2, 3 contro 3), su BT3 o con lo scontro
+  simulato; in qualche missione basta costringerlo a trasformarsi.
+- **Quiz**: una domanda a scelta multipla, con una sola risposta giusta.
+- **Batti**: battere il personaggio di un'altra casella.
+- **Vai da**: portare la pedina sulla casella di un altro personaggio.
+- **Porta**: avere in squadra un certo personaggio.
+- **Accompagnami da**: il personaggio viaggia con te fino alla casella di
+  un altro; un compagno alla volta.
+- **Attendi** e **Salta turni**: stare fermi per alcuni turni, che il
+  gioco salta da solo; più turni, più monete.
+- **Ripassa**: intanto si gioca, ma passati 5 o 6 turni bisogna tornare
+  sulla casella per il premio. Il pannello del giocatore dice quanti
+  turni mancano.
+- **Altro**: una missione scritta a mano: in regia la giudica chi
+  conduce.
+
+Le missioni che durano (tutte tranne Combattimento, Quiz e Altro) si
+accettano nella scena, danno il premio da sole quando la condizione si
+avvera, e si possono abbandonare.
+
+**Chi perde una sfida** (combattimento o quiz) non può sfidare di nuovo
+quel personaggio, a meno che il suo starter abbia il potere «ritentare
+una sfida persa».
+
+### Il negozio
+
+Si compra con la pedina sulla casella del negozio: arrivarci è un
+movimento normale, entrare e comprare non costano azioni.
+
+- **Personaggi**: il prezzo dipende dal tier, da 1.000$ (tier B-) a
+  3.900$ (tier SS+). Ognuno si vende una volta sola, a chi arriva prima,
+  e non si rivende.
+- **Oggetti**:
+
+| Oggetto | Prezzo | A cosa serve |
+|---|---|---|
+| Senzu | 1.000$ | Ricarica il potere dello starter: un uso in più, o di nuovo le monete in più di «Parti con…». Si usa appena comprato. Uno per negozio. |
+| Vestiti pesanti da allenamento | 500$ | Allenamento: 1 personaggio sale di 1 forma. |
+| Camera Gravitazionale del Dr. Brief | 1.000$ | Allenamento: 1 personaggio sale di 2 forme, oppure 2 personaggi salgono di 1. |
+| Stanza dello Spirito e del Tempo | 2.000$ | Allenamento: 2 personaggi salgono di 2 forme. |
+| Nuvola Speedy | 750$ | Viaggio: la pedina va fino a 7 strade più in là, per le strade aperte. |
+| Trasmissione Istantanea | 1.500$ | Viaggio: la pedina va su qualsiasi casella raggiungibile per le strade aperte. Una per negozio. |
+
+- **Salire di una forma** vuol dire passare alla trasformazione
+  successiva, come in BT3: per esempio Vegeta → Vegeta SSJ → Super
+  Vegeta. Chi non ha forme successive non sale. Ogni oggetto di
+  allenamento si compra una volta sola per giocatore.
+- **I viaggi** costano 1 azione, non portano mai sulla casella
+  dell'avversario, e nel turno dopo un viaggio la pedina non si muove: si
+  fanno solo interazioni, anche con un potere che dà azioni in più.
+
+### La squadra
+
+- La squadra ha 5 posti. Una volta per partita, con la squadra completa,
+  si può prendere un **sesto personaggio**: poi uno della squadra se ne
+  va, mai lo starter.
+- **Fusioni**: con la coppia in squadra il gioco ti chiede se fonderli.
+  Son Goku (fine) e Vegeta (seconda forma) diventano Vegetto, o Super
+  Vegetto o Super Gogeta se tutti e due sono SSJ; Son Goku SSJ4 e Vegeta
+  SSJ4 diventano Gogeta SSJ4; Son Goten e Trunks (bambino) diventano
+  Gotenks, o Gotenks SSJ. La fusione prende il posto del primo dei due.
+
+### Tutti i numeri
+
+Due pagine, generate dal gioco stesso: i numeri sono quelli della versione
+che hai.
+
+- [Regole e valori](docs/regole-e-valori.md): le regole per intero, i
+  prezzi dei personaggi tier per tier, i premi delle missioni, come gioca
+  l'IA ai tre livelli, e quello che «Randomizza» mette davvero sulle
+  mappe base (misurato su molte puntate tirate a caso).
+- [Schede dei personaggi](docs/schede-personaggi.md): le schede di ogni
+  personaggio, come funziona lo scontro simulato e le probabilità di
+  vittoria secondo il tier.
+
+## Usare l'app
 
 - **Nuova partita**: scegli una delle tre mappe di base (Pianeta Nameck,
   Pianeta dei Kaioshin, Inferi) e premi «Randomizza tutto»: mette starter,
@@ -121,51 +257,10 @@ e apri <http://localhost:5173> in Chrome. Oppure chiedi all'agente AI.
 - **Puntate**: per preparare in anticipo una partita, con personaggi e
   missioni scelti da te.
 - **Editor delle mappe**: per disegnare mappe nuove sugli sfondi.
-- **Due regole da sapere**: chi perde una sfida (combattimento o quiz) non
-  può sfidare di nuovo quel personaggio, a meno che il suo starter abbia
-  il potere «Ritenta una sfida persa»; una volta per partita, con la
-  squadra completa, si può arruolare un sesto personaggio e poi cacciarne
-  uno (mai lo starter).
-- **Oggetti e viaggi**: Nuvola Speedy (750 monete, fino a 7 strade) e
-  Trasmissione Istantanea (1.500, una per negozio) non portano mai sulla
-  casella dell'avversario, e nel turno dopo un viaggio non ci si muove: si
-  fanno solo interazioni. I prezzi di tutti gli oggetti sono nella pagina
-  delle regole e dei valori.
-- **Missioni della storia**: i cattivi combattono con i loro compagni
-  (Freeza con Re Cold, C-17 con C-18…), dietro le strade grigie c'è chi
-  nella storia viene dopo, e i personaggi speciali (Bulma, Chichi, Kami…)
-  chiedono di accompagnarli da qualcuno, in cambio di monete.
-- **Fusioni**: Goku e Vegeta (fine di Dragon Ball) in Vegetto o Gogeta,
-  Goku e Vegeta SSJ4 in Gogeta SSJ4, Goten e Trunks bambino in Gotenks:
-  con la coppia in squadra il gioco ti chiede se fonderli.
-- **Risucchi**: nei combattimenti simulati C-19, C-20 e Cell (prima e
-  seconda forma) si riprendono energia con Drain Life e con la presa, e
-  compare «CIUCCIAAAAA»; androidi e robot non si risucchiano. Cell recupera
-  un po' di vita anche trasformandosi.
-- **Missioni «Attendi» e «Ripassa»**: con «Attendi» e «Salta turni» il gioco
-  salta da solo i turni di chi accetta (più turni, più monete); con
-  «Ripassa» si gioca nel frattempo, ma passati 5 o 6 turni bisogna tornare
-  sulla casella per il premio. Il pannello del giocatore dice quanti turni
-  mancano.
-- **Ordine nello showdown**: nella schermata dello showdown tocca due
-  personaggi della stessa squadra per scambiarli di posto.
+- **Apri stream** (in regia): apre la finestra per gli spettatori.
 - **Scorciatoie dal PC** (partita PvP / PvIA e regia): la barra
   spaziatrice due volte di seguito è «Fine turno»; nella finestra «Tocca a
   G2», una pressione preme «Inizia il turno».
-- **Apri stream** (in regia): apre la finestra per gli spettatori.
-
-## Regole, valori e statistiche
-
-Due pagine, generate dal gioco stesso: i numeri sono quelli della versione
-che hai.
-
-- [Regole e valori](docs/regole-e-valori.md): il turno, i prezzi dei
-  personaggi, i premi delle missioni, gli oggetti, i poteri degli starter,
-  l'IA, e quello che «Randomizza» mette davvero sulle mappe base
-  (misurato su molte puntate tirate a caso).
-- [Schede dei personaggi](docs/schede-personaggi.md): le schede di ogni
-  personaggio, come funziona lo scontro simulato e le probabilità di
-  vittoria secondo il tier.
 
 ## I tuoi dati
 
@@ -190,3 +285,19 @@ tuoi dati restano in Chrome.
 [PolyForm Noncommercial 1.0.0](LICENSE): puoi usare, modificare e
 condividere il gioco, ma non venderlo né usarlo per guadagnare. I font
 hanno le loro licenze libere, nella cartella `src/fonts`.
+
+## Crediti delle immagini
+
+Le immagini degli oggetti del negozio vengono dal web o sono generate e
+appartengono ai loro autori: Senzu, render di Forever-DB (DeviantArt);
+Camera Gravitazionale, navicella da Comic Vine; Vestiti pesanti, generati
+con Ideogram; Stanza dello Spirito e del Tempo, Nuvola Speedy e abitante
+di Yardrat (Trasmissione Istantanea), immagini dal web. Gli sfondi della
+pagina iniziale, Shenron e la Kame House, sono generati con Gemini. Le
+immagini dei personaggi sono illustrazioni ufficiali di Dragon Ball:
+Sparking! ZERO, Dragon Ball Legends e Budokai Tenkaichi 3 (Bandai Namco)
+e ritagli di fan su DeviantArt di illustrazioni ufficiali (Maxiuchiha22,
+SuperDabura, Ltxalex, PrinceofDBZGames, MonkeyOfLife, Rabazza), con un
+contorno aggiunto; i tre ospiti (Livio, Maggi e Meliador) sono ritagliati
+da un'illustrazione «NIGHTLIVE» pubblicata su Instagram. I crediti di
+ognuna sono in `assets/characters/CREDITI.md`.
